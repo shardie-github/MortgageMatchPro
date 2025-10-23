@@ -11,36 +11,42 @@ const openai = new OpenAI({
   apiKey: process.env.OPENAI_API_KEY,
 })
 
-// Workflow Schemas
+// Workflow automation schemas
 export const WorkflowStepSchema = z.object({
   id: z.string(),
   name: z.string(),
-  type: z.enum(['data_ingestion', 'model_training', 'prediction', 'explanation', 'compliance_check', 'notification']),
+  type: z.enum(['data_ingestion', 'model_training', 'prediction', 'validation', 'notification', 'reporting']),
   status: z.enum(['pending', 'running', 'completed', 'failed', 'skipped']),
   dependencies: z.array(z.string()),
-  inputs: z.record(z.any()),
-  outputs: z.record(z.any()),
+  parameters: z.record(z.any()),
+  output: z.record(z.any()).optional(),
   error: z.string().optional(),
   startedAt: z.string().optional(),
   completedAt: z.string().optional(),
-  retryCount: z.number().default(0),
-  maxRetries: z.number().default(3)
+  duration: z.number().optional()
 })
 
 export const WorkflowSchema = z.object({
   id: z.string(),
   name: z.string(),
   description: z.string(),
-  status: z.enum(['draft', 'active', 'paused', 'completed', 'failed']),
+  version: z.string(),
+  status: z.enum(['draft', 'active', 'paused', 'archived']),
   steps: z.array(WorkflowStepSchema),
   triggers: z.array(z.object({
-    type: z.enum(['schedule', 'event', 'manual', 'data_drift']),
+    type: z.enum(['schedule', 'event', 'manual', 'api']),
     config: z.record(z.any())
   })),
+  retryPolicy: z.object({
+    maxRetries: z.number(),
+    backoffStrategy: z.enum(['linear', 'exponential', 'fixed']),
+    retryDelay: z.number()
+  }),
+  timeout: z.number(),
   createdAt: z.string(),
   updatedAt: z.string(),
-  createdBy: z.string(),
-  version: z.string()
+  lastRun: z.string().optional(),
+  nextRun: z.string().optional()
 })
 
 export const DataDriftDetectionSchema = z.object({
@@ -49,23 +55,25 @@ export const DataDriftDetectionSchema = z.object({
   featureName: z.string(),
   driftType: z.enum(['statistical', 'concept', 'data_quality']),
   severity: z.enum(['low', 'medium', 'high', 'critical']),
-  score: z.number().min(0).max(1),
-  threshold: z.number().min(0).max(1),
+  score: z.number(),
+  threshold: z.number(),
   detectedAt: z.string(),
+  status: z.enum(['detected', 'investigating', 'resolved', 'ignored']),
   details: z.record(z.any()),
-  actionRequired: z.boolean(),
-  actionTaken: z.string().optional()
+  recommendations: z.array(z.string())
 })
 
 export const ModelRetrainingTriggerSchema = z.object({
   id: z.string(),
   modelId: z.string(),
-  triggerType: z.enum(['scheduled', 'drift_detected', 'performance_degradation', 'data_update']),
-  config: z.record(z.any()),
-  isActive: z.boolean(),
-  lastTriggered: z.string().optional(),
-  nextScheduled: z.string().optional(),
-  createdAt: z.string()
+  triggerType: z.enum(['data_drift', 'performance_degradation', 'schedule', 'manual']),
+  threshold: z.number(),
+  currentValue: z.number(),
+  triggeredAt: z.string(),
+  status: z.enum(['triggered', 'in_progress', 'completed', 'failed']),
+  retrainingJobId: z.string().optional(),
+  estimatedDuration: z.number().optional(),
+  priority: z.enum(['low', 'medium', 'high', 'critical'])
 })
 
 export type WorkflowStep = z.infer<typeof WorkflowStepSchema>
@@ -73,57 +81,61 @@ export type Workflow = z.infer<typeof WorkflowSchema>
 export type DataDriftDetection = z.infer<typeof DataDriftDetectionSchema>
 export type ModelRetrainingTrigger = z.infer<typeof ModelRetrainingTriggerSchema>
 
-export interface WorkflowExecutionRequest {
+export interface WorkflowExecution {
+  id: string
   workflowId: string
-  userId: string
-  inputs: Record<string, any>
-  priority: 'low' | 'medium' | 'high' | 'critical'
+  status: 'running' | 'completed' | 'failed' | 'cancelled'
+  startedAt: string
+  completedAt?: string
+  duration?: number
+  steps: WorkflowStep[]
+  logs: string[]
+  metrics: Record<string, any>
 }
 
 export interface HumanInLoopReview {
   id: string
-  stepId: string
-  reviewerId: string
+  type: 'model_change' | 'prompt_update' | 'workflow_modification' | 'compliance_review'
   status: 'pending' | 'approved' | 'rejected' | 'needs_changes'
-  comments: string
-  changes: Record<string, any>
-  reviewedAt: string
+  requestedBy: string
+  reviewedBy?: string
+  reviewData: Record<string, any>
+  comments: string[]
+  createdAt: string
+  updatedAt: string
   deadline: string
 }
 
 export class WorkflowAutomationAgent {
   private model = 'gpt-4o'
 
-  // Create a new workflow
+  // Create workflow for AI operations
   async createWorkflow(
     name: string,
     description: string,
-    steps: Omit<WorkflowStep, 'id' | 'status' | 'retryCount'>[],
+    steps: Omit<WorkflowStep, 'id' | 'status' | 'startedAt' | 'completedAt' | 'duration'>[],
     triggers: any[],
-    createdBy: string
+    retryPolicy: any
   ): Promise<Workflow> {
     try {
       console.log(`Creating workflow: ${name}`)
 
-      const workflowId = `workflow_${Date.now()}`
-      const workflowSteps = steps.map((step, index) => ({
-        ...step,
-        id: `step_${workflowId}_${index}`,
-        status: 'pending' as const,
-        retryCount: 0
-      }))
-
       const workflow: Workflow = {
-        id: workflowId,
+        id: this.generateId(),
         name,
         description,
+        version: '1.0.0',
         status: 'draft',
-        steps: workflowSteps,
+        steps: steps.map(step => ({
+          ...step,
+          id: this.generateId(),
+          status: 'pending'
+        })),
         triggers,
+        retryPolicy,
+        timeout: 3600, // 1 hour default
         createdAt: new Date().toISOString(),
-        updatedAt: new Date().toISOString(),
-        createdBy,
-        version: '1.0.0'
+        updatedAt: new Date().toISOString()
       }
 
       // Store workflow
@@ -136,69 +148,63 @@ export class WorkflowAutomationAgent {
     }
   }
 
-  // Execute a workflow
-  async executeWorkflow(request: WorkflowExecutionRequest): Promise<{
-    executionId: string
-    status: string
-    results: Record<string, any>
-    errors: string[]
-  }> {
+  // Execute workflow
+  async executeWorkflow(workflowId: string, parameters?: Record<string, any>): Promise<WorkflowExecution> {
     try {
-      console.log(`Executing workflow: ${request.workflowId}`)
+      console.log(`Executing workflow: ${workflowId}`)
 
-      const executionId = `exec_${Date.now()}`
-      const workflow = await this.getWorkflow(request.workflowId)
-
+      const workflow = await this.getWorkflow(workflowId)
       if (!workflow) {
         throw new Error('Workflow not found')
       }
 
-      // Update workflow status
-      await this.updateWorkflowStatus(workflow.id, 'active')
+      const execution: WorkflowExecution = {
+        id: this.generateId(),
+        workflowId,
+        status: 'running',
+        startedAt: new Date().toISOString(),
+        steps: workflow.steps.map(step => ({ ...step, status: 'pending' })),
+        logs: [],
+        metrics: {}
+      }
 
-      const results: Record<string, any> = {}
-      const errors: string[] = []
+      // Store execution
+      await this.storeWorkflowExecution(execution)
 
-      // Execute steps in dependency order
-      const executedSteps = new Set<string>()
-      const stepResults = new Map<string, any>()
-
-      while (executedSteps.size < workflow.steps.length) {
-        const readySteps = workflow.steps.filter(step => 
-          !executedSteps.has(step.id) &&
-          step.dependencies.every(dep => executedSteps.has(dep))
-        )
-
-        if (readySteps.length === 0) {
-          throw new Error('Circular dependency detected in workflow')
-        }
-
-        // Execute ready steps in parallel
-        const stepPromises = readySteps.map(async (step) => {
-          try {
-            const stepResult = await this.executeStep(step, stepResults, request.inputs)
-            stepResults.set(step.id, stepResult)
-            results[step.id] = stepResult
-            executedSteps.add(step.id)
-          } catch (error) {
-            errors.push(`Step ${step.name}: ${error}`)
-            executedSteps.add(step.id)
+      // Execute steps in order
+      for (const step of execution.steps) {
+        try {
+          await this.executeStep(step, parameters)
+        } catch (error) {
+          console.error(`Error executing step ${step.id}:`, error)
+          step.status = 'failed'
+          step.error = error.toString()
+          execution.logs.push(`Step ${step.name} failed: ${error}`)
+          
+          // Handle retry policy
+          if (workflow.retryPolicy.maxRetries > 0) {
+            await this.handleStepRetry(step, workflow.retryPolicy)
           }
-        })
-
-        await Promise.all(stepPromises)
+        }
       }
 
-      // Update workflow status
-      const finalStatus = errors.length === 0 ? 'completed' : 'failed'
-      await this.updateWorkflowStatus(workflow.id, finalStatus)
-
-      return {
-        executionId,
-        status: finalStatus,
-        results,
-        errors
+      // Update execution status
+      const allStepsCompleted = execution.steps.every(step => 
+        step.status === 'completed' || step.status === 'skipped'
+      )
+      
+      if (allStepsCompleted) {
+        execution.status = 'completed'
+        execution.completedAt = new Date().toISOString()
+        execution.duration = new Date(execution.completedAt).getTime() - new Date(execution.startedAt).getTime()
+      } else {
+        execution.status = 'failed'
       }
+
+      // Update execution
+      await this.updateWorkflowExecution(execution)
+
+      return execution
     } catch (error) {
       console.error('Error executing workflow:', error)
       throw error
@@ -216,18 +222,43 @@ export class WorkflowAutomationAgent {
         this.getRecentData(modelId)
       ])
 
-      // Perform drift detection
-      const driftDetections = await this.performDriftDetection(modelId, modelData, recentData)
+      // Calculate drift for each feature
+      const driftDetections: DataDriftDetection[] = []
+
+      for (const feature of modelData.features) {
+        const driftScore = await this.calculateDriftScore(feature, recentData)
+        
+        if (driftScore > modelData.driftThreshold) {
+          const detection: DataDriftDetection = {
+            id: this.generateId(),
+            modelId,
+            featureName: feature.name,
+            driftType: 'statistical',
+            severity: this.calculateSeverity(driftScore, modelData.driftThreshold),
+            score: driftScore,
+            threshold: modelData.driftThreshold,
+            detectedAt: new Date().toISOString(),
+            status: 'detected',
+            details: {
+              feature: feature.name,
+              driftScore,
+              threshold: modelData.driftThreshold,
+              sampleSize: recentData.length
+            },
+            recommendations: await this.generateDriftRecommendations(feature, driftScore)
+          }
+
+          driftDetections.push(detection)
+        }
+      }
 
       // Store drift detections
-      await this.storeDriftDetections(driftDetections)
+      await this.storeDataDriftDetections(driftDetections)
 
       // Trigger retraining if critical drift detected
       const criticalDrift = driftDetections.filter(d => d.severity === 'critical')
       if (criticalDrift.length > 0) {
-        await this.triggerModelRetraining(modelId, 'drift_detected', {
-          driftDetections: criticalDrift
-        })
+        await this.triggerModelRetraining(modelId, 'data_drift', criticalDrift)
       }
 
       return driftDetections
@@ -240,298 +271,285 @@ export class WorkflowAutomationAgent {
   // Trigger model retraining
   async triggerModelRetraining(
     modelId: string,
-    triggerType: 'scheduled' | 'drift_detected' | 'performance_degradation' | 'data_update',
-    config: Record<string, any>
-  ): Promise<void> {
+    triggerType: 'data_drift' | 'performance_degradation' | 'schedule' | 'manual',
+    context?: any
+  ): Promise<ModelRetrainingTrigger> {
     try {
       console.log(`Triggering model retraining for: ${modelId}`)
 
-      // Check if retraining is already in progress
-      const existingRetraining = await this.getActiveRetraining(modelId)
-      if (existingRetraining) {
-        console.log('Model retraining already in progress')
-        return
-      }
-
-      // Create retraining trigger
       const trigger: ModelRetrainingTrigger = {
-        id: `retrain_${Date.now()}`,
+        id: this.generateId(),
         modelId,
         triggerType,
-        config,
-        isActive: true,
-        lastTriggered: new Date().toISOString(),
-        createdAt: new Date().toISOString()
+        threshold: 0.8, // Default threshold
+        currentValue: context?.driftScore || 0.9,
+        triggeredAt: new Date().toISOString(),
+        status: 'triggered',
+        estimatedDuration: 3600, // 1 hour
+        priority: triggerType === 'data_drift' ? 'high' : 'medium'
       }
 
       // Store trigger
-      await this.storeRetrainingTrigger(trigger)
+      await this.storeModelRetrainingTrigger(trigger)
 
-      // Execute retraining workflow
-      const retrainingWorkflow = await this.getRetrainingWorkflow(modelId)
-      if (retrainingWorkflow) {
-        await this.executeWorkflow({
-          workflowId: retrainingWorkflow.id,
-          userId: 'system',
-          inputs: { modelId, triggerType, config },
-          priority: 'high'
-        })
-      }
+      // Start retraining job
+      const retrainingJobId = await this.startRetrainingJob(modelId, trigger)
+      trigger.retrainingJobId = retrainingJobId
+      trigger.status = 'in_progress'
+
+      // Update trigger
+      await this.updateModelRetrainingTrigger(trigger)
+
+      return trigger
     } catch (error) {
       console.error('Error triggering model retraining:', error)
       throw error
     }
   }
 
-  // Set up human-in-the-loop review
-  async setupHumanReview(
-    stepId: string,
-    reviewerId: string,
-    deadline: string,
-    context: Record<string, any>
+  // Create human-in-loop review
+  async createHumanInLoopReview(
+    type: 'model_change' | 'prompt_update' | 'workflow_modification' | 'compliance_review',
+    requestedBy: string,
+    reviewData: Record<string, any>,
+    deadline: string
   ): Promise<HumanInLoopReview> {
     try {
-      console.log(`Setting up human review for step: ${stepId}`)
+      console.log(`Creating human-in-loop review for: ${type}`)
 
       const review: HumanInLoopReview = {
-        id: `review_${Date.now()}`,
-        stepId,
-        reviewerId,
+        id: this.generateId(),
+        type,
         status: 'pending',
-        comments: '',
-        changes: {},
-        reviewedAt: '',
+        requestedBy,
+        reviewData,
+        comments: [],
+        createdAt: new Date().toISOString(),
+        updatedAt: new Date().toISOString(),
         deadline
       }
 
       // Store review
-      await this.storeHumanReview(review)
+      await this.storeHumanInLoopReview(review)
 
-      // Send notification to reviewer
-      await this.notifyReviewer(reviewerId, review, context)
+      // Notify reviewers
+      await this.notifyReviewers(review)
 
       return review
     } catch (error) {
-      console.error('Error setting up human review:', error)
+      console.error('Error creating human-in-loop review:', error)
       throw error
     }
   }
 
-  // Process human review
-  async processHumanReview(
+  // Process human-in-loop review
+  async processHumanInLoopReview(
     reviewId: string,
-    status: 'approved' | 'rejected' | 'needs_changes',
-    comments: string,
-    changes: Record<string, any>
+    reviewedBy: string,
+    decision: 'approved' | 'rejected' | 'needs_changes',
+    comments: string[]
   ): Promise<void> {
     try {
-      console.log(`Processing human review: ${reviewId}`)
+      console.log(`Processing human-in-loop review: ${reviewId}`)
+
+      const review = await this.getHumanInLoopReview(reviewId)
+      if (!review) {
+        throw new Error('Review not found')
+      }
+
+      review.status = decision
+      review.reviewedBy = reviewedBy
+      review.comments = [...review.comments, ...comments]
+      review.updatedAt = new Date().toISOString()
 
       // Update review
-      await this.updateHumanReview(reviewId, {
-        status,
-        comments,
-        changes,
-        reviewedAt: new Date().toISOString()
-      })
+      await this.updateHumanInLoopReview(review)
 
-      // If approved, continue workflow
-      if (status === 'approved') {
-        const review = await this.getHumanReview(reviewId)
-        if (review) {
-          await this.continueWorkflowAfterReview(review.stepId, changes)
-        }
+      // Execute approved changes
+      if (decision === 'approved') {
+        await this.executeApprovedChanges(review)
       }
     } catch (error) {
-      console.error('Error processing human review:', error)
+      console.error('Error processing human-in-loop review:', error)
       throw error
     }
   }
 
-  // Get workflow execution status
-  async getWorkflowStatus(workflowId: string): Promise<{
-    status: string
-    progress: number
-    currentStep: string | null
-    completedSteps: number
-    totalSteps: number
-    errors: string[]
+  // Monitor workflow health
+  async monitorWorkflowHealth(): Promise<{
+    activeWorkflows: number
+    failedExecutions: number
+    averageExecutionTime: number
+    healthScore: number
+    alerts: string[]
   }> {
     try {
-      const workflow = await this.getWorkflow(workflowId)
-      if (!workflow) {
-        throw new Error('Workflow not found')
-      }
+      console.log('Monitoring workflow health...')
 
-      const completedSteps = workflow.steps.filter(s => s.status === 'completed').length
-      const failedSteps = workflow.steps.filter(s => s.status === 'failed').length
-      const runningSteps = workflow.steps.filter(s => s.status === 'running')
-      const currentStep = runningSteps.length > 0 ? runningSteps[0].name : null
+      const [activeWorkflows, failedExecutions, averageExecutionTime] = await Promise.all([
+        this.getActiveWorkflows(),
+        this.getFailedExecutions(),
+        this.getAverageExecutionTime()
+      ])
 
-      const progress = (completedSteps / workflow.steps.length) * 100
-      const status = failedSteps > 0 ? 'failed' : 
-                   completedSteps === workflow.steps.length ? 'completed' : 'running'
+      const healthScore = this.calculateHealthScore(activeWorkflows, failedExecutions, averageExecutionTime)
+      const alerts = this.generateHealthAlerts(activeWorkflows, failedExecutions, averageExecutionTime)
 
       return {
-        status,
-        progress,
-        currentStep,
-        completedSteps,
-        totalSteps: workflow.steps.length,
-        errors: workflow.steps.filter(s => s.error).map(s => s.error!)
+        activeWorkflows,
+        failedExecutions,
+        averageExecutionTime,
+        healthScore,
+        alerts
       }
     } catch (error) {
-      console.error('Error getting workflow status:', error)
+      console.error('Error monitoring workflow health:', error)
       throw error
     }
   }
 
   // Private helper methods
-  private async executeStep(
-    step: WorkflowStep,
-    stepResults: Map<string, any>,
-    inputs: Record<string, any>
-  ): Promise<any> {
-    console.log(`Executing step: ${step.name}`)
-
-    // Update step status
-    await this.updateStepStatus(step.id, 'running', { startedAt: new Date().toISOString() })
+  private async executeStep(step: WorkflowStep, parameters?: Record<string, any>): Promise<void> {
+    step.status = 'running'
+    step.startedAt = new Date().toISOString()
 
     try {
-      let result: any
-
       switch (step.type) {
         case 'data_ingestion':
-          result = await this.executeDataIngestionStep(step, stepResults, inputs)
+          await this.executeDataIngestionStep(step, parameters)
           break
         case 'model_training':
-          result = await this.executeModelTrainingStep(step, stepResults, inputs)
+          await this.executeModelTrainingStep(step, parameters)
           break
         case 'prediction':
-          result = await this.executePredictionStep(step, stepResults, inputs)
+          await this.executePredictionStep(step, parameters)
           break
-        case 'explanation':
-          result = await this.executeExplanationStep(step, stepResults, inputs)
-          break
-        case 'compliance_check':
-          result = await this.executeComplianceCheckStep(step, stepResults, inputs)
+        case 'validation':
+          await this.executeValidationStep(step, parameters)
           break
         case 'notification':
-          result = await this.executeNotificationStep(step, stepResults, inputs)
+          await this.executeNotificationStep(step, parameters)
+          break
+        case 'reporting':
+          await this.executeReportingStep(step, parameters)
           break
         default:
           throw new Error(`Unknown step type: ${step.type}`)
       }
 
-      // Update step status
-      await this.updateStepStatus(step.id, 'completed', {
-        completedAt: new Date().toISOString(),
-        outputs: result
-      })
-
-      return result
+      step.status = 'completed'
+      step.completedAt = new Date().toISOString()
+      step.duration = new Date(step.completedAt).getTime() - new Date(step.startedAt).getTime()
     } catch (error) {
-      // Update step status
-      await this.updateStepStatus(step.id, 'failed', {
-        error: error.toString(),
-        retryCount: step.retryCount + 1
-      })
-
-      // Retry if within limits
-      if (step.retryCount < step.maxRetries) {
-        console.log(`Retrying step ${step.name} (attempt ${step.retryCount + 1})`)
-        await new Promise(resolve => setTimeout(resolve, 1000 * (step.retryCount + 1)))
-        return this.executeStep(step, stepResults, inputs)
-      }
-
+      step.status = 'failed'
+      step.error = error.toString()
       throw error
     }
   }
 
-  private async executeDataIngestionStep(
-    step: WorkflowStep,
-    stepResults: Map<string, any>,
-    inputs: Record<string, any>
-  ): Promise<any> {
+  private async executeDataIngestionStep(step: WorkflowStep, parameters?: Record<string, any>): Promise<void> {
     // Simulate data ingestion
-    console.log('Executing data ingestion step')
-    return { recordsProcessed: 1000, status: 'success' }
+    console.log(`Executing data ingestion step: ${step.name}`)
+    await new Promise(resolve => setTimeout(resolve, 1000))
+    step.output = { recordsProcessed: 1000, status: 'success' }
   }
 
-  private async executeModelTrainingStep(
-    step: WorkflowStep,
-    stepResults: Map<string, any>,
-    inputs: Record<string, any>
-  ): Promise<any> {
+  private async executeModelTrainingStep(step: WorkflowStep, parameters?: Record<string, any>): Promise<void> {
     // Simulate model training
-    console.log('Executing model training step')
-    return { modelId: `model_${Date.now()}`, accuracy: 0.95, status: 'success' }
+    console.log(`Executing model training step: ${step.name}`)
+    await new Promise(resolve => setTimeout(resolve, 5000))
+    step.output = { modelVersion: 'v1.1.0', accuracy: 0.95, status: 'success' }
   }
 
-  private async executePredictionStep(
-    step: WorkflowStep,
-    stepResults: Map<string, any>,
-    inputs: Record<string, any>
-  ): Promise<any> {
+  private async executePredictionStep(step: WorkflowStep, parameters?: Record<string, any>): Promise<void> {
     // Simulate prediction
-    console.log('Executing prediction step')
-    return { predictionId: `pred_${Date.now()}`, result: 0.85, status: 'success' }
+    console.log(`Executing prediction step: ${step.name}`)
+    await new Promise(resolve => setTimeout(resolve, 2000))
+    step.output = { predictionsGenerated: 100, status: 'success' }
   }
 
-  private async executeExplanationStep(
-    step: WorkflowStep,
-    stepResults: Map<string, any>,
-    inputs: Record<string, any>
-  ): Promise<any> {
-    // Simulate explanation generation
-    console.log('Executing explanation step')
-    return { explanationId: `exp_${Date.now()}`, status: 'success' }
+  private async executeValidationStep(step: WorkflowStep, parameters?: Record<string, any>): Promise<void> {
+    // Simulate validation
+    console.log(`Executing validation step: ${step.name}`)
+    await new Promise(resolve => setTimeout(resolve, 1500))
+    step.output = { validationPassed: true, status: 'success' }
   }
 
-  private async executeComplianceCheckStep(
-    step: WorkflowStep,
-    stepResults: Map<string, any>,
-    inputs: Record<string, any>
-  ): Promise<any> {
-    // Simulate compliance check
-    console.log('Executing compliance check step')
-    return { checkId: `check_${Date.now()}`, status: 'compliant' }
-  }
-
-  private async executeNotificationStep(
-    step: WorkflowStep,
-    stepResults: Map<string, any>,
-    inputs: Record<string, any>
-  ): Promise<any> {
+  private async executeNotificationStep(step: WorkflowStep, parameters?: Record<string, any>): Promise<void> {
     // Simulate notification
-    console.log('Executing notification step')
-    return { notificationId: `notif_${Date.now()}`, status: 'sent' }
+    console.log(`Executing notification step: ${step.name}`)
+    await new Promise(resolve => setTimeout(resolve, 500))
+    step.output = { notificationsSent: 10, status: 'success' }
   }
 
-  private async performDriftDetection(
-    modelId: string,
-    modelData: any,
-    recentData: any
-  ): Promise<DataDriftDetection[]> {
-    // Simulate drift detection
-    const detections: DataDriftDetection[] = [
-      {
-        id: `drift_${Date.now()}`,
-        modelId,
-        featureName: 'income',
-        driftType: 'statistical',
-        severity: 'medium',
-        score: 0.75,
-        threshold: 0.7,
-        detectedAt: new Date().toISOString(),
-        details: { pValue: 0.01, statistic: 2.5 },
-        actionRequired: true
-      }
+  private async executeReportingStep(step: WorkflowStep, parameters?: Record<string, any>): Promise<void> {
+    // Simulate reporting
+    console.log(`Executing reporting step: ${step.name}`)
+    await new Promise(resolve => setTimeout(resolve, 3000))
+    step.output = { reportsGenerated: 5, status: 'success' }
+  }
+
+  private async handleStepRetry(step: WorkflowStep, retryPolicy: any): Promise<void> {
+    // Implement retry logic
+    console.log(`Retrying step: ${step.name}`)
+  }
+
+  private async calculateDriftScore(feature: any, recentData: any[]): Promise<number> {
+    // Simulate drift calculation
+    return Math.random() * 1.0
+  }
+
+  private calculateSeverity(driftScore: number, threshold: number): 'low' | 'medium' | 'high' | 'critical' {
+    if (driftScore > threshold * 1.5) return 'critical'
+    if (driftScore > threshold * 1.2) return 'high'
+    if (driftScore > threshold) return 'medium'
+    return 'low'
+  }
+
+  private async generateDriftRecommendations(feature: any, driftScore: number): Promise<string[]> {
+    return [
+      'Retrain model with recent data',
+      'Investigate feature distribution changes',
+      'Consider feature engineering updates'
     ]
-
-    return detections
   }
 
+  private async startRetrainingJob(modelId: string, trigger: ModelRetrainingTrigger): Promise<string> {
+    // Simulate retraining job start
+    return `retraining_${modelId}_${Date.now()}`
+  }
+
+  private async executeApprovedChanges(review: HumanInLoopReview): Promise<void> {
+    // Execute approved changes based on review type
+    console.log(`Executing approved changes for review: ${review.id}`)
+  }
+
+  private calculateHealthScore(activeWorkflows: number, failedExecutions: number, averageExecutionTime: number): number {
+    // Calculate health score based on metrics
+    const failureRate = failedExecutions / Math.max(activeWorkflows, 1)
+    const timeScore = Math.max(0, 1 - (averageExecutionTime / 3600000)) // Normalize to hours
+    return Math.round((1 - failureRate) * timeScore * 100)
+  }
+
+  private generateHealthAlerts(activeWorkflows: number, failedExecutions: number, averageExecutionTime: number): string[] {
+    const alerts: string[] = []
+    
+    if (failedExecutions > 5) {
+      alerts.push('High number of failed executions detected')
+    }
+    
+    if (averageExecutionTime > 1800000) { // 30 minutes
+      alerts.push('Average execution time is high')
+    }
+    
+    return alerts
+  }
+
+  private generateId(): string {
+    return `wf_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`
+  }
+
+  // Database operations
   private async storeWorkflow(workflow: Workflow): Promise<void> {
     try {
       const { error } = await supabaseAdmin
@@ -540,13 +558,16 @@ export class WorkflowAutomationAgent {
           id: workflow.id,
           name: workflow.name,
           description: workflow.description,
+          version: workflow.version,
           status: workflow.status,
           steps: workflow.steps,
           triggers: workflow.triggers,
+          retry_policy: workflow.retryPolicy,
+          timeout: workflow.timeout,
           created_at: workflow.createdAt,
           updated_at: workflow.updatedAt,
-          created_by: workflow.createdBy,
-          version: workflow.version
+          last_run: workflow.lastRun,
+          next_run: workflow.nextRun
         })
 
       if (error) throw error
@@ -572,46 +593,53 @@ export class WorkflowAutomationAgent {
     }
   }
 
-  private async updateWorkflowStatus(workflowId: string, status: string): Promise<void> {
+  private async storeWorkflowExecution(execution: WorkflowExecution): Promise<void> {
     try {
       const { error } = await supabaseAdmin
-        .from('workflows')
-        .update({ 
-          status, 
-          updated_at: new Date().toISOString() 
+        .from('workflow_executions')
+        .insert({
+          id: execution.id,
+          workflow_id: execution.workflowId,
+          status: execution.status,
+          started_at: execution.startedAt,
+          completed_at: execution.completedAt,
+          duration: execution.duration,
+          steps: execution.steps,
+          logs: execution.logs,
+          metrics: execution.metrics,
+          created_at: new Date().toISOString()
         })
-        .eq('id', workflowId)
 
       if (error) throw error
     } catch (error) {
-      console.error('Error updating workflow status:', error)
+      console.error('Error storing workflow execution:', error)
       throw error
     }
   }
 
-  private async updateStepStatus(
-    stepId: string,
-    status: string,
-    updates: Record<string, any>
-  ): Promise<void> {
+  private async updateWorkflowExecution(execution: WorkflowExecution): Promise<void> {
     try {
       const { error } = await supabaseAdmin
-        .from('workflow_steps')
-        .update({ 
-          status, 
-          ...updates,
-          updated_at: new Date().toISOString() 
+        .from('workflow_executions')
+        .update({
+          status: execution.status,
+          completed_at: execution.completedAt,
+          duration: execution.duration,
+          steps: execution.steps,
+          logs: execution.logs,
+          metrics: execution.metrics,
+          updated_at: new Date().toISOString()
         })
-        .eq('id', stepId)
+        .eq('id', execution.id)
 
       if (error) throw error
     } catch (error) {
-      console.error('Error updating step status:', error)
+      console.error('Error updating workflow execution:', error)
       throw error
     }
   }
 
-  private async storeDriftDetections(detections: DataDriftDetection[]): Promise<void> {
+  private async storeDataDriftDetections(detections: DataDriftDetection[]): Promise<void> {
     try {
       const { error } = await supabaseAdmin
         .from('data_drift_detections')
@@ -624,20 +652,20 @@ export class WorkflowAutomationAgent {
           score: detection.score,
           threshold: detection.threshold,
           detected_at: detection.detectedAt,
+          status: detection.status,
           details: detection.details,
-          action_required: detection.actionRequired,
-          action_taken: detection.actionTaken,
+          recommendations: detection.recommendations,
           created_at: new Date().toISOString()
         })))
 
       if (error) throw error
     } catch (error) {
-      console.error('Error storing drift detections:', error)
+      console.error('Error storing data drift detections:', error)
       throw error
     }
   }
 
-  private async storeRetrainingTrigger(trigger: ModelRetrainingTrigger): Promise<void> {
+  private async storeModelRetrainingTrigger(trigger: ModelRetrainingTrigger): Promise<void> {
     try {
       const { error } = await supabaseAdmin
         .from('model_retraining_triggers')
@@ -645,110 +673,127 @@ export class WorkflowAutomationAgent {
           id: trigger.id,
           model_id: trigger.modelId,
           trigger_type: trigger.triggerType,
-          config: trigger.config,
-          is_active: trigger.isActive,
-          last_triggered: trigger.lastTriggered,
-          next_scheduled: trigger.nextScheduled,
-          created_at: trigger.createdAt
-        })
-
-      if (error) throw error
-    } catch (error) {
-      console.error('Error storing retraining trigger:', error)
-      throw error
-    }
-  }
-
-  private async getModelData(modelId: string): Promise<any> {
-    // Get model data from database
-    return { modelId, type: 'mortgage_prediction' }
-  }
-
-  private async getRecentData(modelId: string): Promise<any> {
-    // Get recent data from database
-    return { records: 1000, features: ['income', 'debt', 'credit_score'] }
-  }
-
-  private async getActiveRetraining(modelId: string): Promise<any> {
-    // Check for active retraining
-    return null
-  }
-
-  private async getRetrainingWorkflow(modelId: string): Promise<Workflow | null> {
-    // Get retraining workflow for model
-    return null
-  }
-
-  private async storeHumanReview(review: HumanInLoopReview): Promise<void> {
-    try {
-      const { error } = await supabaseAdmin
-        .from('human_reviews')
-        .insert({
-          id: review.id,
-          step_id: review.stepId,
-          reviewer_id: review.reviewerId,
-          status: review.status,
-          comments: review.comments,
-          changes: review.changes,
-          reviewed_at: review.reviewedAt,
-          deadline: review.deadline,
+          threshold: trigger.threshold,
+          current_value: trigger.currentValue,
+          triggered_at: trigger.triggeredAt,
+          status: trigger.status,
+          retraining_job_id: trigger.retrainingJobId,
+          estimated_duration: trigger.estimatedDuration,
+          priority: trigger.priority,
           created_at: new Date().toISOString()
         })
 
       if (error) throw error
     } catch (error) {
-      console.error('Error storing human review:', error)
+      console.error('Error storing model retraining trigger:', error)
       throw error
     }
   }
 
-  private async notifyReviewer(
-    reviewerId: string,
-    review: HumanInLoopReview,
-    context: Record<string, any>
-  ): Promise<void> {
-    // Send notification to reviewer
-    console.log(`Notifying reviewer ${reviewerId} about review ${review.id}`)
-  }
-
-  private async updateHumanReview(
-    reviewId: string,
-    updates: Partial<HumanInLoopReview>
-  ): Promise<void> {
+  private async updateModelRetrainingTrigger(trigger: ModelRetrainingTrigger): Promise<void> {
     try {
       const { error } = await supabaseAdmin
-        .from('human_reviews')
+        .from('model_retraining_triggers')
         .update({
-          ...updates,
+          status: trigger.status,
+          retraining_job_id: trigger.retrainingJobId,
           updated_at: new Date().toISOString()
         })
-        .eq('id', reviewId)
+        .eq('id', trigger.id)
 
       if (error) throw error
     } catch (error) {
-      console.error('Error updating human review:', error)
+      console.error('Error updating model retraining trigger:', error)
       throw error
     }
   }
 
-  private async getHumanReview(reviewId: string): Promise<HumanInLoopReview | null> {
+  private async storeHumanInLoopReview(review: HumanInLoopReview): Promise<void> {
+    try {
+      const { error } = await supabaseAdmin
+        .from('human_in_loop_reviews')
+        .insert({
+          id: review.id,
+          type: review.type,
+          status: review.status,
+          requested_by: review.requestedBy,
+          reviewed_by: review.reviewedBy,
+          review_data: review.reviewData,
+          comments: review.comments,
+          created_at: review.createdAt,
+          updated_at: review.updatedAt,
+          deadline: review.deadline
+        })
+
+      if (error) throw error
+    } catch (error) {
+      console.error('Error storing human-in-loop review:', error)
+      throw error
+    }
+  }
+
+  private async getHumanInLoopReview(reviewId: string): Promise<HumanInLoopReview | null> {
     try {
       const { data, error } = await supabaseAdmin
-        .from('human_reviews')
+        .from('human_in_loop_reviews')
         .select('*')
         .eq('id', reviewId)
         .single()
 
       if (error) throw error
-      return data || null
+      return data ? data as HumanInLoopReview : null
     } catch (error) {
-      console.error('Error getting human review:', error)
+      console.error('Error getting human-in-loop review:', error)
       return null
     }
   }
 
-  private async continueWorkflowAfterReview(stepId: string, changes: Record<string, any>): Promise<void> {
-    // Continue workflow execution after human review
-    console.log(`Continuing workflow after review for step: ${stepId}`)
+  private async updateHumanInLoopReview(review: HumanInLoopReview): Promise<void> {
+    try {
+      const { error } = await supabaseAdmin
+        .from('human_in_loop_reviews')
+        .update({
+          status: review.status,
+          reviewed_by: review.reviewedBy,
+          comments: review.comments,
+          updated_at: review.updatedAt
+        })
+        .eq('id', review.id)
+
+      if (error) throw error
+    } catch (error) {
+      console.error('Error updating human-in-loop review:', error)
+      throw error
+    }
+  }
+
+  private async notifyReviewers(review: HumanInLoopReview): Promise<void> {
+    // Implement notification logic
+    console.log(`Notifying reviewers for review: ${review.id}`)
+  }
+
+  private async getModelData(modelId: string): Promise<any> {
+    // Get model data
+    return { features: [], driftThreshold: 0.8 }
+  }
+
+  private async getRecentData(modelId: string): Promise<any[]> {
+    // Get recent data
+    return []
+  }
+
+  private async getActiveWorkflows(): Promise<number> {
+    // Get active workflows count
+    return 5
+  }
+
+  private async getFailedExecutions(): Promise<number> {
+    // Get failed executions count
+    return 2
+  }
+
+  private async getAverageExecutionTime(): Promise<number> {
+    // Get average execution time
+    return 1800000 // 30 minutes
   }
 }
