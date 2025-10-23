@@ -181,4 +181,224 @@ export const PRICES = {
   },
 } as const
 
+// Product IDs (these should be set in your Stripe dashboard)
+export const PRODUCT_IDS = {
+  RATE_CHECK_TOKEN: 'rate_check_token',
+  PREMIUM_SUBSCRIPTION: 'premium_subscription',
+  BROKER_LICENSE: 'broker_license',
+} as const
+
+// Price IDs (these should be set in your Stripe dashboard)
+export const PRICE_IDS = {
+  RATE_CHECK_CAD: 'price_rate_check_cad',
+  RATE_CHECK_USD: 'price_rate_check_usd',
+  PREMIUM_MONTHLY_CAD: 'price_premium_monthly_cad',
+  PREMIUM_MONTHLY_USD: 'price_premium_monthly_usd',
+  BROKER_YEARLY_CAD: 'price_broker_yearly_cad',
+  BROKER_YEARLY_USD: 'price_broker_yearly_usd',
+} as const
+
+// Create checkout session for one-time payments
+export async function createCheckoutSession({
+  customerId,
+  priceId,
+  successUrl,
+  cancelUrl,
+  metadata = {},
+}: {
+  customerId: string
+  priceId: string
+  successUrl: string
+  cancelUrl: string
+  metadata?: Record<string, string>
+}) {
+  try {
+    const session = await stripe.checkout.sessions.create({
+      customer: customerId,
+      payment_method_types: ['card'],
+      line_items: [
+        {
+          price: priceId,
+          quantity: 1,
+        },
+      ],
+      mode: 'payment',
+      success_url: successUrl,
+      cancel_url: cancelUrl,
+      metadata,
+    })
+
+    return {
+      success: true,
+      sessionId: session.id,
+      url: session.url,
+    }
+  } catch (error) {
+    console.error('Stripe checkout session error:', error)
+    return {
+      success: false,
+      error: error instanceof Error ? error.message : 'Checkout session creation failed',
+    }
+  }
+}
+
+// Create checkout session for subscriptions
+export async function createSubscriptionCheckoutSession({
+  customerId,
+  priceId,
+  successUrl,
+  cancelUrl,
+  metadata = {},
+}: {
+  customerId: string
+  priceId: string
+  successUrl: string
+  cancelUrl: string
+  metadata?: Record<string, string>
+}) {
+  try {
+    const session = await stripe.checkout.sessions.create({
+      customer: customerId,
+      payment_method_types: ['card'],
+      line_items: [
+        {
+          price: priceId,
+          quantity: 1,
+        },
+      ],
+      mode: 'subscription',
+      success_url: successUrl,
+      cancel_url: cancelUrl,
+      metadata,
+      subscription_data: {
+        metadata,
+      },
+    })
+
+    return {
+      success: true,
+      sessionId: session.id,
+      url: session.url,
+    }
+  } catch (error) {
+    console.error('Stripe subscription checkout session error:', error)
+    return {
+      success: false,
+      error: error instanceof Error ? error.message : 'Subscription checkout session creation failed',
+    }
+  }
+}
+
+// Create portal session for subscription management
+export async function createPortalSession({
+  customerId,
+  returnUrl,
+}: {
+  customerId: string
+  returnUrl: string
+}) {
+  try {
+    const session = await stripe.billingPortal.sessions.create({
+      customer: customerId,
+      return_url: returnUrl,
+    })
+
+    return {
+      success: true,
+      url: session.url,
+    }
+  } catch (error) {
+    console.error('Stripe portal session error:', error)
+    return {
+      success: false,
+      error: error instanceof Error ? error.message : 'Portal session creation failed',
+    }
+  }
+}
+
+// Get price by ID
+export async function getPrice(priceId: string) {
+  try {
+    const price = await stripe.prices.retrieve(priceId)
+    return {
+      success: true,
+      price,
+    }
+  } catch (error) {
+    console.error('Stripe price retrieval error:', error)
+    return {
+      success: false,
+      error: error instanceof Error ? error.message : 'Price retrieval failed',
+    }
+  }
+}
+
+// Create refund
+export async function createRefund({
+  paymentIntentId,
+  amount,
+  reason = 'requested_by_customer',
+}: {
+  paymentIntentId: string
+  amount?: number
+  reason?: 'duplicate' | 'fraudulent' | 'requested_by_customer'
+}) {
+  try {
+    const refund = await stripe.refunds.create({
+      payment_intent: paymentIntentId,
+      amount,
+      reason,
+    })
+
+    return {
+      success: true,
+      refund,
+    }
+  } catch (error) {
+    console.error('Stripe refund error:', error)
+    return {
+      success: false,
+      error: error instanceof Error ? error.message : 'Refund creation failed',
+    }
+  }
+}
+
+// List customer payment methods
+export async function listPaymentMethods(customerId: string) {
+  try {
+    const paymentMethods = await stripe.paymentMethods.list({
+      customer: customerId,
+      type: 'card',
+    })
+
+    return {
+      success: true,
+      paymentMethods: paymentMethods.data,
+    }
+  } catch (error) {
+    console.error('Stripe payment methods list error:', error)
+    return {
+      success: false,
+      error: error instanceof Error ? error.message : 'Payment methods retrieval failed',
+    }
+  }
+}
+
+// Detach payment method
+export async function detachPaymentMethod(paymentMethodId: string) {
+  try {
+    const paymentMethod = await stripe.paymentMethods.detach(paymentMethodId)
+    return {
+      success: true,
+      paymentMethod,
+    }
+  } catch (error) {
+    console.error('Stripe payment method detach error:', error)
+    return {
+      success: false,
+      error: error instanceof Error ? error.message : 'Payment method detach failed',
+    }
+  }
+}
+
 export { stripe }
