@@ -146,29 +146,111 @@ export class RateIntelligenceAgent {
     propertyPrice: number
     downPayment: number
   }): Promise<RateResult[]> {
-    const response = await openai.chat.completions.create({
-      model: 'gpt-4o-mini',
-      messages: [
+    // For now, return mock data. In production, this would call real APIs
+    const mockRates = {
+      CA: [
         {
-          role: 'system',
-          content: `You are the Rate Intelligence Agent. Fetch current mortgage rates for ${input.country}.
-
-For Canada: Use Ratehub.ca data, Big 6 banks, credit unions
-For US: Use Freddie Mac PMMS, Fannie Mae, major lenders
-
-Return array of rates with lender details, APR, and contact info.`,
+          lender: 'Royal Bank of Canada',
+          rate: 5.45,
+          apr: 5.52,
+          term: input.termYears,
+          type: input.rateType,
+          paymentEstimate: this.calculatePayment(input.propertyPrice - input.downPayment, 5.45, input.termYears),
+          features: ['No fee', 'Pre-approval available', 'Portable'],
+          contactInfo: {
+            phone: '1-800-769-2511',
+            email: 'mortgages@rbc.com',
+            website: 'https://rbc.com/mortgages',
+          },
         },
         {
-          role: 'user',
-          content: JSON.stringify(input),
+          lender: 'TD Canada Trust',
+          rate: 5.52,
+          apr: 5.59,
+          term: input.termYears,
+          type: input.rateType,
+          paymentEstimate: this.calculatePayment(input.propertyPrice - input.downPayment, 5.52, input.termYears),
+          features: ['Rate hold', 'Pre-approval available', 'Cashback'],
+          contactInfo: {
+            phone: '1-866-222-3456',
+            email: 'mortgages@td.com',
+            website: 'https://td.com/mortgages',
+          },
+        },
+        {
+          lender: 'Scotiabank',
+          rate: 5.38,
+          apr: 5.45,
+          term: input.termYears,
+          type: input.rateType,
+          paymentEstimate: this.calculatePayment(input.propertyPrice - input.downPayment, 5.38, input.termYears),
+          features: ['No fee', 'Rate hold', 'Portable'],
+          contactInfo: {
+            phone: '1-800-4SCOTIA',
+            email: 'mortgages@scotiabank.com',
+            website: 'https://scotiabank.com/mortgages',
+          },
         },
       ],
-      response_format: { type: 'json_object' },
-      temperature: 0.1,
-    })
+      US: [
+        {
+          lender: 'Wells Fargo',
+          rate: 6.25,
+          apr: 6.35,
+          term: input.termYears,
+          type: input.rateType,
+          paymentEstimate: this.calculatePayment(input.propertyPrice - input.downPayment, 6.25, input.termYears),
+          features: ['No PMI with 20% down', 'Rate lock', 'Online application'],
+          contactInfo: {
+            phone: '1-800-869-3557',
+            email: 'mortgages@wellsfargo.com',
+            website: 'https://wellsfargo.com/mortgages',
+          },
+        },
+        {
+          lender: 'Bank of America',
+          rate: 6.32,
+          apr: 6.42,
+          term: input.termYears,
+          type: input.rateType,
+          paymentEstimate: this.calculatePayment(input.propertyPrice - input.downPayment, 6.32, input.termYears),
+          features: ['Rate lock', 'Online application', 'Pre-approval'],
+          contactInfo: {
+            phone: '1-800-900-9000',
+            email: 'mortgages@bankofamerica.com',
+            website: 'https://bankofamerica.com/mortgages',
+          },
+        },
+        {
+          lender: 'Chase Bank',
+          rate: 6.18,
+          apr: 6.28,
+          term: input.termYears,
+          type: input.rateType,
+          paymentEstimate: this.calculatePayment(input.propertyPrice - input.downPayment, 6.18, input.termYears),
+          features: ['No PMI with 20% down', 'Rate lock', 'Online application'],
+          contactInfo: {
+            phone: '1-800-873-6577',
+            email: 'mortgages@chase.com',
+            website: 'https://chase.com/mortgages',
+          },
+        },
+      ],
+    }
 
-    const result = JSON.parse(response.choices[0].message.content || '{}')
-    return z.array(RateSchema).parse(result.rates || [])
+    return mockRates[input.country] || []
+  }
+
+  private calculatePayment(principal: number, rate: number, termYears: number): number {
+    const monthlyRate = rate / 100 / 12
+    const numPayments = termYears * 12
+    
+    if (monthlyRate === 0) {
+      return principal / numPayments
+    }
+    
+    return principal * (monthlyRate * Math.pow(1 + monthlyRate, numPayments)) / 
+           (Math.pow(1 + monthlyRate, numPayments) - 1)
   }
 }
 

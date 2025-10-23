@@ -1,36 +1,59 @@
 import { NextApiRequest, NextApiResponse } from 'next'
 import { ScenarioAnalysisAgent } from '@/lib/openai'
+import { supabaseAdmin } from '@/lib/supabase'
+import { 
+  withSecurity, 
+  withRateLimit, 
+  logAuditEvent,
+  handleError
+} from '@/lib/security'
+import { analytics, errorTracking } from '@/lib/monitoring'
+import { z } from 'zod'
 
-export default async function handler(req: NextApiRequest, res: NextApiResponse) {
-  if (req.method !== 'POST') {
-    return res.status(405).json({ error: 'Method not allowed' })
-  }
+const ScenarioInputSchema = z.object({
+  scenarios: z.array(z.object({
+    name: z.string(),
+    rate: z.number(),
+    term: z.number(),
+    type: z.enum(['fixed', 'variable']),
+    propertyPrice: z.number(),
+    downPayment: z.number(),
+  })),
+  userId: z.string().optional(),
+})
 
+async function handler(req: NextApiRequest, res: NextApiResponse) {
   try {
-    const { scenarios } = req.body
+    const { scenarios, userId } = ScenarioInputSchema.parse(req.body)
 
-    // Validate required fields
-    if (!scenarios || !Array.isArray(scenarios) || scenarios.length < 2) {
-      return res.status(400).json({ error: 'At least 2 scenarios are required' })
-    }
-
-    // Validate each scenario
-    for (const scenario of scenarios) {
-      if (!scenario.name || !scenario.rate || !scenario.term || !scenario.type || !scenario.propertyPrice || !scenario.downPayment) {
-        return res.status(400).json({ error: 'Each scenario must have name, rate, term, type, propertyPrice, and downPayment' })
-      }
+    // Log the scenario comparison request
+    if (userId) {
+      await logAuditEvent('scenario_comparison', userId, {
+        scenarioCount: scenarios.length,
+        propertyPrice: Math.floor(scenarios[0]?.propertyPrice / 50000) * 50000, // Round for privacy
+      })
     }
 
     // Compare scenarios using AI agent
     const agent = new ScenarioAnalysisAgent()
-    const comparison = await agent.compareScenarios({ scenarios })
+    const result = await agent.compareScenarios({ scenarios })
 
-    res.status(200).json(comparison)
-  } catch (error) {
-    console.error('Scenario comparison error:', error)
-    res.status(500).json({ 
-      error: 'Failed to compare scenarios',
-      details: error instanceof Error ? error.message : 'Unknown error'
+    // Track analytics
+    analytics.trackScenarioComparison({
+      scenarioCount: scenarios.length,
+      bestOption: result.recommendation.bestOption,
     })
+
+    res.status(200).json(result)
+  } catch (error) {
+    errorTracking.captureException(error as Error, {
+      context: 'scenario_comparison',
+      userId: req.body.userId,
+    })
+    handleError(res, error as Error, 'scenario_comparison')
   }
 }
+
+export default withSecurity(
+  withRateLimit('scenarios')(handler)
+)

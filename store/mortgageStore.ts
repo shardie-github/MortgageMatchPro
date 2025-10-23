@@ -3,7 +3,7 @@ import { persist } from 'zustand/middleware'
 import { AffordabilityResult, RateResult, ScenarioComparison, LeadData } from '@/lib/openai'
 
 interface MortgageState {
-  // User data
+  // User data (now managed by auth context)
   user: {
     id: string | null
     email: string | null

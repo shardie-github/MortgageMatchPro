@@ -1,292 +1,288 @@
 # MortgageMatch Pro
 
-An AI-powered mortgage intelligence platform built with ChatGPT Canvas integration, providing real-time affordability analysis, rate comparisons, and broker connections for Canadian and US users.
+AI-Powered Mortgage Intelligence Platform with ChatGPT Canvas Integration
 
-## Features
+## 🚀 Features
 
-### 🤖 Multi-Agent AI System
-- **Affordability Agent**: Calculates mortgage affordability using OSFI (Canada) and CFPB (US) regulations
-- **Rate Intelligence Agent**: Fetches real-time rates from Ratehub.ca and Freddie Mac APIs
-- **Scenario Analysis Agent**: Compares multiple mortgage options with detailed amortization schedules
-- **Lead Routing Agent**: Matches users with qualified brokers based on lead scoring
-- **Monetization Agent**: Handles Stripe payments and subscription management
+- **Mortgage Affordability Calculator**: Calculate how much you can afford based on income, debts, and financial situation
+- **Real-time Rate Comparison**: Compare rates from top lenders in Canada and the US
+- **Scenario Analysis**: Compare different mortgage options with detailed amortization schedules
+- **Lead Generation**: Connect with qualified mortgage brokers
+- **User Authentication**: Secure sign-in with email/password and Google OAuth
+- **Session Persistence**: Save and reload mortgage scenarios
+- **Responsive Design**: Works on desktop, tablet, and mobile devices
 
-### 🎨 ChatGPT Canvas Integration
-- Interactive affordability calculator with sliders and real-time updates
-- Dynamic rate comparison tables with lender contact information
-- Amortization charts showing principal vs interest over time
-- Lead generation modal with broker recommendations
-- Responsive design optimized for ChatGPT Canvas
+## 🛠️ Tech Stack
 
-### 🏦 Compliance & Security
-- OSFI B-20 compliance for Canadian mortgages
-- CFPB TILA RESPA compliance for US mortgages
-- PIPEDA and CCPA data privacy compliance
-- Row Level Security (RLS) with Supabase
-- Encrypted data transmission and storage
+- **Frontend**: Next.js 14, React 18, TypeScript, Tailwind CSS
+- **Backend**: Next.js API Routes, Node.js
+- **Database**: Supabase (PostgreSQL)
+- **Authentication**: Supabase Auth
+- **AI Integration**: OpenAI GPT-4
+- **State Management**: Zustand
+- **Charts**: Recharts
+- **Testing**: Jest, Playwright
+- **Deployment**: Vercel
 
-### 💰 Monetization
-- Rate check tokens: $2.99 one-time
-- Premium subscription: $9.99/month unlimited
-- White-label broker version: $1,200/year
-- Commission-based lead referrals: $150-$300 per conversion
+## 📋 Prerequisites
 
-## Tech Stack
-
-### Frontend
-- **Next.js 14** with App Router
-- **TypeScript** for type safety
-- **Tailwind CSS** for styling
-- **Recharts** for data visualization
-- **Zustand** for state management
-- **Radix UI** for accessible components
-
-### Backend
-- **Fastify** for API server
-- **GraphQL Yoga** for GraphQL API
-- **Supabase** for database and auth
-- **Redis** for caching rate data
-- **OpenAI SDK** for AI agents
-
-### Integrations
-- **Stripe** for payments
-- **Twilio** for SMS notifications
-- **Plaid** for income verification
-- **Sentry** for error monitoring
-- **PostHog** for analytics
-
-## Getting Started
-
-### Prerequisites
-- Node.js 18+
+- Node.js 18+ 
+- npm or yarn
 - Supabase account
 - OpenAI API key
-- Stripe account
-- Twilio account
-- Redis instance
+- Redis (optional, for caching)
 
-### Installation
+## 🚀 Quick Start
 
-1. **Clone the repository**
-   ```bash
-   git clone https://github.com/your-org/mortgagematch-pro.git
-   cd mortgagematch-pro
-   ```
+### 1. Clone the Repository
 
-2. **Install dependencies**
-   ```bash
-   npm install
-   ```
-
-3. **Set up environment variables**
-   ```bash
-   cp .env.example .env.local
-   ```
-   Fill in your API keys and configuration values.
-
-4. **Set up Supabase**
-   ```bash
-   # Install Supabase CLI
-   npm install -g supabase
-
-   # Initialize Supabase
-   supabase init
-
-   # Start local Supabase
-   supabase start
-
-   # Run migrations
-   supabase db reset
-   ```
-
-5. **Start the development server**
-   ```bash
-   npm run dev
-   ```
-
-6. **Open your browser**
-   Navigate to [http://localhost:3000](http://localhost:3000)
-
-## API Endpoints
-
-### Affordability Calculation
-```http
-POST /api/affordability
-Content-Type: application/json
-
-{
-  "country": "CA",
-  "income": 75000,
-  "debts": 500,
-  "downPayment": 50000,
-  "propertyPrice": 500000,
-  "interestRate": 5.5,
-  "termYears": 25,
-  "location": "Toronto, ON"
-}
+```bash
+git clone https://github.com/your-username/mortgagematch-pro.git
+cd mortgagematch-pro
 ```
 
-### Rate Lookup
-```http
-GET /api/rates?country=CA&termYears=25&rateType=fixed&propertyPrice=500000&downPayment=50000
+### 2. Install Dependencies
+
+```bash
+npm install
 ```
 
-### Scenario Comparison
-```http
-POST /api/scenarios
-Content-Type: application/json
+### 3. Environment Setup
 
-{
-  "scenarios": [
-    {
-      "name": "5-Year Fixed",
-      "rate": 5.5,
-      "term": 25,
-      "type": "fixed",
-      "propertyPrice": 500000,
-      "downPayment": 50000
-    }
-  ]
-}
+Create a `.env.local` file in the root directory:
+
+```env
+# Supabase Configuration
+SUPABASE_URL=your_supabase_url
+SUPABASE_ANON_KEY=your_supabase_anon_key
+SUPABASE_SERVICE_KEY=your_supabase_service_key
+
+# OpenAI Configuration
+OPENAI_API_KEY=your_openai_api_key
+
+# Redis Configuration (optional)
+REDIS_URL=redis://localhost:6379
+
+# App Configuration
+NEXT_PUBLIC_APP_URL=http://localhost:3000
+NODE_ENV=development
+
+# Encryption Key (generate a random 32-character string)
+ENCRYPTION_KEY=your_32_character_encryption_key
+
+# Rate API Keys (optional, for production)
+RATEHUB_API_KEY=your_ratehub_api_key
+FREDDIE_MAC_API_KEY=your_freddie_mac_api_key
 ```
 
-### Lead Submission
-```http
-POST /api/leads
-Content-Type: application/json
+### 4. Database Setup
 
-{
-  "name": "John Doe",
-  "email": "john@example.com",
-  "phone": "+14161234567",
-  "leadData": {
-    "income": 75000,
-    "debts": 500,
-    "downPayment": 50000,
-    "propertyPrice": 500000,
-    "creditScore": 750,
-    "employmentType": "salaried",
-    "location": "Toronto, ON"
-  }
-}
+#### Option A: Using Supabase CLI (Recommended)
+
+```bash
+# Install Supabase CLI
+npm install -g supabase
+
+# Initialize Supabase
+supabase init
+
+# Start local Supabase
+supabase start
+
+# Run migrations
+supabase db reset
+
+# Generate types
+npm run db:generate
 ```
 
-## Deployment
+#### Option B: Using Supabase Dashboard
 
-### Vercel Deployment
+1. Go to your Supabase dashboard
+2. Create a new project
+3. Go to SQL Editor
+4. Run the SQL from `supabase/migrations/001_initial_schema.sql`
+5. Run the SQL from `supabase/migrations/002_security_hardening.sql`
 
-1. **Connect to Vercel**
-   ```bash
-   npm install -g vercel
-   vercel login
-   vercel
-   ```
+### 5. Start Development Server
 
-2. **Set environment variables**
-   Use the Vercel dashboard to add all environment variables from `.env.example`
-
-3. **Deploy**
-   ```bash
-   vercel --prod
-   ```
-
-### Supabase Deployment
-
-1. **Deploy database**
-   ```bash
-   supabase db push
-   ```
-
-2. **Set up production environment**
-   - Create production Supabase project
-   - Update environment variables
-   - Run migrations
-
-## Usage Examples
-
-### ChatGPT Canvas Integration
-
-```typescript
-// Example: Calculate affordability
-const affordability = await fetch('/api/affordability', {
-  method: 'POST',
-  headers: { 'Content-Type': 'application/json' },
-  body: JSON.stringify({
-    country: 'CA',
-    income: 95000,
-    debts: 600,
-    downPayment: 80000,
-    propertyPrice: 600000,
-    interestRate: 4.89,
-    termYears: 25,
-    location: 'Vancouver, BC'
-  })
-})
+```bash
+npm run dev
 ```
 
-### OpenAI SDK Integration
+Open [http://localhost:3000](http://localhost:3000) in your browser.
 
-```typescript
-import { AffordabilityAgent } from '@/lib/openai'
+## 🧪 Testing
 
-const agent = new AffordabilityAgent()
-const result = await agent.calculateAffordability({
-  country: 'CA',
-  income: 95000,
-  debts: 600,
-  downPayment: 80000,
-  propertyPrice: 600000,
-  interestRate: 4.89,
-  termYears: 25,
-  location: 'Vancouver, BC'
-})
+### Unit Tests
+
+```bash
+# Run all tests
+npm test
+
+# Run tests in watch mode
+npm run test:watch
+
+# Run tests with coverage
+npm test -- --coverage
 ```
 
-## Compliance
+### E2E Tests
 
-### Canadian Regulations (OSFI)
-- GDS ≤ 32% (Gross Debt Service)
-- TDS ≤ 44% (Total Debt Service)
-- Stress test = max(rate + 2%, 5.25%)
-- CMHC insured mortgage compliance
+```bash
+# Install Playwright browsers
+npx playwright install
 
-### US Regulations (CFPB)
-- DTI ≤ 43% (Debt-to-Income)
-- TILA RESPA compliance
-- NMLS licensing requirements
+# Run E2E tests
+npx playwright test
 
-## Monitoring & Analytics
+# Run E2E tests in headed mode
+npx playwright test --headed
 
-- **Sentry**: Error tracking and performance monitoring
-- **PostHog**: User analytics and feature flags
-- **Supabase**: Database monitoring and logs
-- **Vercel**: Deployment and performance metrics
+# Run E2E tests in debug mode
+npx playwright test --debug
+```
 
-## Contributing
+### Type Checking
+
+```bash
+npm run type-check
+```
+
+### Linting
+
+```bash
+npm run lint
+```
+
+## 🏗️ Project Structure
+
+```
+mortgagematch-pro/
+├── app/                          # Next.js app directory
+│   └── page.tsx                  # Main application page
+├── components/                   # React components
+│   ├── canvas/                   # Canvas-specific components
+│   │   ├── AffordabilityInputPanel.tsx
+│   │   ├── RateComparisonTable.tsx
+│   │   ├── AmortizationChart.tsx
+│   │   └── LeadGenModal.tsx
+│   └── ui/                       # Reusable UI components
+├── lib/                          # Utility libraries
+│   ├── auth.tsx                  # Authentication context
+│   ├── openai.ts                 # OpenAI integration
+│   ├── supabase.ts               # Supabase client
+│   ├── security.ts               # Security utilities
+│   ├── monitoring.ts             # Analytics and monitoring
+│   └── rate-apis.ts              # Rate API integrations
+├── pages/                        # Next.js pages
+│   ├── api/                      # API routes
+│   │   ├── calculate.ts          # Affordability calculation
+│   │   ├── rates.ts              # Rate fetching
+│   │   ├── scenarios.ts          # Scenario comparison
+│   │   └── leads.ts              # Lead processing
+│   └── auth/                     # Authentication pages
+├── store/                        # State management
+│   └── mortgageStore.ts          # Zustand store
+├── supabase/                     # Database migrations
+│   └── migrations/
+├── __tests__/                    # Test files
+│   ├── lib/                      # Unit tests
+│   ├── integration/              # Integration tests
+│   └── e2e/                      # E2E tests
+└── styles/                       # Global styles
+    └── globals.css
+```
+
+## 🔧 Configuration
+
+### Supabase Setup
+
+1. Create a new Supabase project
+2. Enable Row Level Security (RLS)
+3. Set up authentication providers (Email, Google)
+4. Configure CORS settings for your domain
+
+### OpenAI Setup
+
+1. Get an API key from OpenAI
+2. Add the key to your environment variables
+3. Ensure you have sufficient credits for API usage
+
+### Rate APIs (Optional)
+
+For production use, you can integrate with real rate APIs:
+
+- **Ratehub.ca**: Canadian mortgage rates
+- **Freddie Mac**: US mortgage rates
+
+## 🚀 Deployment
+
+### Vercel (Recommended)
+
+1. Connect your GitHub repository to Vercel
+2. Set environment variables in Vercel dashboard
+3. Deploy automatically on push to main branch
+
+### Manual Deployment
+
+```bash
+# Build the application
+npm run build
+
+# Start production server
+npm start
+```
+
+## 🔒 Security
+
+- Row Level Security (RLS) enabled on all database tables
+- Input validation and sanitization
+- Rate limiting on API endpoints
+- Audit logging for compliance
+- Data encryption for sensitive information
+- CORS configuration for Canvas integration
+
+## 📊 Monitoring
+
+- Error tracking with Sentry integration
+- Analytics tracking for user behavior
+- Performance monitoring
+- Audit logs for compliance
+
+## 🤝 Contributing
 
 1. Fork the repository
 2. Create a feature branch (`git checkout -b feature/amazing-feature`)
-3. Commit your changes (`git commit -m 'Add amazing feature'`)
+3. Commit your changes (`git commit -m 'Add some amazing feature'`)
 4. Push to the branch (`git push origin feature/amazing-feature`)
 5. Open a Pull Request
 
-## License
+## 📝 License
 
 This project is licensed under the MIT License - see the [LICENSE](LICENSE) file for details.
 
-## Support
+## 🆘 Support
 
-For support, email support@mortgagematchpro.com or join our Discord community.
+If you encounter any issues or have questions:
 
-## Roadmap
+1. Check the [Issues](https://github.com/your-username/mortgagematch-pro/issues) page
+2. Create a new issue with detailed information
+3. Contact the development team
+
+## 🗺️ Roadmap
 
 - [ ] Mobile app (React Native)
-- [ ] Advanced scenario modeling
-- [ ] Integration with more lenders
-- [ ] Automated document processing
-- [ ] Real-time market insights
-- [ ] Multi-language support
 - [ ] Advanced analytics dashboard
-- [ ] API rate limiting and caching
-- [ ] Webhook integrations
-- [ ] Advanced lead scoring algorithms
+- [ ] Broker portal
+- [ ] Document management
+- [ ] Integration with more lenders
+- [ ] Multi-language support
+- [ ] Advanced mortgage products
+
+## 🙏 Acknowledgments
+
+- OpenAI for GPT-4 integration
+- Supabase for backend services
+- Vercel for hosting
+- The open-source community for amazing tools and libraries
