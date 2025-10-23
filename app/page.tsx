@@ -7,6 +7,7 @@ import { ScenarioComparisonChart } from '@/components/canvas/ScenarioComparisonC
 import { RateComparisonTable } from '@/components/canvas/RateComparisonTable'
 import { AmortizationChart } from '@/components/canvas/AmortizationChart'
 import { LeadGenModal, LeadFormData } from '@/components/canvas/LeadGenModal'
+import GlobalExpansionDashboard from '@/components/dashboard/GlobalExpansionDashboard'
 import { useMortgageStore } from '@/store/mortgageStore'
 import { useAuth } from '@/lib/auth'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
@@ -61,6 +62,7 @@ export default function MortgageMatchPro() {
   const [activeTab, setActiveTab] = useState('scenarios')
   const [showLeadModal, setShowLeadModal] = useState(false)
   const [showDashboard, setShowDashboard] = useState(false)
+  const [showGlobalDashboard, setShowGlobalDashboard] = useState(false)
   const [showPrivacySettings, setShowPrivacySettings] = useState(false)
   const [scenarioResults, setScenarioResults] = useState<ScenarioResult[]>([])
   const [scenarioComparison, setScenarioComparison] = useState<ScenarioComparison | null>(null)
