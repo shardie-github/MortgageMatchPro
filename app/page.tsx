@@ -6,7 +6,7 @@ import { RateComparisonTable } from '@/components/canvas/RateComparisonTable'
 import { AmortizationChart } from '@/components/canvas/AmortizationChart'
 import { LeadGenModal, LeadFormData } from '@/components/canvas/LeadGenModal'
 import { useMortgageStore } from '@/store/mortgageStore'
-import { AffordabilityAgent, RateIntelligenceAgent, ScenarioAnalysisAgent, LeadRoutingAgent } from '@/lib/openai'
+import { useAuth } from '@/lib/auth'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 import { Button } from '@/components/ui/button'
 import { Badge } from '@/components/ui/badge'
@@ -20,12 +20,14 @@ import {
   AlertCircle,
   Home,
   DollarSign,
-  Percent
+  Percent,
+  LogIn,
+  User
 } from 'lucide-react'
 
 export default function MortgageMatchPro() {
+  const { user, signOut } = useAuth()
   const {
-    user,
     currentAffordability,
     rateResults,
     currentComparison,
@@ -44,18 +46,28 @@ export default function MortgageMatchPro() {
   const [activeTab, setActiveTab] = useState('affordability')
   const [showLeadModal, setShowLeadModal] = useState(false)
 
-  // Initialize agents
-  const affordabilityAgent = new AffordabilityAgent()
-  const rateAgent = new RateIntelligenceAgent()
-  const scenarioAgent = new ScenarioAnalysisAgent()
-  const leadAgent = new LeadRoutingAgent()
-
   const handleAffordabilityCalculate = async (input: AffordabilityInput) => {
     setLoading('affordability', true)
     clearError('affordability')
     
     try {
-      const result = await affordabilityAgent.calculateAffordability(input)
+      const response = await fetch('/api/calculate', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          ...input,
+          userId: user?.id,
+        }),
+      })
+
+      if (!response.ok) {
+        const errorData = await response.json()
+        throw new Error(errorData.error || 'Failed to calculate affordability')
+      }
+
+      const result = await response.json()
       setAffordabilityResult(result)
       setActiveTab('results')
     } catch (error) {
@@ -72,14 +84,24 @@ export default function MortgageMatchPro() {
     clearError('rates')
     
     try {
-      const results = await rateAgent.fetchRates({
+      const params = new URLSearchParams({
         country: 'CA',
-        termYears: 25,
+        termYears: '25',
         rateType: 'fixed',
-        propertyPrice: currentAffordability.maxAffordable,
-        downPayment: 50000, // This should come from user input
+        propertyPrice: currentAffordability.maxAffordable.toString(),
+        downPayment: '50000', // This should come from user input
+        ...(user?.id && { userId: user.id }),
       })
-      setRateResults(results)
+
+      const response = await fetch(`/api/rates?${params}`)
+      
+      if (!response.ok) {
+        const errorData = await response.json()
+        throw new Error(errorData.error || 'Failed to fetch rates')
+      }
+
+      const data = await response.json()
+      setRateResults(data.rates)
       setActiveTab('rates')
     } catch (error) {
       setError('rates', error instanceof Error ? error.message : 'Failed to fetch rates')
@@ -104,7 +126,23 @@ export default function MortgageMatchPro() {
         downPayment: 50000,
       }))
 
-      const comparison = await scenarioAgent.compareScenarios({ scenarios })
+      const response = await fetch('/api/scenarios', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          scenarios,
+          userId: user?.id,
+        }),
+      })
+
+      if (!response.ok) {
+        const errorData = await response.json()
+        throw new Error(errorData.error || 'Failed to compare scenarios')
+      }
+
+      const comparison = await response.json()
       setScenarioComparison(comparison)
       setActiveTab('scenarios')
     } catch (error) {
@@ -121,20 +159,32 @@ export default function MortgageMatchPro() {
     clearError('leads')
     
     try {
-      const leadData = await leadAgent.processLead({
-        name: data.name,
-        email: data.email,
-        phone: data.phone,
-        leadData: {
-          income: currentAffordability.maxAffordable * 0.3, // Estimate from affordability
-          debts: 500, // This should come from user input
-          downPayment: 50000,
-          propertyPrice: currentAffordability.maxAffordable,
-          creditScore: 750, // This should come from user input
-          employmentType: 'salaried',
-          location: 'Toronto, ON',
+      const response = await fetch('/api/leads', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
         },
+        body: JSON.stringify({
+          ...data,
+          leadData: {
+            income: currentAffordability.maxAffordable * 0.3, // Estimate from affordability
+            debts: 500, // This should come from user input
+            downPayment: 50000,
+            propertyPrice: currentAffordability.maxAffordable,
+            creditScore: 750, // This should come from user input
+            employmentType: 'salaried',
+            location: 'Toronto, ON',
+          },
+          userId: user?.id,
+        }),
       })
+
+      if (!response.ok) {
+        const errorData = await response.json()
+        throw new Error(errorData.error || 'Failed to process lead')
+      }
+
+      const leadData = await response.json()
       setLeadData(leadData)
       setShowLeadModal(false)
     } catch (error) {
@@ -156,6 +206,32 @@ export default function MortgageMatchPro() {
       <div className="container mx-auto px-4 py-8">
         {/* Header */}
         <div className="text-center mb-8">
+          <div className="flex justify-between items-center mb-4">
+            <div></div>
+            <div className="flex items-center gap-4">
+              {user ? (
+                <div className="flex items-center gap-2">
+                  <User className="h-5 w-5" />
+                  <span className="text-sm text-gray-600">{user.email}</span>
+                  <Button
+                    variant="outline"
+                    size="sm"
+                    onClick={() => signOut()}
+                  >
+                    Sign Out
+                  </Button>
+                </div>
+              ) : (
+                <Button
+                  variant="outline"
+                  onClick={() => window.location.href = '/auth/login'}
+                >
+                  <LogIn className="h-4 w-4 mr-2" />
+                  Sign In
+                </Button>
+              )}
+            </div>
+          </div>
           <h1 className="text-4xl font-bold text-gray-900 mb-2">
             MortgageMatch Pro
           </h1>
@@ -209,7 +285,7 @@ export default function MortgageMatchPro() {
 
           <TabsContent value="results" className="mt-6">
             {currentAffordability ? (
-              <div className="space-y-6">
+              <div className="space-y-6" data-testid="affordability-results">
                 {/* Summary Cards */}
                 <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
                   <Card>
@@ -355,7 +431,7 @@ export default function MortgageMatchPro() {
 
           <TabsContent value="scenarios" className="mt-6">
             {currentComparison ? (
-              <div className="space-y-6">
+              <div className="space-y-6" data-testid="scenario-comparison">
                 <Card>
                   <CardHeader>
                     <CardTitle>Scenario Comparison</CardTitle>

@@ -91,7 +91,7 @@ export function RateComparisonTable({ rates, loading = false, onContactLender }:
   }
 
   return (
-    <Card className="w-full">
+    <Card className="w-full" data-testid="rate-comparison-table">
       <CardHeader>
         <CardTitle className="flex items-center gap-2">
           <TrendingUp className="h-6 w-6 text-primary" />

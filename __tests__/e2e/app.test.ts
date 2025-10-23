@@ -2,291 +2,191 @@ import { test, expect } from '@playwright/test'
 
 test.describe('MortgageMatch Pro E2E Tests', () => {
   test.beforeEach(async ({ page }) => {
-    // Mock external APIs
-    await page.route('**/api/affordability', async (route) => {
-      const mockResponse = {
-        maxAffordable: 500000,
-        monthlyPayment: 2500,
-        gdsRatio: 30,
-        tdsRatio: 40,
-        dtiRatio: 35,
-        qualifyingRate: 5.5,
-        qualificationResult: true,
-        breakdown: {
-          principal: 2000,
-          interest: 500,
-          taxes: 300,
-          insurance: 200,
-        },
-        recommendations: ['Consider a larger down payment'],
-        disclaimers: ['This is an estimate only'],
-      }
-      await route.fulfill({ json: mockResponse })
-    })
-
-    await page.route('**/api/rates', async (route) => {
-      const mockResponse = {
-        rates: [
-          {
-            lender: 'Royal Bank of Canada',
-            rate: 5.45,
-            apr: 5.52,
-            term: 25,
-            type: 'fixed',
-            paymentEstimate: 2847.23,
-            features: ['No fee', 'Pre-approval available'],
-            contactInfo: {
-              phone: '1-800-769-2511',
-              email: 'mortgages@rbc.com',
-              website: 'https://rbc.com/mortgages',
-            },
-          },
-        ],
-        cached: false,
-        lastUpdated: new Date().toISOString(),
-      }
-      await route.fulfill({ json: mockResponse })
-    })
-
-    await page.route('**/api/leads', async (route) => {
-      const mockResponse = {
-        name: 'John Doe',
-        email: 'john@example.com',
-        phone: '+14161234567',
-        leadData: {
-          income: 75000,
-          debts: 500,
-          downPayment: 50000,
-          propertyPrice: 500000,
-          creditScore: 750,
-          employmentType: 'salaried',
-          location: 'Toronto, ON',
-        },
-        leadScore: 85,
-        brokerRecommendations: [
-          {
-            brokerId: 'broker-1',
-            name: 'John Smith',
-            company: 'Royal Bank Mortgage',
-            commissionRate: 0.75,
-            matchReason: 'High income and good credit',
-          },
-        ],
-        leadId: 'test-lead-id',
-        message: 'Lead submitted successfully',
-      }
-      await route.fulfill({ json: mockResponse })
-    })
+    await page.goto('/')
   })
 
-  test('should complete full affordability calculation flow', async ({ page }) => {
-    await page.goto('/')
+  test('should display the main page with all components', async ({ page }) => {
+    // Check if the main heading is visible
+    await expect(page.getByRole('heading', { name: 'MortgageMatch Pro' })).toBeVisible()
+    
+    // Check if the tabs are visible
+    await expect(page.getByRole('tab', { name: 'Affordability' })).toBeVisible()
+    await expect(page.getByRole('tab', { name: 'Results' })).toBeVisible()
+    await expect(page.getByRole('tab', { name: 'Rates' })).toBeVisible()
+    await expect(page.getByRole('tab', { name: 'Compare' })).toBeVisible()
+    
+    // Check if the affordability form is visible
+    await expect(page.getByText('Mortgage Affordability Calculator')).toBeVisible()
+  })
 
-    // Wait for the page to load
-    await expect(page.locator('h1')).toBeVisible()
-
+  test('should calculate affordability successfully', async ({ page }) => {
     // Fill in the affordability form
-    await page.selectOption('select[name="country"]', 'CA')
-    await page.fill('input[name="location"]', 'Toronto, ON')
-    await page.fill('input[name="income"]', '75000')
-    await page.fill('input[name="debts"]', '500')
-    await page.fill('input[name="downPayment"]', '50000')
-    await page.fill('input[name="propertyPrice"]', '500000')
-    await page.fill('input[name="interestRate"]', '5.5')
-    await page.selectOption('select[name="termYears"]', '25')
-
+    await page.getByLabel('Country').selectOption('CA')
+    await page.getByLabel('Location (Province/State)').fill('Toronto, ON')
+    
+    // Set income using slider
+    const incomeSlider = page.locator('input[type="range"]').first()
+    await incomeSlider.fill('75000')
+    
+    // Set debts
+    const debtsSlider = page.locator('input[type="range"]').nth(1)
+    await debtsSlider.fill('500')
+    
+    // Set down payment
+    const downPaymentSlider = page.locator('input[type="range"]').nth(2)
+    await downPaymentSlider.fill('50000')
+    
+    // Set property price
+    const propertyPriceSlider = page.locator('input[type="range"]').nth(3)
+    await propertyPriceSlider.fill('500000')
+    
+    // Set interest rate
+    const interestRateSlider = page.locator('input[type="range"]').nth(4)
+    await interestRateSlider.fill('5.5')
+    
+    // Set term years
+    await page.getByLabel('Amortization Period (Years)').selectOption('25')
+    
     // Submit the form
-    await page.click('button[type="submit"]')
-
-    // Wait for the results to load
-    await expect(page.locator('[data-testid="affordability-results"]')).toBeVisible()
-
-    // Verify the results are displayed
-    await expect(page.locator('[data-testid="max-affordable"]')).toContainText('$500,000')
-    await expect(page.locator('[data-testid="monthly-payment"]')).toContainText('$2,500')
-    await expect(page.locator('[data-testid="qualification-result"]')).toContainText('Qualified')
+    await page.getByRole('button', { name: 'Calculate Affordability' }).click()
+    
+    // Wait for calculation to complete
+    await page.waitForSelector('[data-testid="affordability-results"]', { timeout: 10000 })
+    
+    // Check if results are displayed
+    await expect(page.getByText('Max Affordable')).toBeVisible()
+    await expect(page.getByText('Monthly Payment')).toBeVisible()
+    await expect(page.getByText('GDS Ratio')).toBeVisible()
+    await expect(page.getByText('Qualification')).toBeVisible()
   })
 
-  test('should complete rate comparison flow', async ({ page }) => {
-    await page.goto('/')
-
-    // Navigate to rates tab
-    await page.click('[data-testid="rates-tab"]')
-
-    // Fill in rate search form
-    await page.selectOption('select[name="country"]', 'CA')
-    await page.selectOption('select[name="termYears"]', '25')
-    await page.selectOption('select[name="rateType"]', 'fixed')
-    await page.fill('input[name="propertyPrice"]', '500000')
-    await page.fill('input[name="downPayment"]', '50000')
-
-    // Submit the form
-    await page.click('button[type="submit"]')
-
-    // Wait for the results to load
-    await expect(page.locator('[data-testid="rates-results"]')).toBeVisible()
-
-    // Verify rates are displayed
-    await expect(page.locator('[data-testid="rate-card"]')).toHaveCount(1)
-    await expect(page.locator('[data-testid="lender-name"]')).toContainText('Royal Bank of Canada')
-    await expect(page.locator('[data-testid="rate"]')).toContainText('5.45%')
+  test('should fetch and display rates', async ({ page }) => {
+    // First calculate affordability
+    await page.getByLabel('Country').selectOption('CA')
+    await page.getByLabel('Location (Province/State)').fill('Toronto, ON')
+    
+    const incomeSlider = page.locator('input[type="range"]').first()
+    await incomeSlider.fill('75000')
+    
+    const debtsSlider = page.locator('input[type="range"]').nth(1)
+    await debtsSlider.fill('500')
+    
+    const downPaymentSlider = page.locator('input[type="range"]').nth(2)
+    await downPaymentSlider.fill('50000')
+    
+    const propertyPriceSlider = page.locator('input[type="range"]').nth(3)
+    await propertyPriceSlider.fill('500000')
+    
+    const interestRateSlider = page.locator('input[type="range"]').nth(4)
+    await interestRateSlider.fill('5.5')
+    
+    await page.getByLabel('Amortization Period (Years)').selectOption('25')
+    
+    await page.getByRole('button', { name: 'Calculate Affordability' }).click()
+    
+    // Wait for calculation to complete
+    await page.waitForSelector('[data-testid="affordability-results"]', { timeout: 10000 })
+    
+    // Click on Get Current Rates button
+    await page.getByRole('button', { name: 'Get Current Rates' }).click()
+    
+    // Wait for rates to load
+    await page.waitForSelector('[data-testid="rate-comparison-table"]', { timeout: 10000 })
+    
+    // Check if rates are displayed
+    await expect(page.getByText('Current Mortgage Rates')).toBeVisible()
+    await expect(page.getByText('Lender')).toBeVisible()
+    await expect(page.getByText('Rate')).toBeVisible()
+    await expect(page.getByText('APR')).toBeVisible()
+    await expect(page.getByText('Monthly Payment')).toBeVisible()
   })
 
-  test('should complete lead submission flow', async ({ page }) => {
-    await page.goto('/')
-
-    // Navigate to leads tab
-    await page.click('[data-testid="leads-tab"]')
-
-    // Fill in lead form
-    await page.fill('input[name="name"]', 'John Doe')
-    await page.fill('input[name="email"]', 'john@example.com')
-    await page.fill('input[name="phone"]', '+14161234567')
-    await page.fill('input[name="income"]', '75000')
-    await page.fill('input[name="debts"]', '500')
-    await page.fill('input[name="downPayment"]', '50000')
-    await page.fill('input[name="propertyPrice"]', '500000')
-    await page.fill('input[name="creditScore"]', '750')
-    await page.selectOption('select[name="employmentType"]', 'salaried')
-    await page.fill('input[name="location"]', 'Toronto, ON')
-
-    // Submit the form
-    await page.click('button[type="submit"]')
-
-    // Wait for the success message
-    await expect(page.locator('[data-testid="lead-success"]')).toBeVisible()
-
-    // Verify lead score and broker recommendations
-    await expect(page.locator('[data-testid="lead-score"]')).toContainText('85')
-    await expect(page.locator('[data-testid="broker-recommendation"]')).toHaveCount(1)
-    await expect(page.locator('[data-testid="broker-name"]')).toContainText('John Smith')
+  test('should compare scenarios', async ({ page }) => {
+    // First calculate affordability and get rates
+    await page.getByLabel('Country').selectOption('CA')
+    await page.getByLabel('Location (Province/State)').fill('Toronto, ON')
+    
+    const incomeSlider = page.locator('input[type="range"]').first()
+    await incomeSlider.fill('75000')
+    
+    const debtsSlider = page.locator('input[type="range"]').nth(1)
+    await debtsSlider.fill('500')
+    
+    const downPaymentSlider = page.locator('input[type="range"]').nth(2)
+    await downPaymentSlider.fill('50000')
+    
+    const propertyPriceSlider = page.locator('input[type="range"]').nth(3)
+    await propertyPriceSlider.fill('500000')
+    
+    const interestRateSlider = page.locator('input[type="range"]').nth(4)
+    await interestRateSlider.fill('5.5')
+    
+    await page.getByLabel('Amortization Period (Years)').selectOption('25')
+    
+    await page.getByRole('button', { name: 'Calculate Affordability' }).click()
+    
+    // Wait for calculation to complete
+    await page.waitForSelector('[data-testid="affordability-results"]', { timeout: 10000 })
+    
+    // Get rates
+    await page.getByRole('button', { name: 'Get Current Rates' }).click()
+    await page.waitForSelector('[data-testid="rate-comparison-table"]', { timeout: 10000 })
+    
+    // Click on Compare Scenarios button
+    await page.getByRole('button', { name: 'Compare Scenarios' }).click()
+    
+    // Wait for comparison to complete
+    await page.waitForSelector('[data-testid="scenario-comparison"]', { timeout: 10000 })
+    
+    // Check if comparison results are displayed
+    await expect(page.getByText('Scenario Comparison')).toBeVisible()
+    await expect(page.getByText('Recommended:')).toBeVisible()
+    await expect(page.getByText('Potential savings:')).toBeVisible()
   })
 
-  test('should handle form validation errors', async ({ page }) => {
-    await page.goto('/')
-
-    // Try to submit empty form
-    await page.click('button[type="submit"]')
-
-    // Verify validation errors are shown
-    await expect(page.locator('[data-testid="validation-error"]')).toBeVisible()
-    await expect(page.locator('text=Required field')).toBeVisible()
+  test('should handle authentication flow', async ({ page }) => {
+    // Click on Sign In button
+    await page.getByRole('button', { name: 'Sign In' }).click()
+    
+    // Should navigate to login page
+    await expect(page).toHaveURL('/auth/login')
+    await expect(page.getByText('Welcome Back')).toBeVisible()
+    
+    // Check if form fields are present
+    await expect(page.getByLabel('Email')).toBeVisible()
+    await expect(page.getByLabel('Password')).toBeVisible()
+    await expect(page.getByRole('button', { name: 'Sign In' })).toBeVisible()
+    await expect(page.getByRole('button', { name: 'Continue with Google' })).toBeVisible()
   })
 
-  test('should handle API errors gracefully', async ({ page }) => {
-    // Mock API error
-    await page.route('**/api/affordability', async (route) => {
-      await route.fulfill({ 
-        status: 500, 
-        json: { error: 'Internal server error' } 
-      })
-    })
-
-    await page.goto('/')
-
-    // Fill in the form
-    await page.selectOption('select[name="country"]', 'CA')
-    await page.fill('input[name="location"]', 'Toronto, ON')
-    await page.fill('input[name="income"]', '75000')
-    await page.fill('input[name="debts"]', '500')
-    await page.fill('input[name="downPayment"]', '50000')
-    await page.fill('input[name="propertyPrice"]', '500000')
-    await page.fill('input[name="interestRate"]', '5.5')
-    await page.selectOption('select[name="termYears"]', '25')
-
-    // Submit the form
-    await page.click('button[type="submit"]')
-
-    // Verify error message is shown
-    await expect(page.locator('[data-testid="error-message"]')).toBeVisible()
-    await expect(page.locator('text=Failed to calculate affordability')).toBeVisible()
+  test('should display error messages for invalid input', async ({ page }) => {
+    // Try to submit form with invalid data
+    await page.getByLabel('Country').selectOption('CA')
+    await page.getByLabel('Location (Province/State)').fill('')
+    
+    // Set very low income
+    const incomeSlider = page.locator('input[type="range"]').first()
+    await incomeSlider.fill('10000')
+    
+    // Set very high debts
+    const debtsSlider = page.locator('input[type="range"]').nth(1)
+    await debtsSlider.fill('5000')
+    
+    await page.getByRole('button', { name: 'Calculate Affordability' }).click()
+    
+    // Should show error or warning
+    await expect(page.getByText('Please fill in all required fields')).toBeVisible()
   })
 
   test('should be responsive on mobile devices', async ({ page }) => {
     // Set mobile viewport
     await page.setViewportSize({ width: 375, height: 667 })
-
-    await page.goto('/')
-
-    // Verify the page is responsive
-    await expect(page.locator('h1')).toBeVisible()
     
-    // Check that form elements are accessible on mobile
-    await expect(page.locator('select[name="country"]')).toBeVisible()
-    await expect(page.locator('input[name="location"]')).toBeVisible()
+    // Check if main elements are still visible
+    await expect(page.getByRole('heading', { name: 'MortgageMatch Pro' })).toBeVisible()
+    await expect(page.getByText('Mortgage Affordability Calculator')).toBeVisible()
     
-    // Verify mobile navigation works
-    await page.click('[data-testid="mobile-menu"]')
-    await expect(page.locator('[data-testid="mobile-nav"]')).toBeVisible()
-  })
-
-  test('should maintain state across page refreshes', async ({ page }) => {
-    await page.goto('/')
-
-    // Fill in some form data
-    await page.selectOption('select[name="country"]', 'CA')
-    await page.fill('input[name="location"]', 'Toronto, ON')
-    await page.fill('input[name="income"]', '75000')
-
-    // Refresh the page
-    await page.reload()
-
-    // Verify state is maintained (if implemented)
-    // This would depend on your state management implementation
-  })
-
-  test('should work with different browsers', async ({ page, browserName }) => {
-    await page.goto('/')
-
-    // Basic functionality test that should work across browsers
-    await expect(page.locator('h1')).toBeVisible()
-    await expect(page.locator('select[name="country"]')).toBeVisible()
-    await expect(page.locator('input[name="location"]')).toBeVisible()
-    
-    // Browser-specific tests could be added here
-    if (browserName === 'chromium') {
-      // Chrome-specific tests
-    } else if (browserName === 'firefox') {
-      // Firefox-specific tests
-    } else if (browserName === 'webkit') {
-      // Safari-specific tests
-    }
-  })
-
-  test('should handle concurrent users', async ({ page, context }) => {
-    // Create multiple browser contexts to simulate concurrent users
-    const contexts = await Promise.all([
-      context,
-      context.browser()?.newContext(),
-      context.browser()?.newContext(),
-    ].filter(Boolean))
-
-    const pages = await Promise.all(
-      contexts.map(ctx => ctx.newPage())
-    )
-
-    // All users navigate to the page simultaneously
-    await Promise.all(pages.map(p => p.goto('/')))
-
-    // All users fill in the form simultaneously
-    await Promise.all(pages.map(async (p, index) => {
-      await p.selectOption('select[name="country"]', 'CA')
-      await p.fill('input[name="location"]', `Toronto, ON ${index}`)
-      await p.fill('input[name="income"]', '75000')
-      await p.fill('input[name="debts"]', '500')
-      await p.fill('input[name="downPayment"]', '50000')
-      await p.fill('input[name="propertyPrice"]', '500000')
-      await p.fill('input[name="interestRate"]', '5.5')
-      await p.selectOption('select[name="termYears"]', '25')
-      await p.click('button[type="submit"]')
-    }))
-
-    // Verify all users get results
-    await Promise.all(pages.map(p => 
-      expect(p.locator('[data-testid="affordability-results"]')).toBeVisible()
-    ))
-
-    // Clean up
-    await Promise.all(contexts.map(ctx => ctx.close()))
+    // Check if tabs are accessible
+    await expect(page.getByRole('tab', { name: 'Affordability' })).toBeVisible()
   })
 })

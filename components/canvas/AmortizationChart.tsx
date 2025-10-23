@@ -2,10 +2,10 @@
 
 import React from 'react'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
-import { LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, Legend, ResponsiveContainer, BarChart, Bar } from 'recharts'
-import { TrendingDown, PieChart, DollarSign } from 'lucide-react'
+import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, LineChart, Line } from 'recharts'
+import { TrendingUp, PieChart } from 'lucide-react'
 
-interface AmortizationEntry {
+interface AmortizationData {
   month: number
   principal: number
   interest: number
@@ -13,78 +13,78 @@ interface AmortizationEntry {
 }
 
 interface AmortizationChartProps {
-  data: AmortizationEntry[]
-  monthlyPayment: number
-  totalInterest: number
-  totalCost: number
-  termYears: number
+  data: AmortizationData[]
+  loading?: boolean
 }
 
-export function AmortizationChart({ 
-  data, 
-  monthlyPayment, 
-  totalInterest, 
-  totalCost, 
-  termYears 
-}: AmortizationChartProps) {
-  const formatCurrency = (value: number) => {
-    return new Intl.NumberFormat('en-CA', {
-      style: 'currency',
-      currency: 'CAD',
-      minimumFractionDigits: 0,
-      maximumFractionDigits: 0,
-    }).format(value)
+export function AmortizationChart({ data, loading = false }: AmortizationChartProps) {
+  if (loading) {
+    return (
+      <Card className="w-full">
+        <CardHeader>
+          <CardTitle className="flex items-center gap-2">
+            <PieChart className="h-6 w-6 text-primary" />
+            Amortization Schedule
+          </CardTitle>
+        </CardHeader>
+        <CardContent>
+          <div className="flex items-center justify-center py-8">
+            <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary" />
+            <span className="ml-2">Loading chart...</span>
+          </div>
+        </CardContent>
+      </Card>
+    )
   }
 
-  const formatTooltipCurrency = (value: number) => {
-    return new Intl.NumberFormat('en-CA', {
-      style: 'currency',
-      currency: 'CAD',
-    }).format(value)
+  if (!data || data.length === 0) {
+    return (
+      <Card className="w-full">
+        <CardHeader>
+          <CardTitle className="flex items-center gap-2">
+            <PieChart className="h-6 w-6 text-primary" />
+            Amortization Schedule
+          </CardTitle>
+        </CardHeader>
+        <CardContent>
+          <div className="text-center py-8 text-muted-foreground">
+            No amortization data available
+          </div>
+        </CardContent>
+      </Card>
+    )
   }
 
   // Prepare data for charts
-  const chartData = data.map(entry => ({
-    month: entry.month,
-    principal: entry.principal,
-    interest: entry.interest,
-    balance: entry.balance,
-    year: Math.ceil(entry.month / 12),
+  const chartData = data.map((item, index) => ({
+    month: item.month,
+    principal: item.principal,
+    interest: item.interest,
+    balance: item.balance,
+    year: Math.floor(item.month / 12) + 1,
   }))
 
-  // Calculate yearly data for the bar chart
-  const yearlyData = Array.from({ length: termYears }, (_, i) => {
-    const yearStart = i * 12 + 1
-    const yearEnd = Math.min((i + 1) * 12, data.length)
-    const yearEntries = data.slice(yearStart - 1, yearEnd)
-    
-    const totalPrincipal = yearEntries.reduce((sum, entry) => sum + entry.principal, 0)
-    const totalInterest = yearEntries.reduce((sum, entry) => sum + entry.interest, 0)
-    
-    return {
-      year: i + 1,
-      principal: totalPrincipal,
-      interest: totalInterest,
-      balance: yearEntries[yearEntries.length - 1]?.balance || 0,
-    }
-  })
-
-  const summaryData = [
-    { name: 'Principal', value: totalCost - totalInterest, color: '#22c55e' },
-    { name: 'Interest', value: totalInterest, color: '#ef4444' },
-  ]
+  // Calculate totals
+  const totalPrincipal = data.reduce((sum, item) => sum + item.principal, 0)
+  const totalInterest = data.reduce((sum, item) => sum + item.interest, 0)
+  const totalPaid = totalPrincipal + totalInterest
 
   return (
     <div className="space-y-6">
       {/* Summary Cards */}
-      <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
+      <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
         <Card>
           <CardContent className="p-4">
             <div className="flex items-center gap-2">
-              <DollarSign className="h-5 w-5 text-primary" />
+              <TrendingUp className="h-5 w-5 text-green-500" />
               <div>
-                <p className="text-sm text-muted-foreground">Monthly Payment</p>
-                <p className="text-2xl font-bold">{formatCurrency(monthlyPayment)}</p>
+                <p className="text-sm text-muted-foreground">Total Principal</p>
+                <p className="text-2xl font-bold">
+                  {new Intl.NumberFormat('en-CA', {
+                    style: 'currency',
+                    currency: 'CAD',
+                  }).format(totalPrincipal)}
+                </p>
               </div>
             </div>
           </CardContent>
@@ -93,35 +93,31 @@ export function AmortizationChart({
         <Card>
           <CardContent className="p-4">
             <div className="flex items-center gap-2">
-              <TrendingDown className="h-5 w-5 text-red-500" />
+              <PieChart className="h-5 w-5 text-blue-500" />
               <div>
                 <p className="text-sm text-muted-foreground">Total Interest</p>
-                <p className="text-2xl font-bold">{formatCurrency(totalInterest)}</p>
-              </div>
-            </div>
-          </CardContent>
-        </Card>
-        
-        <Card>
-          <CardContent className="p-4">
-            <div className="flex items-center gap-2">
-              <PieChart className="h-5 w-5 text-green-500" />
-              <div>
-                <p className="text-sm text-muted-foreground">Total Cost</p>
-                <p className="text-2xl font-bold">{formatCurrency(totalCost)}</p>
-              </div>
-            </div>
-          </CardContent>
-        </Card>
-        
-        <Card>
-          <CardContent className="p-4">
-            <div className="flex items-center gap-2">
-              <div className="h-5 w-5 rounded-full bg-blue-500" />
-              <div>
-                <p className="text-sm text-muted-foreground">Interest Ratio</p>
                 <p className="text-2xl font-bold">
-                  {((totalInterest / totalCost) * 100).toFixed(1)}%
+                  {new Intl.NumberFormat('en-CA', {
+                    style: 'currency',
+                    currency: 'CAD',
+                  }).format(totalInterest)}
+                </p>
+              </div>
+            </div>
+          </CardContent>
+        </Card>
+        
+        <Card>
+          <CardContent className="p-4">
+            <div className="flex items-center gap-2">
+              <TrendingUp className="h-5 w-5 text-purple-500" />
+              <div>
+                <p className="text-sm text-muted-foreground">Total Paid</p>
+                <p className="text-2xl font-bold">
+                  {new Intl.NumberFormat('en-CA', {
+                    style: 'currency',
+                    currency: 'CAD',
+                  }).format(totalPaid)}
                 </p>
               </div>
             </div>
@@ -129,142 +125,151 @@ export function AmortizationChart({
         </Card>
       </div>
 
-      {/* Amortization Schedule Chart */}
+      {/* Principal vs Interest Chart */}
       <Card>
         <CardHeader>
-          <CardTitle>Amortization Schedule</CardTitle>
+          <CardTitle>Principal vs Interest Payments</CardTitle>
           <p className="text-sm text-muted-foreground">
-            Principal vs Interest payments over time
+            Monthly breakdown of principal and interest payments
           </p>
         </CardHeader>
         <CardContent>
-          <ResponsiveContainer width="100%" height={400}>
-            <LineChart data={chartData}>
-              <CartesianGrid strokeDasharray="3 3" />
-              <XAxis 
-                dataKey="month" 
-                tickFormatter={(value) => `Year ${Math.ceil(value / 12)}`}
-                interval="preserveStartEnd"
-              />
-              <YAxis 
-                tickFormatter={formatTooltipCurrency}
-                domain={[0, 'dataMax']}
-              />
-              <Tooltip 
-                formatter={(value: number, name: string) => [
-                  formatTooltipCurrency(value), 
-                  name === 'principal' ? 'Principal' : name === 'interest' ? 'Interest' : 'Balance'
-                ]}
-                labelFormatter={(value) => `Month ${value}`}
-              />
-              <Legend />
-              <Line 
-                type="monotone" 
-                dataKey="principal" 
-                stroke="#22c55e" 
-                strokeWidth={2}
-                name="Principal"
-              />
-              <Line 
-                type="monotone" 
-                dataKey="interest" 
-                stroke="#ef4444" 
-                strokeWidth={2}
-                name="Interest"
-              />
-            </LineChart>
-          </ResponsiveContainer>
-        </CardContent>
-      </Card>
-
-      {/* Yearly Breakdown */}
-      <Card>
-        <CardHeader>
-          <CardTitle>Yearly Payment Breakdown</CardTitle>
-          <p className="text-sm text-muted-foreground">
-            Principal and interest payments by year
-          </p>
-        </CardHeader>
-        <CardContent>
-          <ResponsiveContainer width="100%" height={300}>
-            <BarChart data={yearlyData}>
-              <CartesianGrid strokeDasharray="3 3" />
-              <XAxis dataKey="year" />
-              <YAxis tickFormatter={formatTooltipCurrency} />
-              <Tooltip 
-                formatter={(value: number, name: string) => [
-                  formatTooltipCurrency(value), 
-                  name === 'principal' ? 'Principal' : 'Interest'
-                ]}
-              />
-              <Legend />
-              <Bar dataKey="principal" fill="#22c55e" name="Principal" />
-              <Bar dataKey="interest" fill="#ef4444" name="Interest" />
-            </BarChart>
-          </ResponsiveContainer>
-        </CardContent>
-      </Card>
-
-      {/* Principal vs Interest Pie Chart */}
-      <Card>
-        <CardHeader>
-          <CardTitle>Payment Composition</CardTitle>
-          <p className="text-sm text-muted-foreground">
-            Total principal vs interest over the life of the loan
-          </p>
-        </CardHeader>
-        <CardContent>
-          <div className="flex items-center justify-center">
-            <div className="w-64 h-64 relative">
-              <svg className="w-full h-full transform -rotate-90">
-                <circle
-                  cx="128"
-                  cy="128"
-                  r="100"
-                  fill="none"
-                  stroke="#e5e7eb"
-                  strokeWidth="20"
+          <div className="h-80">
+            <ResponsiveContainer width="100%" height="100%">
+              <BarChart data={chartData.slice(0, 60)}> {/* Show first 5 years */}
+                <CartesianGrid strokeDasharray="3 3" />
+                <XAxis 
+                  dataKey="month" 
+                  tickFormatter={(value) => `Month ${value}`}
                 />
-                <circle
-                  cx="128"
-                  cy="128"
-                  r="100"
-                  fill="none"
-                  stroke="#22c55e"
-                  strokeWidth="20"
-                  strokeDasharray={`${2 * Math.PI * 100 * (totalCost - totalInterest) / totalCost} ${2 * Math.PI * 100}`}
-                  strokeDashoffset="0"
+                <YAxis 
+                  tickFormatter={(value) => 
+                    new Intl.NumberFormat('en-CA', {
+                      style: 'currency',
+                      currency: 'CAD',
+                      minimumFractionDigits: 0,
+                    }).format(value)
+                  }
                 />
-                <circle
-                  cx="128"
-                  cy="128"
-                  r="100"
-                  fill="none"
-                  stroke="#ef4444"
-                  strokeWidth="20"
-                  strokeDasharray={`${2 * Math.PI * 100 * totalInterest / totalCost} ${2 * Math.PI * 100}`}
-                  strokeDashoffset={`-${2 * Math.PI * 100 * (totalCost - totalInterest) / totalCost}`}
+                <Tooltip 
+                  formatter={(value: number, name: string) => [
+                    new Intl.NumberFormat('en-CA', {
+                      style: 'currency',
+                      currency: 'CAD',
+                    }).format(value),
+                    name === 'principal' ? 'Principal' : 'Interest'
+                  ]}
+                  labelFormatter={(value) => `Month ${value}`}
                 />
-              </svg>
-              <div className="absolute inset-0 flex items-center justify-center">
-                <div className="text-center">
-                  <div className="text-2xl font-bold">
-                    {((totalCost - totalInterest) / totalCost * 100).toFixed(1)}%
-                  </div>
-                  <div className="text-sm text-muted-foreground">Principal</div>
-                </div>
-              </div>
-            </div>
+                <Bar dataKey="principal" fill="#10b981" name="principal" />
+                <Bar dataKey="interest" fill="#3b82f6" name="interest" />
+              </BarChart>
+            </ResponsiveContainer>
           </div>
-          <div className="flex justify-center gap-6 mt-4">
-            <div className="flex items-center gap-2">
-              <div className="w-4 h-4 bg-green-500 rounded"></div>
-              <span className="text-sm">Principal: {formatCurrency(totalCost - totalInterest)}</span>
-            </div>
-            <div className="flex items-center gap-2">
-              <div className="w-4 h-4 bg-red-500 rounded"></div>
-              <span className="text-sm">Interest: {formatCurrency(totalInterest)}</span>
-            </div>
+        </CardContent>
+      </Card>
+
+      {/* Remaining Balance Chart */}
+      <Card>
+        <CardHeader>
+          <CardTitle>Remaining Balance Over Time</CardTitle>
+          <p className="text-sm text-muted-foreground">
+            How your mortgage balance decreases over time
+          </p>
+        </CardHeader>
+        <CardContent>
+          <div className="h-80">
+            <ResponsiveContainer width="100%" height="100%">
+              <LineChart data={chartData}>
+                <CartesianGrid strokeDasharray="3 3" />
+                <XAxis 
+                  dataKey="year" 
+                  tickFormatter={(value) => `Year ${value}`}
+                />
+                <YAxis 
+                  tickFormatter={(value) => 
+                    new Intl.NumberFormat('en-CA', {
+                      style: 'currency',
+                      currency: 'CAD',
+                      minimumFractionDigits: 0,
+                    }).format(value)
+                  }
+                />
+                <Tooltip 
+                  formatter={(value: number) => [
+                    new Intl.NumberFormat('en-CA', {
+                      style: 'currency',
+                      currency: 'CAD',
+                    }).format(value),
+                    'Remaining Balance'
+                  ]}
+                  labelFormatter={(value) => `Year ${value}`}
+                />
+                <Line 
+                  type="monotone" 
+                  dataKey="balance" 
+                  stroke="#8b5cf6" 
+                  strokeWidth={2}
+                  dot={false}
+                />
+              </LineChart>
+            </ResponsiveContainer>
+          </div>
+        </CardContent>
+      </Card>
+
+      {/* Payment Breakdown Table */}
+      <Card>
+        <CardHeader>
+          <CardTitle>Payment Breakdown</CardTitle>
+          <p className="text-sm text-muted-foreground">
+            Detailed breakdown of your monthly payments
+          </p>
+        </CardHeader>
+        <CardContent>
+          <div className="overflow-x-auto">
+            <table className="w-full text-sm">
+              <thead>
+                <tr className="border-b">
+                  <th className="text-left py-2">Month</th>
+                  <th className="text-right py-2">Principal</th>
+                  <th className="text-right py-2">Interest</th>
+                  <th className="text-right py-2">Balance</th>
+                </tr>
+              </thead>
+              <tbody>
+                {data.slice(0, 12).map((item) => (
+                  <tr key={item.month} className="border-b">
+                    <td className="py-2">{item.month}</td>
+                    <td className="text-right py-2">
+                      {new Intl.NumberFormat('en-CA', {
+                        style: 'currency',
+                        currency: 'CAD',
+                      }).format(item.principal)}
+                    </td>
+                    <td className="text-right py-2">
+                      {new Intl.NumberFormat('en-CA', {
+                        style: 'currency',
+                        currency: 'CAD',
+                      }).format(item.interest)}
+                    </td>
+                    <td className="text-right py-2">
+                      {new Intl.NumberFormat('en-CA', {
+                        style: 'currency',
+                        currency: 'CAD',
+                      }).format(item.balance)}
+                    </td>
+                  </tr>
+                ))}
+                {data.length > 12 && (
+                  <tr>
+                    <td colSpan={4} className="text-center py-2 text-muted-foreground">
+                      ... and {data.length - 12} more months
+                    </td>
+                  </tr>
+                )}
+              </tbody>
+            </table>
           </div>
         </CardContent>
       </Card>
