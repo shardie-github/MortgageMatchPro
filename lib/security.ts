@@ -36,18 +36,18 @@ export const RateInputSchema = z.object({
 })
 
 export const LeadInputSchema = z.object({
-  name: z.string().min(1).max(100),
+  name: z.string().min(2).max(100),
   email: z.string().email().max(255),
   phone: z.string().min(10).max(20),
-  leadData: z.object({
-    income: z.number().min(0).max(10000000),
-    debts: z.number().min(0).max(100000),
-    downPayment: z.number().min(0).max(10000000),
-    propertyPrice: z.number().min(10000).max(50000000),
-    creditScore: z.number().min(300).max(850).optional(),
-    employmentType: z.string().min(1).max(50),
-    location: z.string().min(1).max(100),
-  }),
+  propertyValue: z.number().min(10000).max(50000000),
+  downPayment: z.number().min(0).max(10000000),
+  income: z.number().min(0).max(10000000),
+  employmentType: z.enum(['salaried', 'self-employed', 'contract', 'unemployed']),
+  creditScore: z.number().min(300).max(850),
+  preferredLender: z.string().optional(),
+  additionalInfo: z.string().optional(),
+  consentToShare: z.boolean(),
+  consentToContact: z.boolean(),
 })
 
 // Security headers
