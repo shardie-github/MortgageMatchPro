@@ -1,0 +1,19 @@
+# This would be an Excel file with the competency matrix
+# For now, I'll create a CSV version that can be imported into Excel
+
+Area,Owner,Backup,Level,Last Updated,Notes
+Frontend Architecture,Senior Frontend Dev,Full Stack Lead,4,Dec 2024,React/Next.js expert
+Backend Architecture,Backend Expert,Full Stack Lead,4,Dec 2024,API and database expert
+AI Agent Framework,AI/ML Specialist,Senior Frontend Dev,4,Dec 2024,AI integration expert
+DevOps & Deployment,DevOps Engineer,Backend Expert,4,Dec 2024,Infrastructure expert
+Security & Compliance,Security Lead,DevOps Engineer,4,Dec 2024,Security expert
+Database Design,Backend Expert,AI/ML Specialist,3,Dec 2024,Supabase expert
+Payment Processing,Backend Expert,Full Stack Lead,3,Dec 2024,Stripe integration
+Testing Strategy,Full Stack Lead,Senior Frontend Dev,3,Dec 2024,Test automation
+Performance Optimization,Senior Frontend Dev,DevOps Engineer,3,Dec 2024,Frontend performance
+Mobile Development,Senior Frontend Dev,Full Stack Lead,2,Dec 2024,Responsive design
+Documentation,Full Stack Lead,All Team,3,Dec 2024,Technical writing
+Code Review,All Senior Devs,All Team,3,Dec 2024,Quality assurance
+Incident Response,DevOps Engineer,Backend Expert,3,Dec 2024,Emergency procedures
+Customer Support,Product Manager,Full Stack Lead,2,Dec 2024,User assistance
+Business Analysis,Product Manager,Full Stack Lead,3,Dec 2024,Requirements gathering

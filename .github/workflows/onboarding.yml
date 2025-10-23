@@ -1,0 +1,141 @@
+name: New Developer Onboarding
+
+on:
+  issues:
+    types: [opened]
+    labels: ['onboarding', 'new-developer']
+  repository_dispatch:
+    types: [new-member-added]
+
+jobs:
+  setup-onboarding:
+    runs-on: ubuntu-latest
+    if: github.event.label.name == 'onboarding' || github.event.action == 'new-member-added'
+    
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+      
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '18'
+          cache: 'npm'
+      
+      - name: Install dependencies
+        run: npm ci
+      
+      - name: Run type checking
+        run: npm run type-check
+      
+      - name: Run tests
+        run: npm test -- --passWithNoTests
+      
+      - name: Generate onboarding tasks
+        run: node scripts/generate-onboarding-tasks.js
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          DEVELOPER_USERNAME: ${{ github.event.issue.user.login || github.event.client_payload.username }}
+      
+      - name: Assign mentor
+        run: node scripts/assign-mentor.js
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          DEVELOPER_USERNAME: ${{ github.event.issue.user.login || github.event.client_payload.username }}
+      
+      - name: Create welcome comment
+        uses: actions/github-script@v7
+        with:
+          script: |
+            const issue = context.payload.issue;
+            const username = issue.user.login;
+            
+            const comment = `## 🎉 Welcome to MortgageMatch Pro, @${username}!
+            
+            I've set up your onboarding journey! Here's what happens next:
+            
+            ### ✅ Environment Setup Complete
+            - [x] Repository cloned
+            - [x] Dependencies installed
+            - [x] Type checking passed
+            - [x] Tests running
+            
+            ### 📋 Your Onboarding Tasks
+            I've created a series of issues to guide you through your first contributions:
+            
+            **Phase 1: Environment Setup (10 min)**
+            - [ ] Set up local development environment
+            - [ ] Configure environment variables
+            - [ ] Start development server
+            
+            **Phase 2: First Contribution (20 min)**
+            - [ ] Make a small documentation fix
+            - [ ] Add a unit test
+            - [ ] Create your first PR
+            
+            ### 🤖 AI Assistant Available
+            I'm here to help you throughout your onboarding! Ask me about:
+            - How the codebase is structured
+            - How to implement features
+            - Best practices and conventions
+            - Debugging and troubleshooting
+            
+            ### 👥 Your Mentor
+            I've assigned @${{ env.MENTOR_USERNAME }} as your mentor. They'll help guide you through your first few contributions.
+            
+            ### 📚 Resources
+            - [Developer Onboarding Checklist](docs/developer_onboarding_checklist.md)
+            - [API Documentation](docs/api/)
+            - [Architecture Overview](docs/architecture.md)
+            
+            Ready to start? Let me know if you have any questions! 🚀`;
+            
+            github.rest.issues.createComment({
+              issue_number: issue.number,
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              body: comment
+            });
+
+  generate-tasks:
+    runs-on: ubuntu-latest
+    if: github.event.label.name == 'onboarding'
+    
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+      
+      - name: Generate onboarding issues
+        run: node scripts/generate-onboarding-tasks.js
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          DEVELOPER_USERNAME: ${{ github.event.issue.user.login }}
+
+  assign-mentor:
+    runs-on: ubuntu-latest
+    if: github.event.label.name == 'onboarding'
+    
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+      
+      - name: Assign mentor
+        run: node scripts/assign-mentor.js
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          DEVELOPER_USERNAME: ${{ github.event.issue.user.login }}
+
+  track-progress:
+    runs-on: ubuntu-latest
+    if: github.event.action == 'closed' && github.event.issue.labels.some(label => label.name === 'onboarding-task')
+    
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+      
+      - name: Update progress
+        run: node scripts/update-onboarding-progress.js
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          DEVELOPER_USERNAME: ${{ github.event.issue.user.login }}
+          TASK_COMPLETED: ${{ github.event.issue.title }}
