@@ -1,12 +1,17 @@
 import { NextApiRequest, NextApiResponse } from 'next'
 import { AffordabilityAgent } from '@/lib/openai'
 import { supabaseAdmin } from '@/lib/supabase'
+import { 
+  withSecurity, 
+  withRateLimit, 
+  withValidation, 
+  AffordabilityInputSchema,
+  logAuditEvent,
+  handleError
+} from '@/lib/security'
+import { analytics, errorTracking } from '@/lib/monitoring'
 
-export default async function handler(req: NextApiRequest, res: NextApiResponse) {
-  if (req.method !== 'POST') {
-    return res.status(405).json({ error: 'Method not allowed' })
-  }
-
+async function handler(req: NextApiRequest, res: NextApiResponse) {
   try {
     const {
       userId,
@@ -23,9 +28,14 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
       hoa = 0,
     } = req.body
 
-    // Validate required fields
-    if (!country || !income || !debts || !downPayment || !propertyPrice || !interestRate || !termYears || !location) {
-      return res.status(400).json({ error: 'Missing required fields' })
+    // Log the calculation request
+    if (userId) {
+      await logAuditEvent('affordability_calculation', userId, {
+        country,
+        income: Math.floor(income / 10000) * 10000, // Round for privacy
+        propertyPrice: Math.floor(propertyPrice / 50000) * 50000, // Round for privacy
+        location,
+      })
     }
 
     // Calculate affordability using AI agent
@@ -42,6 +52,14 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
       taxes,
       insurance,
       hoa,
+    })
+
+    // Track analytics
+    analytics.trackAffordabilityCalculation({
+      country,
+      income,
+      propertyPrice,
+      qualificationResult: result.qualificationResult,
     })
 
     // Save calculation to database if userId provided
@@ -63,20 +81,33 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
           max_affordable: result.maxAffordable,
           monthly_payment: result.monthlyPayment,
           qualifying_rate: result.qualifyingRate,
+          ip_address: req.headers['x-forwarded-for'] || req.connection.remoteAddress,
+          user_agent: req.headers['user-agent'],
+          session_id: req.headers['x-session-id'],
         })
 
       if (error) {
-        console.error('Database error:', error)
+        errorTracking.captureException(new Error('Database save failed'), {
+          context: 'affordability_calculation',
+          userId,
+          error: error.message,
+        })
         // Don't fail the request if database save fails
       }
     }
 
     res.status(200).json(result)
   } catch (error) {
-    console.error('Affordability calculation error:', error)
-    res.status(500).json({ 
-      error: 'Failed to calculate affordability',
-      details: error instanceof Error ? error.message : 'Unknown error'
+    errorTracking.captureException(error as Error, {
+      context: 'affordability_calculation',
+      userId: req.body.userId,
     })
+    handleError(res, error as Error, 'affordability_calculation')
   }
 }
+
+export default withSecurity(
+  withRateLimit('affordability')(
+    withValidation(AffordabilityInputSchema)(handler)
+  )
+)
