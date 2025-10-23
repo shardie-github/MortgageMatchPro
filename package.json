@@ -51,7 +51,13 @@
     "@hookform/resolvers": "^3.3.2",
     "lucide-react": "^0.294.0",
     "clsx": "^2.0.0",
-    "class-variance-authority": "^0.7.0"
+    "class-variance-authority": "^0.7.0",
+    "@growthbook/growthbook": "^0.25.0",
+    "@growthbook/growthbook-react": "^0.25.0",
+    "fireworks-ai": "^0.1.0",
+    "arize-ai": "^0.1.0",
+    "ml-matrix": "^6.10.4",
+    "simple-statistics": "^7.8.3"
   },
   "devDependencies": {
     "@types/jest": "^29.5.8",
