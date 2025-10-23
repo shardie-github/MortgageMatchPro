@@ -22,8 +22,12 @@ import {
   DollarSign,
   Percent,
   LogIn,
-  User
+  User,
+  BarChart,
+  Settings
 } from 'lucide-react'
+import { initAnalytics, trackCanvasOpen, trackAffordabilityCalculation, trackRateCheck, trackScenarioComparison, trackLeadSubmission, identifyUser } from '@/lib/analytics'
+import { initSentry, setUserContext, recordPerformanceMetrics } from '@/lib/monitoring'
 
 export default function MortgageMatchPro() {
   const { user, signOut } = useAuth()
@@ -45,6 +49,32 @@ export default function MortgageMatchPro() {
 
   const [activeTab, setActiveTab] = useState('affordability')
   const [showLeadModal, setShowLeadModal] = useState(false)
+  const [showDashboard, setShowDashboard] = useState(false)
+  const [showPrivacySettings, setShowPrivacySettings] = useState(false)
+
+  // Initialize analytics and monitoring
+  useEffect(() => {
+    initAnalytics()
+    initSentry()
+    
+    // Record performance metrics on page load
+    recordPerformanceMetrics()
+  }, [])
+
+  // Track user identification
+  useEffect(() => {
+    if (user) {
+      identifyUser(user.id, {
+        email: user.email,
+        subscription_tier: 'free', // This would come from user data
+      })
+      setUserContext({
+        id: user.id,
+        email: user.email || '',
+        subscriptionTier: 'free',
+      })
+    }
+  }, [user])
 
   const handleAffordabilityCalculate = async (input: AffordabilityInput) => {
     setLoading('affordability', true)
@@ -70,6 +100,16 @@ export default function MortgageMatchPro() {
       const result = await response.json()
       setAffordabilityResult(result)
       setActiveTab('results')
+      
+      // Track analytics
+      if (user) {
+        trackAffordabilityCalculation(
+          user.id,
+          input.income,
+          result.maxAffordable,
+          result.gdsRatio
+        )
+      }
     } catch (error) {
       setError('affordability', error instanceof Error ? error.message : 'Failed to calculate affordability')
     } finally {
@@ -103,6 +143,11 @@ export default function MortgageMatchPro() {
       const data = await response.json()
       setRateResults(data.rates)
       setActiveTab('rates')
+      
+      // Track analytics
+      if (user) {
+        trackRateCheck(user.id, 'CA', 25, 'fixed')
+      }
     } catch (error) {
       setError('rates', error instanceof Error ? error.message : 'Failed to fetch rates')
     } finally {
@@ -145,6 +190,15 @@ export default function MortgageMatchPro() {
       const comparison = await response.json()
       setScenarioComparison(comparison)
       setActiveTab('scenarios')
+      
+      // Track analytics
+      if (user) {
+        trackScenarioComparison(
+          user.id,
+          scenarios.length,
+          comparison.recommendation.bestOption
+        )
+      }
     } catch (error) {
       setError('scenarios', error instanceof Error ? error.message : 'Failed to compare scenarios')
     } finally {
