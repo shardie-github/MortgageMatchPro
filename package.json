@@ -57,7 +57,14 @@
     "fireworks-ai": "^0.1.0",
     "arize-ai": "^0.1.0",
     "ml-matrix": "^6.10.4",
-    "simple-statistics": "^7.8.3"
+    "simple-statistics": "^7.8.3",
+    "prophet-node": "^0.1.0",
+    "xgboost": "^0.1.0",
+    "tensorflow": "^4.15.0",
+    "shap": "^0.1.0",
+    "lime": "^0.1.0",
+    "monte-carlo": "^1.0.0",
+    "time-series-analysis": "^1.0.0"
   },
   "devDependencies": {
     "@types/jest": "^29.5.8",
