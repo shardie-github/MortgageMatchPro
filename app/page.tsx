@@ -2,6 +2,8 @@
 
 import React, { useState, useEffect } from 'react'
 import { AffordabilityInputPanel, AffordabilityInput } from '@/components/canvas/AffordabilityInputPanel'
+import { ScenarioInputPanel } from '@/components/canvas/ScenarioInputPanel'
+import { ScenarioComparisonChart } from '@/components/canvas/ScenarioComparisonChart'
 import { RateComparisonTable } from '@/components/canvas/RateComparisonTable'
 import { AmortizationChart } from '@/components/canvas/AmortizationChart'
 import { LeadGenModal, LeadFormData } from '@/components/canvas/LeadGenModal'
@@ -24,10 +26,19 @@ import {
   LogIn,
   User,
   BarChart,
-  Settings
+  Settings,
+  Brain,
+  FileText,
+  Share2,
+  Download,
+  History,
+  Zap
 } from 'lucide-react'
 import { initAnalytics, trackCanvasOpen, trackAffordabilityCalculation, trackRateCheck, trackScenarioComparison, trackLeadSubmission, identifyUser } from '@/lib/analytics'
 import { initSentry, setUserContext, recordPerformanceMetrics } from '@/lib/monitoring'
+import { ScenarioResult, ScenarioComparison } from '@/lib/scenario-types'
+import { ScenarioManager } from '@/lib/scenario-manager'
+import { ExportService } from '@/lib/export-service'
 
 export default function MortgageMatchPro() {
   const { user, signOut } = useAuth()
@@ -47,10 +58,17 @@ export default function MortgageMatchPro() {
     clearError,
   } = useMortgageStore()
 
-  const [activeTab, setActiveTab] = useState('affordability')
+  const [activeTab, setActiveTab] = useState('scenarios')
   const [showLeadModal, setShowLeadModal] = useState(false)
   const [showDashboard, setShowDashboard] = useState(false)
   const [showPrivacySettings, setShowPrivacySettings] = useState(false)
+  const [scenarioResults, setScenarioResults] = useState<ScenarioResult[]>([])
+  const [scenarioComparison, setScenarioComparison] = useState<ScenarioComparison | null>(null)
+  const [showAIInsights, setShowAIInsights] = useState(false)
+  const [isExporting, setIsExporting] = useState(false)
+
+  const scenarioManager = new ScenarioManager()
+  const exportService = new ExportService()
 
   // Initialize analytics and monitoring
   useEffect(() => {
@@ -155,54 +173,114 @@ export default function MortgageMatchPro() {
     }
   }
 
-  const handleCompareScenarios = async () => {
-    if (!currentAffordability || rateResults.length < 2) return
+  const handleScenarioUpdate = (scenario: ScenarioResult) => {
+    setScenarioResults(prev => {
+      const existingIndex = prev.findIndex(s => s.scenarioId === scenario.scenarioId)
+      if (existingIndex >= 0) {
+        const newResults = [...prev]
+        newResults[existingIndex] = scenario
+        return newResults
+      }
+      return [...prev, scenario]
+    })
+  }
+
+  const handleComparisonUpdate = async (scenarios: ScenarioResult[]) => {
+    if (scenarios.length < 2) return
 
     setLoading('scenarios', true)
     clearError('scenarios')
     
     try {
-      const scenarios = rateResults.slice(0, 3).map((rate, index) => ({
-        name: `${rate.lender} - ${rate.type}`,
-        rate: rate.rate,
-        term: rate.term,
-        type: rate.type,
-        propertyPrice: currentAffordability.maxAffordable,
-        downPayment: 50000,
-      }))
-
-      const response = await fetch('/api/scenarios', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({
-          scenarios,
-          userId: user?.id,
-        }),
-      })
-
-      if (!response.ok) {
-        const errorData = await response.json()
-        throw new Error(errorData.error || 'Failed to compare scenarios')
-      }
-
-      const comparison = await response.json()
+      const comparison = await scenarioManager.compareScenarios(
+        scenarios.map(s => ({
+          id: s.scenarioId,
+          name: `Scenario ${scenarios.indexOf(s) + 1}`,
+          description: '',
+          parameters: {
+            propertyPrice: 500000, // This should come from the scenario
+            downPayment: 50000,
+            interestRate: 5.5,
+            termYears: 25,
+            rateType: 'fixed' as const,
+            location: 'Toronto, ON',
+            taxes: 0,
+            insurance: 0,
+            hoa: 0,
+            pmi: 0,
+          },
+          metadata: {
+            createdAt: new Date().toISOString(),
+            updatedAt: new Date().toISOString(),
+            userId: user?.id,
+            isTemplate: false,
+            tags: [],
+          },
+        }))
+      )
+      
       setScenarioComparison(comparison)
-      setActiveTab('scenarios')
       
       // Track analytics
       if (user) {
         trackScenarioComparison(
           user.id,
           scenarios.length,
-          comparison.recommendation.bestOption
+          comparison.comparison.bestOption
         )
       }
     } catch (error) {
       setError('scenarios', error instanceof Error ? error.message : 'Failed to compare scenarios')
     } finally {
       setLoading('scenarios', false)
+    }
+  }
+
+  const handleExport = async (format: 'pdf' | 'excel' | 'csv') => {
+    if (!scenarioComparison) return
+
+    setIsExporting(true)
+    try {
+      const result = await exportService.generatePDFReport(scenarioComparison, {
+        format,
+        includeCharts: true,
+        includeAmortization: true,
+        includeAIInsights: true,
+        branding: user?.subscriptionTier === 'broker' ? {
+          companyName: 'Your Company Name',
+        } : undefined,
+      })
+
+      if (result.success && result.url) {
+        window.open(result.url, '_blank')
+      } else {
+        throw new Error(result.error || 'Export failed')
+      }
+    } catch (error) {
+      setError('scenarios', error instanceof Error ? error.message : 'Export failed')
+    } finally {
+      setIsExporting(false)
+    }
+  }
+
+  const handleShare = async () => {
+    if (!scenarioComparison) return
+
+    try {
+      const result = await exportService.generateShareLink(scenarioComparison, {
+        expiresIn: 24,
+        allowDownload: true,
+      })
+
+      if (result.success && result.shareUrl) {
+        await navigator.clipboard.writeText(result.shareUrl)
+        // Show success message
+        alert('Share link copied to clipboard!')
+      } else {
+        throw new Error(result.error || 'Share failed')
+      }
+    } catch (error) {
+      setError('scenarios', error instanceof Error ? error.message : 'Share failed')
     }
   }
 
@@ -301,7 +379,11 @@ export default function MortgageMatchPro() {
 
         {/* Main Content */}
         <Tabs value={activeTab} onValueChange={setActiveTab} className="w-full">
-          <TabsList className="grid w-full grid-cols-4">
+          <TabsList className="grid w-full grid-cols-6">
+            <TabsTrigger value="scenarios" className="flex items-center gap-2">
+              <Zap className="h-4 w-4" />
+              Scenarios
+            </TabsTrigger>
             <TabsTrigger value="affordability" className="flex items-center gap-2">
               <Calculator className="h-4 w-4" />
               Affordability
@@ -314,11 +396,34 @@ export default function MortgageMatchPro() {
               <TrendingUp className="h-4 w-4" />
               Rates
             </TabsTrigger>
-            <TabsTrigger value="scenarios" className="flex items-center gap-2">
+            <TabsTrigger value="compare" className="flex items-center gap-2">
               <BarChart3 className="h-4 w-4" />
               Compare
             </TabsTrigger>
+            <TabsTrigger value="insights" className="flex items-center gap-2">
+              <Brain className="h-4 w-4" />
+              AI Insights
+            </TabsTrigger>
           </TabsList>
+
+          <TabsContent value="scenarios" className="mt-6">
+            <ScenarioInputPanel
+              onScenarioUpdate={handleScenarioUpdate}
+              onComparisonUpdate={handleComparisonUpdate}
+              loading={loading.scenarios}
+              userId={user?.id}
+            />
+            {errors.scenarios && (
+              <Card className="mt-4 border-red-200 bg-red-50">
+                <CardContent className="p-4">
+                  <div className="flex items-center gap-2 text-red-800">
+                    <AlertCircle className="h-5 w-5" />
+                    <span>{errors.scenarios}</span>
+                  </div>
+                </CardContent>
+              </Card>
+            )}
+          </TabsContent>
 
           <TabsContent value="affordability" className="mt-6">
             <AffordabilityInputPanel
