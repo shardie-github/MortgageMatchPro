@@ -1,0 +1,29 @@
+{
+  "timestamp": "2025-10-24T19:24:41.931Z",
+  "targetBundleSize": 1572864,
+  "results": [
+    {
+      "size": 0,
+      "status": "error",
+      "platform": "android"
+    },
+    {
+      "size": 0,
+      "status": "error",
+      "platform": "ios"
+    }
+  ],
+  "recommendations": [
+    {
+      "type": "general",
+      "priority": "medium",
+      "suggestions": [
+        "Enable Hermes for better JavaScript performance",
+        "Use React.memo() for component memoization",
+        "Implement proper image optimization",
+        "Use FlatList instead of ScrollView for large lists",
+        "Enable Flipper for debugging in development"
+      ]
+    }
+  ]
+}

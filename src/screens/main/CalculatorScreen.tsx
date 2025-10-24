@@ -2,9 +2,6 @@ import React, { useState } from 'react';
 import {
   View,
   StyleSheet,
-  ScrollView,
-  KeyboardAvoidingView,
-  Platform,
 } from 'react-native';
 import { Text, Card, Button, useTheme } from 'react-native-paper';
 import { useAuth } from '../../contexts/AuthContext';
@@ -16,6 +13,9 @@ import { AffordabilityInputForm } from '../../components/calculator/Affordabilit
 import { MortgageProductSelector } from '../../components/calculator/MortgageProductSelector';
 import { AffordabilityResultsCard } from '../../components/calculator/AffordabilityResultsCard';
 import { RecommendationsCard } from '../../components/calculator/RecommendationsCard';
+import { ResponsiveLayout } from '../../components/layout/ResponsiveLayout';
+import { ResponsiveText } from '../../components/ui/ResponsiveText';
+import { ResponsiveButton } from '../../components/ui/ResponsiveButton';
 
 export const CalculatorScreen: React.FC = () => {
   const { theme } = useTheme();
@@ -42,31 +42,38 @@ export const CalculatorScreen: React.FC = () => {
   };
 
   return (
-    <KeyboardAvoidingView
-      style={[styles.container, { backgroundColor: theme.colors.background }]}
-      behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
+    <ResponsiveLayout
+      backgroundColor={theme.colors.background}
+      scrollable={true}
+      keyboardAvoiding={true}
+      safeArea={true}
     >
-      <ScrollView
-        style={styles.scrollView}
-        showsVerticalScrollIndicator={false}
-        keyboardShouldPersistTaps="handled"
-      >
+      <View style={styles.container}>
         {/* Header */}
         <View style={styles.header}>
-          <Text style={[styles.title, { color: theme.colors.onBackground }]}>
+          <ResponsiveText 
+            variant="h1" 
+            style={[styles.title, { color: theme.colors.onBackground }]}
+          >
             Mortgage Calculator
-          </Text>
-          <Text style={[styles.subtitle, { color: theme.colors.onSurfaceVariant }]}>
+          </ResponsiveText>
+          <ResponsiveText 
+            variant="body" 
+            style={[styles.subtitle, { color: theme.colors.onSurfaceVariant }]}
+          >
             Calculate your affordability and explore mortgage options
-          </Text>
+          </ResponsiveText>
         </View>
 
         {/* Mortgage Product Selection */}
         <Card style={[styles.card, { backgroundColor: theme.colors.surface }]}>
           <Card.Content>
-            <Text style={[styles.cardTitle, { color: theme.colors.onSurface }]}>
+            <ResponsiveText 
+              variant="h3" 
+              style={[styles.cardTitle, { color: theme.colors.onSurface }]}
+            >
               Select Mortgage Product
-            </Text>
+            </ResponsiveText>
             <MortgageProductSelector
               selectedProduct={selectedProduct}
               onProductSelect={handleProductSelect}
@@ -77,9 +84,12 @@ export const CalculatorScreen: React.FC = () => {
         {/* Affordability Calculator */}
         <Card style={[styles.card, { backgroundColor: theme.colors.surface }]}>
           <Card.Content>
-            <Text style={[styles.cardTitle, { color: theme.colors.onSurface }]}>
+            <ResponsiveText 
+              variant="h3" 
+              style={[styles.cardTitle, { color: theme.colors.onSurface }]}
+            >
               Affordability Calculator
-            </Text>
+            </ResponsiveText>
             <AffordabilityInputForm
               onCalculate={handleCalculate}
               loading={loading}
@@ -99,28 +109,24 @@ export const CalculatorScreen: React.FC = () => {
         {/* Action Buttons */}
         {affordabilityResult && (
           <View style={styles.actionButtons}>
-            <Button
-              mode="contained"
+            <ResponsiveButton
+              title="View Current Rates"
               onPress={() => {/* Navigate to rates */}}
+              variant="primary"
               style={styles.actionButton}
-              contentStyle={styles.buttonContent}
-            >
-              View Current Rates
-            </Button>
-            <Button
-              mode="outlined"
+            />
+            <ResponsiveButton
+              title="Compare Scenarios"
               onPress={() => {/* Navigate to scenarios */}}
+              variant="outline"
               style={styles.actionButton}
-              contentStyle={styles.buttonContent}
-            >
-              Compare Scenarios
-            </Button>
+            />
           </View>
         )}
 
         <View style={styles.bottomSpacing} />
-      </ScrollView>
-    </KeyboardAvoidingView>
+      </View>
+    </ResponsiveLayout>
   );
 };
 

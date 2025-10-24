@@ -2,9 +2,7 @@ import React, { useEffect, useState } from 'react';
 import {
   View,
   StyleSheet,
-  ScrollView,
   RefreshControl,
-  Dimensions,
 } from 'react-native';
 import { Text, Card, FAB, useTheme } from 'react-native-paper';
 import { LineChart, BarChart, PieChart } from 'react-native-chart-kit';
@@ -17,9 +15,12 @@ import { QuickActionsCard } from '../../components/home/QuickActionsCard';
 import { MetricsCard } from '../../components/home/MetricsCard';
 import { RecentActivityCard } from '../../components/home/RecentActivityCard';
 import { MarketInsightsCard } from '../../components/home/MarketInsightsCard';
+import { ResponsiveLayout } from '../../components/layout/ResponsiveLayout';
+import { ResponsiveGrid } from '../../components/layout/ResponsiveGrid';
+import { ResponsiveText } from '../../components/ui/ResponsiveText';
+import { scale, layout } from '../../utils/responsive';
 
-const { width } = Dimensions.get('window');
-const chartWidth = width - (spacing.lg * 2);
+const chartWidth = layout.screenWidth - (spacing.lg * 2);
 
 export const HomeScreen: React.FC = () => {
   const { theme } = useTheme();
@@ -125,22 +126,27 @@ export const HomeScreen: React.FC = () => {
   }
 
   return (
-    <View style={[styles.container, { backgroundColor: theme.colors.background }]}>
-      <ScrollView
-        style={styles.scrollView}
-        refreshControl={
-          <RefreshControl refreshing={refreshing} onRefresh={onRefresh} />
-        }
-        showsVerticalScrollIndicator={false}
-      >
+    <ResponsiveLayout
+      backgroundColor={theme.colors.background}
+      scrollable={true}
+      keyboardAvoiding={false}
+      safeArea={true}
+    >
+      <View style={styles.container}>
         {/* Welcome Header */}
         <View style={styles.header}>
-          <Text style={[styles.welcomeText, { color: theme.colors.onSurfaceVariant }]}>
+          <ResponsiveText 
+            variant="body" 
+            style={[styles.welcomeText, { color: theme.colors.onSurfaceVariant }]}
+          >
             Welcome back,
-          </Text>
-          <Text style={[styles.userName, { color: theme.colors.onBackground }]}>
+          </ResponsiveText>
+          <ResponsiveText 
+            variant="h2" 
+            style={[styles.userName, { color: theme.colors.onBackground }]}
+          >
             {user?.firstName || 'User'}
-          </Text>
+          </ResponsiveText>
         </View>
 
         {/* Quick Actions */}
@@ -148,7 +154,11 @@ export const HomeScreen: React.FC = () => {
 
         {/* Key Metrics */}
         {metrics && (
-          <View style={styles.metricsContainer}>
+          <ResponsiveGrid
+            columns={{ xs: 1, sm: 2, lg: 4 }}
+            gap="md"
+            padding="none"
+          >
             <MetricsCard
               title="Total Leads"
               value={metrics.totalLeads.toString()}
@@ -177,19 +187,22 @@ export const HomeScreen: React.FC = () => {
               changeType="positive"
               icon="⚡"
             />
-          </View>
+          </ResponsiveGrid>
         )}
 
         {/* Monthly Trends Chart */}
         <Card style={[styles.chartCard, { backgroundColor: theme.colors.surface }]}>
           <Card.Content>
-            <Text style={[styles.chartTitle, { color: theme.colors.onSurface }]}>
+            <ResponsiveText 
+              variant="h3" 
+              style={[styles.chartTitle, { color: theme.colors.onSurface }]}
+            >
               Monthly Performance
-            </Text>
+            </ResponsiveText>
             <LineChart
               data={monthlyData}
               width={chartWidth}
-              height={220}
+              height={scale(220)}
               chartConfig={chartConfig}
               bezier
               style={styles.chart}
@@ -200,13 +213,16 @@ export const HomeScreen: React.FC = () => {
         {/* Lead Sources Chart */}
         <Card style={[styles.chartCard, { backgroundColor: theme.colors.surface }]}>
           <Card.Content>
-            <Text style={[styles.chartTitle, { color: theme.colors.onSurface }]}>
+            <ResponsiveText 
+              variant="h3" 
+              style={[styles.chartTitle, { color: theme.colors.onSurface }]}
+            >
               Lead Sources
-            </Text>
+            </ResponsiveText>
             <PieChart
               data={leadSourceData}
               width={chartWidth}
-              height={220}
+              height={scale(220)}
               chartConfig={chartConfig}
               accessor="population"
               backgroundColor="transparent"
@@ -223,7 +239,7 @@ export const HomeScreen: React.FC = () => {
         <MarketInsightsCard />
 
         <View style={styles.bottomSpacing} />
-      </ScrollView>
+      </View>
 
       {/* Floating Action Button */}
       <FAB
@@ -231,7 +247,7 @@ export const HomeScreen: React.FC = () => {
         style={[styles.fab, { backgroundColor: theme.colors.primary }]}
         onPress={() => {/* Navigate to create lead */}}
       />
-    </View>
+    </ResponsiveLayout>
   );
 };
 

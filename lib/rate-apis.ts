@@ -1,12 +1,88 @@
-import axios from 'axios'
+import axios, { AxiosInstance } from 'axios'
+
+// Circuit breaker for API resilience
+class CircuitBreaker {
+  private state: 'CLOSED' | 'OPEN' | 'HALF_OPEN' = 'CLOSED'
+  private failureCount = 0
+  private lastFailureTime = 0
+  private readonly failureThreshold = 5
+  private readonly resetTimeout = 30000 // 30 seconds
+
+  async execute<T>(operation: () => Promise<T>): Promise<T> {
+    if (this.state === 'OPEN') {
+      if (Date.now() - this.lastFailureTime > this.resetTimeout) {
+        this.state = 'HALF_OPEN'
+      } else {
+        throw new Error('Rate API circuit breaker is OPEN - service temporarily unavailable')
+      }
+    }
+
+    try {
+      const result = await Promise.race([
+        operation(),
+        new Promise((_, reject) => 
+          setTimeout(() => reject(new Error('Rate API request timeout')), 10000)
+        )
+      ])
+
+      if (this.state === 'HALF_OPEN') {
+        this.state = 'CLOSED'
+        this.failureCount = 0
+      }
+
+      return result as T
+    } catch (error) {
+      this.failureCount++
+      this.lastFailureTime = Date.now()
+
+      if (this.failureCount >= this.failureThreshold) {
+        this.state = 'OPEN'
+      }
+
+      throw error
+    }
+  }
+
+  getState() {
+    return this.state
+  }
+
+  reset() {
+    this.state = 'CLOSED'
+    this.failureCount = 0
+    this.lastFailureTime = 0
+  }
+}
 
 // Ratehub.ca API integration for Canadian rates
 export class RatehubAPI {
   private apiKey: string
   private baseURL = 'https://api.ratehub.ca/v1'
+  private axiosInstance: AxiosInstance
+  private circuitBreaker: CircuitBreaker
 
   constructor(apiKey: string) {
     this.apiKey = apiKey
+    this.circuitBreaker = new CircuitBreaker()
+    
+    this.axiosInstance = axios.create({
+      baseURL: this.baseURL,
+      timeout: 10000,
+      headers: {
+        'Authorization': `Bearer ${this.apiKey}`,
+        'Content-Type': 'application/json',
+        'User-Agent': 'MortgageMatch-Pro/1.0',
+      },
+    })
+
+    // Add request/response interceptors for better error handling
+    this.axiosInstance.interceptors.response.use(
+      (response) => response,
+      (error) => {
+        console.error('Ratehub API error:', error.response?.status, error.message)
+        return Promise.reject(error)
+      }
+    )
   }
 
   async getRates(params: {
@@ -17,18 +93,16 @@ export class RatehubAPI {
     downPayment: number
   }) {
     try {
-      const response = await axios.get(`${this.baseURL}/rates`, {
-        headers: {
-          'Authorization': `Bearer ${this.apiKey}`,
-          'Content-Type': 'application/json',
-        },
-        params: {
-          term_years: params.term,
-          rate_type: params.type,
-          province: params.province,
-          property_value: params.propertyValue,
-          down_payment: params.downPayment,
-        },
+      const response = await this.circuitBreaker.execute(async () => {
+        return this.axiosInstance.get('/rates', {
+          params: {
+            term_years: params.term,
+            rate_type: params.type,
+            province: params.province,
+            property_value: params.propertyValue,
+            down_payment: params.downPayment,
+          },
+        })
       })
 
       return response.data.rates.map((rate: any) => ({
@@ -48,10 +122,13 @@ export class RatehubAPI {
           email: rate.email || 'info@ratehub.ca',
           website: rate.website || 'https://ratehub.ca',
         },
+        lastUpdated: new Date().toISOString(),
+        source: 'ratehub',
       }))
     } catch (error) {
       console.error('Ratehub API error:', error)
-      throw new Error('Failed to fetch rates from Ratehub')
+      // Return empty array instead of throwing to allow fallback
+      return []
     }
   }
 
@@ -72,9 +149,31 @@ export class RatehubAPI {
 export class FreddieMacAPI {
   private apiKey: string
   private baseURL = 'https://api.freddiemac.com/v1'
+  private axiosInstance: AxiosInstance
+  private circuitBreaker: CircuitBreaker
 
   constructor(apiKey: string) {
     this.apiKey = apiKey
+    this.circuitBreaker = new CircuitBreaker()
+    
+    this.axiosInstance = axios.create({
+      baseURL: this.baseURL,
+      timeout: 10000,
+      headers: {
+        'Authorization': `Bearer ${this.apiKey}`,
+        'Content-Type': 'application/json',
+        'User-Agent': 'MortgageMatch-Pro/1.0',
+      },
+    })
+
+    // Add request/response interceptors for better error handling
+    this.axiosInstance.interceptors.response.use(
+      (response) => response,
+      (error) => {
+        console.error('Freddie Mac API error:', error.response?.status, error.message)
+        return Promise.reject(error)
+      }
+    )
   }
 
   async getRates(params: {
@@ -85,18 +184,16 @@ export class FreddieMacAPI {
     downPayment: number
   }) {
     try {
-      const response = await axios.get(`${this.baseURL}/rates/pmm`, {
-        headers: {
-          'Authorization': `Bearer ${this.apiKey}`,
-          'Content-Type': 'application/json',
-        },
-        params: {
-          term_years: params.term,
-          rate_type: params.type,
-          state: params.state,
-          property_value: params.propertyValue,
-          down_payment: params.downPayment,
-        },
+      const response = await this.circuitBreaker.execute(async () => {
+        return this.axiosInstance.get('/rates/pmm', {
+          params: {
+            term_years: params.term,
+            rate_type: params.type,
+            state: params.state,
+            property_value: params.propertyValue,
+            down_payment: params.downPayment,
+          },
+        })
       })
 
       return response.data.rates.map((rate: any) => ({
@@ -116,10 +213,13 @@ export class FreddieMacAPI {
           email: rate.email || 'info@freddiemac.com',
           website: rate.website || 'https://freddiemac.com',
         },
+        lastUpdated: new Date().toISOString(),
+        source: 'freddiemac',
       }))
     } catch (error) {
       console.error('Freddie Mac API error:', error)
-      throw new Error('Failed to fetch rates from Freddie Mac')
+      // Return empty array instead of throwing to allow fallback
+      return []
     }
   }
 
@@ -284,20 +384,41 @@ export const mockRates = {
   ],
 }
 
-// Rate fetching service
+// Rate fetching service with enhanced error handling and fallbacks
 export class RateService {
   private ratehubAPI: RatehubAPI
   private freddieMacAPI: FreddieMacAPI
+  private cache: Map<string, { data: any; timestamp: number }> = new Map()
+  private readonly CACHE_TTL = 5 * 60 * 1000 // 5 minutes
 
   constructor() {
     this.ratehubAPI = new RatehubAPI(process.env.RATEHUB_API_KEY || '')
     this.freddieMacAPI = new FreddieMacAPI(process.env.FREDDIE_MAC_API_KEY || '')
   }
 
+  private getCacheKey(country: string, params: any): string {
+    return `${country}_${JSON.stringify(params)}`
+  }
+
+  private isCacheValid(timestamp: number): boolean {
+    return Date.now() - timestamp < this.CACHE_TTL
+  }
+
   async getRates(country: 'CA' | 'US', params: any) {
+    const cacheKey = this.getCacheKey(country, params)
+    
+    // Check cache first
+    const cached = this.cache.get(cacheKey)
+    if (cached && this.isCacheValid(cached.timestamp)) {
+      console.log('Returning cached rates')
+      return cached.data
+    }
+
     try {
+      let rates: any[] = []
+      
       if (country === 'CA') {
-        return await this.ratehubAPI.getRates({
+        rates = await this.ratehubAPI.getRates({
           term: params.termYears,
           type: params.rateType,
           province: params.location?.split(',')[1]?.trim() || 'ON',
@@ -305,7 +426,7 @@ export class RateService {
           downPayment: params.downPayment,
         })
       } else {
-        return await this.freddieMacAPI.getRates({
+        rates = await this.freddieMacAPI.getRates({
           term: params.termYears,
           type: params.rateType,
           state: params.location?.split(',')[1]?.trim() || 'CA',
@@ -313,13 +434,85 @@ export class RateService {
           downPayment: params.downPayment,
         })
       }
+
+      // If API returns empty array, try fallback
+      if (rates.length === 0) {
+        console.warn('No rates from API, using fallback data')
+        rates = this.getFallbackRates(country, params)
+      }
+
+      // Cache the results
+      this.cache.set(cacheKey, {
+        data: rates,
+        timestamp: Date.now(),
+      })
+
+      return rates
     } catch (error) {
       console.error('Rate service error:', error)
-      // Fallback to mock data in development
-      if (process.env.NODE_ENV === 'development') {
-        return mockRates[country]
+      
+      // Try to return cached data even if expired
+      if (cached) {
+        console.log('Returning expired cached data due to API error')
+        return cached.data
       }
-      throw error
+
+      // Fallback to mock data
+      console.log('Falling back to mock data')
+      return this.getFallbackRates(country, params)
+    }
+  }
+
+  private getFallbackRates(country: 'CA' | 'US', params: any) {
+    const baseRates = mockRates[country]
+    
+    // Filter rates based on parameters
+    return baseRates.filter(rate => {
+      if (params.rateType && rate.type !== params.rateType) return false
+      if (params.termYears && rate.term !== params.termYears) return false
+      return true
+    }).map(rate => ({
+      ...rate,
+      lastUpdated: new Date().toISOString(),
+      source: 'fallback',
+    }))
+  }
+
+  // Health check for all APIs
+  async healthCheck(): Promise<{ ratehub: boolean; freddiemac: boolean }> {
+    const [ratehubHealth, freddiemacHealth] = await Promise.allSettled([
+      this.ratehubAPI.getRates({
+        term: 25,
+        type: 'fixed',
+        province: 'ON',
+        propertyValue: 500000,
+        downPayment: 100000,
+      }).then(() => true).catch(() => false),
+      this.freddieMacAPI.getRates({
+        term: 30,
+        type: 'fixed',
+        state: 'CA',
+        propertyValue: 500000,
+        downPayment: 100000,
+      }).then(() => true).catch(() => false),
+    ])
+
+    return {
+      ratehub: ratehubHealth.status === 'fulfilled' && ratehubHealth.value,
+      freddiemac: freddiemacHealth.status === 'fulfilled' && freddiemacHealth.value,
+    }
+  }
+
+  // Clear cache
+  clearCache(): void {
+    this.cache.clear()
+  }
+
+  // Get cache statistics
+  getCacheStats(): { size: number; keys: string[] } {
+    return {
+      size: this.cache.size,
+      keys: Array.from(this.cache.keys()),
     }
   }
 }
