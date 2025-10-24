@@ -336,7 +336,7 @@ export default function MortgageMatchPro() {
   }
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-blue-50 to-indigo-100">
+    <div className="min-h-screen bg-white">
       <div className="container mx-auto px-4 py-8">
         {/* Header */}
         <div className="text-center mb-8">
@@ -345,12 +345,13 @@ export default function MortgageMatchPro() {
             <div className="flex items-center gap-4">
               {user ? (
                 <div className="flex items-center gap-2">
-                  <User className="h-5 w-5" />
+                  <User className="h-5 w-5 text-gray-600" />
                   <span className="text-sm text-gray-600">{user.email}</span>
                   <Button
                     variant="outline"
                     size="sm"
                     onClick={() => signOut()}
+                    className="border-gray-300 text-gray-700 hover:bg-gray-50"
                   >
                     Sign Out
                   </Button>
@@ -359,6 +360,7 @@ export default function MortgageMatchPro() {
                 <Button
                   variant="outline"
                   onClick={() => window.location.href = '/auth/login'}
+                  className="border-gray-300 text-gray-700 hover:bg-gray-50"
                 >
                   <LogIn className="h-4 w-4 mr-2" />
                   Sign In
@@ -370,39 +372,57 @@ export default function MortgageMatchPro() {
             MortgageMatch Pro
           </h1>
           <p className="text-xl text-gray-600 mb-4">
-            AI-Powered Mortgage Intelligence Platform
+            Smarter Mortgages Start Here – Your AI Loan Advisor Built on ChatGPT
           </p>
           <div className="flex justify-center gap-2">
-            <Badge variant="secondary">Canada & USA</Badge>
-            <Badge variant="secondary">Real-time Rates</Badge>
-            <Badge variant="secondary">OSFI & CFPB Compliant</Badge>
+            <Badge variant="secondary" className="bg-gray-100 text-gray-700">Canada & USA</Badge>
+            <Badge variant="secondary" className="bg-gray-100 text-gray-700">Real-time Rates</Badge>
+            <Badge variant="secondary" className="bg-gray-100 text-gray-700">OSFI & CFPB Compliant</Badge>
           </div>
         </div>
 
         {/* Main Content */}
         <Tabs value={activeTab} onValueChange={setActiveTab} className="w-full">
-          <TabsList className="grid w-full grid-cols-6">
-            <TabsTrigger value="scenarios" className="flex items-center gap-2">
+          <TabsList className="grid w-full grid-cols-6 bg-gray-100 rounded-lg p-1">
+            <TabsTrigger 
+              value="scenarios" 
+              className="flex items-center gap-2 data-[state=active]:bg-white data-[state=active]:shadow-sm"
+            >
               <Zap className="h-4 w-4" />
               Scenarios
             </TabsTrigger>
-            <TabsTrigger value="affordability" className="flex items-center gap-2">
+            <TabsTrigger 
+              value="affordability" 
+              className="flex items-center gap-2 data-[state=active]:bg-white data-[state=active]:shadow-sm"
+            >
               <Calculator className="h-4 w-4" />
               Affordability
             </TabsTrigger>
-            <TabsTrigger value="results" className="flex items-center gap-2">
+            <TabsTrigger 
+              value="results" 
+              className="flex items-center gap-2 data-[state=active]:bg-white data-[state=active]:shadow-sm"
+            >
               <CheckCircle className="h-4 w-4" />
               Results
             </TabsTrigger>
-            <TabsTrigger value="rates" className="flex items-center gap-2">
+            <TabsTrigger 
+              value="rates" 
+              className="flex items-center gap-2 data-[state=active]:bg-white data-[state=active]:shadow-sm"
+            >
               <TrendingUp className="h-4 w-4" />
               Rates
             </TabsTrigger>
-            <TabsTrigger value="compare" className="flex items-center gap-2">
+            <TabsTrigger 
+              value="compare" 
+              className="flex items-center gap-2 data-[state=active]:bg-white data-[state=active]:shadow-sm"
+            >
               <BarChart3 className="h-4 w-4" />
               Compare
             </TabsTrigger>
-            <TabsTrigger value="insights" className="flex items-center gap-2">
+            <TabsTrigger 
+              value="insights" 
+              className="flex items-center gap-2 data-[state=active]:bg-white data-[state=active]:shadow-sm"
+            >
               <Brain className="h-4 w-4" />
               AI Insights
             </TabsTrigger>
