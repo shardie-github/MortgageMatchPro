@@ -12,10 +12,22 @@ port = 54321
 # endpoints. `public` and `graphql_public` schemas are included by default.
 schemas = ["public", "graphql_public"]
 # Extra schemas to add to the search_path of every request.
+# SECURITY: Fixed search path to prevent function hijacking
 extra_search_path = ["public", "extensions"]
 # The maximum number of rows returns from a view, table, or stored procedure. Limits payload size
 # for accidental or malicious requests.
 max_rows = 1000
+
+# Security settings for enhanced protection
+[api.security]
+# Enable request logging for security monitoring
+enable_request_logging = true
+# Maximum request size in bytes
+max_request_size = "10MB"
+# Rate limiting per IP
+rate_limit_per_minute = 100
+# Enable CORS for specific origins only
+cors_origins = ["https://yourdomain.com", "https://app.yourdomain.com"]
 
 [api.tls]
 # Enable HTTPS endpoints locally using a self-signed certificate.
@@ -32,6 +44,19 @@ shadow_port = 54320
 # The database major version to use. This has to be the same as your remote database's. Run `SHOW
 # server_version;` on the remote database to check.
 major_version = 17
+
+# Enhanced database security and performance settings
+[db.security]
+# Enable connection encryption
+ssl_mode = "require"
+# Connection timeout settings
+connection_timeout = "30s"
+# Maximum connections per user
+max_connections_per_user = 20
+# Enable query logging for security monitoring
+enable_query_logging = true
+# Enable slow query logging (queries > 1 second)
+slow_query_threshold = "1s"
 
 [db.pooler]
 enabled = false
