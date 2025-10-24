@@ -14,6 +14,7 @@ import { ThemeProvider } from './contexts/ThemeContext';
 import { I18nProvider } from './contexts/I18nContext';
 import { theme } from './constants/theme';
 import { toastConfig } from './utils/toastConfig';
+import { usePerformanceMonitor, analyzeBundleSize } from './utils/performance';
 
 const queryClient = new QueryClient({
   defaultOptions: {
@@ -25,12 +26,26 @@ const queryClient = new QueryClient({
 });
 
 const App: React.FC = () => {
+  const { startTiming, endTiming } = usePerformanceMonitor();
+
   useEffect(() => {
+    // Start performance monitoring
+    startTiming('app_initialization');
+    
     if (Platform.OS === 'android') {
       StatusBar.setBackgroundColor(theme.colors.primary);
     }
     StatusBar.setBarStyle('light-content');
-  }, []);
+
+    // Analyze bundle size in development
+    if (__DEV__) {
+      analyzeBundleSize();
+    }
+
+    // End initialization timing
+    const initTime = endTiming('app_initialization');
+    console.log(`App initialization took: ${initTime}ms`);
+  }, [startTiming, endTiming]);
 
   return (
     <GestureHandlerRootView style={{ flex: 1 }}>
