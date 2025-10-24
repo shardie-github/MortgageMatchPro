@@ -787,6 +787,48 @@ CREATE POLICY "Service role can manage all payment methods" ON payment_methods
 CREATE POLICY "Service role can manage all refunds" ON refunds
     FOR ALL USING (auth.role() = 'service_role');
 
+-- Additional RLS policies for missing tables
+CREATE POLICY "Users can view their own mortgage calculations" ON mortgage_calculations
+    FOR SELECT USING (auth.uid() = user_id);
+
+CREATE POLICY "Users can insert their own mortgage calculations" ON mortgage_calculations
+    FOR INSERT WITH CHECK (auth.uid() = user_id);
+
+CREATE POLICY "Users can view their own rate checks" ON rate_checks
+    FOR SELECT USING (auth.uid() = user_id);
+
+CREATE POLICY "Users can insert their own rate checks" ON rate_checks
+    FOR INSERT WITH CHECK (auth.uid() = user_id);
+
+CREATE POLICY "Users can view their own leads" ON leads
+    FOR SELECT USING (auth.uid() = user_id);
+
+CREATE POLICY "Users can insert their own leads" ON leads
+    FOR INSERT WITH CHECK (auth.uid() = user_id);
+
+CREATE POLICY "Users can update their own leads" ON leads
+    FOR UPDATE USING (auth.uid() = user_id);
+
+-- Brokers can view leads assigned to them
+CREATE POLICY "Brokers can view assigned leads" ON leads
+    FOR SELECT USING (
+        EXISTS (
+            SELECT 1 FROM brokers 
+            WHERE brokers.id = leads.broker_id 
+            AND brokers.email = auth.jwt() ->> 'email'
+        )
+    );
+
+-- Brokers can update leads assigned to them
+CREATE POLICY "Brokers can update assigned leads" ON leads
+    FOR UPDATE USING (
+        EXISTS (
+            SELECT 1 FROM brokers 
+            WHERE brokers.id = leads.broker_id 
+            AND brokers.email = auth.jwt() ->> 'email'
+        )
+    );
+
 -- =============================================
 -- UTILITY FUNCTIONS
 -- =============================================

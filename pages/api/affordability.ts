@@ -13,6 +13,11 @@ import { analytics, errorTracking } from '@/lib/monitoring'
 
 async function handler(req: NextApiRequest, res: NextApiResponse) {
   try {
+    // Validate request method
+    if (req.method !== 'POST') {
+      return res.status(405).json({ error: 'Method not allowed' })
+    }
+
     const {
       userId,
       country,
@@ -27,6 +32,14 @@ async function handler(req: NextApiRequest, res: NextApiResponse) {
       insurance = 0,
       hoa = 0,
     } = req.body
+
+    // Additional validation
+    if (!country || !income || !propertyPrice || !interestRate || !termYears || !location) {
+      return res.status(400).json({ 
+        error: 'Missing required fields',
+        required: ['country', 'income', 'propertyPrice', 'interestRate', 'termYears', 'location']
+      })
+    }
 
     // Log the calculation request
     if (userId) {
