@@ -13,7 +13,12 @@
     "build:android": "cd android && ./gradlew assembleRelease",
     "build:ios": "cd ios && xcodebuild -workspace MortgageMatchPro.xcworkspace -scheme MortgageMatchPro -configuration Release -destination generic/platform=iOS -archivePath MortgageMatchPro.xcarchive archive",
     "clean": "react-native clean",
-    "reset-cache": "npx react-native start --reset-cache"
+    "reset-cache": "npx react-native start --reset-cache",
+    "db:setup": "./scripts/setup-supabase-database.sh --remote",
+    "db:setup:local": "./scripts/setup-supabase-database.sh --local",
+    "db:setup:dry-run": "./scripts/setup-supabase-database.sh --dry-run",
+    "db:migrate": "node scripts/run-migrations.js",
+    "db:migrate:dry-run": "node scripts/run-migrations.js --dry-run"
   },
   "dependencies": {
     "react": "18.2.0",
