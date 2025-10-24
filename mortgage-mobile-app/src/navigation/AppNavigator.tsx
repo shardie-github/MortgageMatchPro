@@ -4,6 +4,7 @@ import { createStackNavigator } from '@react-navigation/stack';
 import Icon from 'react-native-vector-icons/MaterialIcons';
 
 // Screens
+import AuthScreen from '../screens/auth/AuthScreen';
 import DashboardScreen from '../screens/dashboard/DashboardScreen';
 import CalculatorScreen from '../screens/calculator/CalculatorScreen';
 import DocumentsScreen from '../screens/documents/DocumentsScreen';
@@ -12,6 +13,9 @@ import SettingsScreen from '../screens/settings/SettingsScreen';
 
 // Types
 import { RootStackParamList, TabParamList } from '../types/navigation';
+
+// Store
+import { useAuthStore } from '../store/authStore';
 
 const Tab = createBottomTabNavigator<TabParamList>();
 const Stack = createStackNavigator<RootStackParamList>();
@@ -61,14 +65,22 @@ const TabNavigator = () => {
 };
 
 export const AppNavigator = () => {
+  const { isAuthenticated } = useAuthStore();
+
   return (
     <Stack.Navigator
       screenOptions={{
         headerShown: false,
       }}
     >
-      <Stack.Screen name="Main" component={TabNavigator} />
-      <Stack.Screen name="Settings" component={SettingsScreen} />
+      {isAuthenticated ? (
+        <>
+          <Stack.Screen name="Main" component={TabNavigator} />
+          <Stack.Screen name="Settings" component={SettingsScreen} />
+        </>
+      ) : (
+        <Stack.Screen name="Auth" component={AuthScreen} />
+      )}
     </Stack.Navigator>
   );
 };

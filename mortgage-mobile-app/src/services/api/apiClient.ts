@@ -45,10 +45,12 @@ apiClient.interceptors.response.use(
 
 // Helper functions for token management
 const getAuthToken = (): string | null => {
-  // Implement token retrieval from secure storage
+  // TODO: Implement token retrieval from secure storage (Keychain/Keystore)
+  // For now, return null - this should be implemented with react-native-keychain
   return null;
 };
 
 const clearAuthToken = (): void => {
-  // Implement token clearing
+  // TODO: Implement token clearing from secure storage
+  // This should clear tokens from Keychain/Keystore
 };

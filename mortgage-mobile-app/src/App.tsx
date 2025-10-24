@@ -1,31 +1,35 @@
-import React from 'react';
+import React, { useEffect } from 'react';
+import { StatusBar, Platform } from 'react-native';
 import { NavigationContainer } from '@react-navigation/native';
-import { createStackNavigator } from '@react-navigation/stack';
+import { GestureHandlerRootView } from 'react-native-gesture-handler';
+import { SafeAreaProvider } from 'react-native-safe-area-context';
 import { Provider as PaperProvider } from 'react-native-paper';
 import { QueryClient, QueryClientProvider } from 'react-query';
-import { StatusBar } from 'react-native';
-import { SafeAreaProvider } from 'react-native-safe-area-context';
-import { GestureHandlerRootView } from 'react-native-gesture-handler';
+import Toast from 'react-native-toast-message';
+import FlashMessage from 'react-native-flash-message';
 
-// Screens
-import AuthScreen from './screens/auth/AuthScreen';
-import DashboardScreen from './screens/dashboard/DashboardScreen';
-import CalculatorScreen from './screens/calculator/CalculatorScreen';
-import ProfileScreen from './screens/profile/ProfileScreen';
-import DocumentsScreen from './screens/documents/DocumentsScreen';
-import SettingsScreen from './screens/settings/SettingsScreen';
-
-// Store
+import { AppNavigator } from './navigation/AppNavigator';
 import { useAuthStore } from './store/authStore';
-
-// Theme
 import { theme } from './constants/theme';
 
-const Stack = createStackNavigator();
-const queryClient = new QueryClient();
+const queryClient = new QueryClient({
+  defaultOptions: {
+    queries: {
+      retry: 2,
+      staleTime: 5 * 60 * 1000, // 5 minutes
+    },
+  },
+});
 
-const App = () => {
+const App: React.FC = () => {
   const { isAuthenticated } = useAuthStore();
+
+  useEffect(() => {
+    if (Platform.OS === 'android') {
+      StatusBar.setBackgroundColor(theme.colors.primary);
+    }
+    StatusBar.setBarStyle('light-content');
+  }, []);
 
   return (
     <GestureHandlerRootView style={{ flex: 1 }}>
@@ -33,24 +37,9 @@ const App = () => {
         <QueryClientProvider client={queryClient}>
           <PaperProvider theme={theme}>
             <NavigationContainer>
-              <StatusBar barStyle="dark-content" backgroundColor="#fff" />
-              <Stack.Navigator
-                screenOptions={{
-                  headerShown: false,
-                }}
-              >
-                {isAuthenticated ? (
-                  <>
-                    <Stack.Screen name="Dashboard" component={DashboardScreen} />
-                    <Stack.Screen name="Calculator" component={CalculatorScreen} />
-                    <Stack.Screen name="Profile" component={ProfileScreen} />
-                    <Stack.Screen name="Documents" component={DocumentsScreen} />
-                    <Stack.Screen name="Settings" component={SettingsScreen} />
-                  </>
-                ) : (
-                  <Stack.Screen name="Auth" component={AuthScreen} />
-                )}
-              </Stack.Navigator>
+              <AppNavigator />
+              <Toast />
+              <FlashMessage position="top" />
             </NavigationContainer>
           </PaperProvider>
         </QueryClientProvider>
