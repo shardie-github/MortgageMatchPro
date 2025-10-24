@@ -60,17 +60,17 @@ export function AffordabilityInputPanel({ onCalculate, loading = false }: Afford
   }
 
   return (
-    <Card className="w-full max-w-4xl mx-auto">
-      <CardHeader>
-        <CardTitle className="flex items-center gap-2">
-          <Calculator className="h-6 w-6 text-primary" />
+    <Card className="w-full max-w-4xl mx-auto border-gray-200 shadow-sm">
+      <CardHeader className="pb-4">
+        <CardTitle className="flex items-center gap-2 text-gray-900">
+          <Calculator className="h-6 w-6 text-gray-600" />
           Mortgage Affordability Calculator
         </CardTitle>
-        <p className="text-sm text-muted-foreground">
+        <p className="text-sm text-gray-600 mt-2">
           Calculate how much you can afford based on your income and financial situation
         </p>
       </CardHeader>
-      <CardContent>
+      <CardContent className="pt-0">
         <form onSubmit={handleSubmit} className="space-y-6">
           {/* Country Selection */}
           <div className="space-y-2">
@@ -254,7 +254,11 @@ export function AffordabilityInputPanel({ onCalculate, loading = false }: Afford
             </div>
           </div>
 
-          <Button type="submit" className="w-full" disabled={loading}>
+          <Button 
+            type="submit" 
+            className="w-full bg-gray-900 hover:bg-gray-800 text-white font-medium py-3 px-4 rounded-lg transition-colors duration-150" 
+            disabled={loading}
+          >
             {loading ? (
               <>
                 <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-white mr-2" />
