@@ -1,0 +1,77 @@
+{
+  "timestamp": "2025-10-25T23:25:28.104Z",
+  "config": {
+    "thresholds": {
+      "performance": 95,
+      "accessibility": 95,
+      "bestPractices": 95,
+      "seo": 95,
+      "pwa": 90
+    },
+    "categories": [
+      "performance",
+      "accessibility",
+      "best-practices",
+      "seo",
+      "pwa"
+    ],
+    "output": [
+      "json",
+      "html"
+    ],
+    "viewport": {
+      "width": 1280,
+      "height": 720
+    },
+    "throttling": {
+      "rttMs": 40,
+      "throughputKbps": 10240,
+      "cpuSlowdownMultiplier": 1
+    }
+  },
+  "results": {
+    "summary": {
+      "totalPages": 4,
+      "averageScores": {},
+      "overallHealth": "excellent",
+      "criticalIssues": [],
+      "recommendations": []
+    },
+    "details": {
+      "homepage": {
+        "page": "homepage",
+        "url": "http://localhost:3000",
+        "scores": {},
+        "audits": {},
+        "timestamp": "2025-10-25T23:25:26.627Z",
+        "error": "Audit failed - page may not be accessible"
+      },
+      "dashboard": {
+        "page": "dashboard",
+        "url": "http://localhost:3000/dashboard",
+        "scores": {},
+        "audits": {},
+        "timestamp": "2025-10-25T23:25:27.129Z",
+        "error": "Audit failed - page may not be accessible"
+      },
+      "calculator": {
+        "page": "calculator",
+        "url": "http://localhost:3000/calculator",
+        "scores": {},
+        "audits": {},
+        "timestamp": "2025-10-25T23:25:27.617Z",
+        "error": "Audit failed - page may not be accessible"
+      },
+      "rates": {
+        "page": "rates",
+        "url": "http://localhost:3000/rates",
+        "scores": {},
+        "audits": {},
+        "timestamp": "2025-10-25T23:25:28.103Z",
+        "error": "Audit failed - page may not be accessible"
+      }
+    },
+    "recommendations": [],
+    "scores": {}
+  }
+}
