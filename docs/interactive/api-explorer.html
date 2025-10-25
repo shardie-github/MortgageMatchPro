@@ -1,0 +1,860 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>MortgageMatch Pro - API Explorer</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            background: #f8fafc;
+            color: #1a202c;
+            line-height: 1.6;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+
+        .header {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 40px 0;
+            text-align: center;
+            margin-bottom: 40px;
+            border-radius: 12px;
+        }
+
+        .header h1 {
+            font-size: 2.5rem;
+            margin-bottom: 10px;
+        }
+
+        .header p {
+            font-size: 1.2rem;
+            opacity: 0.9;
+        }
+
+        .api-section {
+            background: white;
+            border-radius: 12px;
+            padding: 30px;
+            margin-bottom: 30px;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+        }
+
+        .endpoint {
+            border: 1px solid #e2e8f0;
+            border-radius: 8px;
+            margin-bottom: 20px;
+            overflow: hidden;
+        }
+
+        .endpoint-header {
+            background: #f7fafc;
+            padding: 15px 20px;
+            border-bottom: 1px solid #e2e8f0;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+        }
+
+        .method {
+            padding: 4px 12px;
+            border-radius: 4px;
+            font-weight: 600;
+            font-size: 0.875rem;
+            margin-right: 15px;
+        }
+
+        .method.get { background: #48bb78; color: white; }
+        .method.post { background: #4299e1; color: white; }
+        .method.put { background: #ed8936; color: white; }
+        .method.delete { background: #f56565; color: white; }
+
+        .endpoint-path {
+            font-family: 'Monaco', 'Menlo', monospace;
+            font-size: 1.1rem;
+            color: #2d3748;
+        }
+
+        .endpoint-description {
+            color: #718096;
+            font-size: 0.9rem;
+        }
+
+        .endpoint-content {
+            padding: 20px;
+            display: none;
+        }
+
+        .endpoint-content.active {
+            display: block;
+        }
+
+        .tabs {
+            display: flex;
+            border-bottom: 1px solid #e2e8f0;
+            margin-bottom: 20px;
+        }
+
+        .tab {
+            padding: 10px 20px;
+            cursor: pointer;
+            border-bottom: 2px solid transparent;
+            color: #718096;
+            transition: all 0.2s;
+        }
+
+        .tab.active {
+            color: #4299e1;
+            border-bottom-color: #4299e1;
+        }
+
+        .tab:hover {
+            color: #2d3748;
+        }
+
+        .tab-content {
+            display: none;
+        }
+
+        .tab-content.active {
+            display: block;
+        }
+
+        .code-block {
+            background: #1a202c;
+            color: #e2e8f0;
+            padding: 20px;
+            border-radius: 8px;
+            font-family: 'Monaco', 'Menlo', monospace;
+            font-size: 0.9rem;
+            overflow-x: auto;
+            margin: 15px 0;
+        }
+
+        .form-group {
+            margin-bottom: 15px;
+        }
+
+        .form-group label {
+            display: block;
+            margin-bottom: 5px;
+            font-weight: 600;
+            color: #2d3748;
+        }
+
+        .form-group input,
+        .form-group select,
+        .form-group textarea {
+            width: 100%;
+            padding: 10px;
+            border: 1px solid #e2e8f0;
+            border-radius: 6px;
+            font-size: 0.9rem;
+        }
+
+        .form-group textarea {
+            height: 120px;
+            resize: vertical;
+        }
+
+        .btn {
+            background: #4299e1;
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 6px;
+            cursor: pointer;
+            font-size: 0.9rem;
+            transition: background 0.2s;
+        }
+
+        .btn:hover {
+            background: #3182ce;
+        }
+
+        .btn:disabled {
+            background: #a0aec0;
+            cursor: not-allowed;
+        }
+
+        .response {
+            background: #f7fafc;
+            border: 1px solid #e2e8f0;
+            border-radius: 6px;
+            padding: 15px;
+            margin-top: 15px;
+        }
+
+        .response-header {
+            font-weight: 600;
+            margin-bottom: 10px;
+            color: #2d3748;
+        }
+
+        .response-content {
+            font-family: 'Monaco', 'Menlo', monospace;
+            font-size: 0.9rem;
+            white-space: pre-wrap;
+            overflow-x: auto;
+        }
+
+        .status-success { color: #48bb78; }
+        .status-error { color: #f56565; }
+
+        .auth-section {
+            background: #fff5f5;
+            border: 1px solid #fed7d7;
+            border-radius: 8px;
+            padding: 20px;
+            margin-bottom: 30px;
+        }
+
+        .auth-section h3 {
+            color: #c53030;
+            margin-bottom: 10px;
+        }
+
+        .auth-section p {
+            color: #742a2a;
+            margin-bottom: 15px;
+        }
+
+        .copy-btn {
+            background: #718096;
+            color: white;
+            border: none;
+            padding: 5px 10px;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 0.8rem;
+            margin-left: 10px;
+        }
+
+        .copy-btn:hover {
+            background: #4a5568;
+        }
+
+        .loading {
+            display: none;
+            text-align: center;
+            padding: 20px;
+            color: #718096;
+        }
+
+        .spinner {
+            border: 2px solid #e2e8f0;
+            border-top: 2px solid #4299e1;
+            border-radius: 50%;
+            width: 20px;
+            height: 20px;
+            animation: spin 1s linear infinite;
+            margin: 0 auto 10px;
+        }
+
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+
+        .error {
+            background: #fed7d7;
+            color: #c53030;
+            padding: 15px;
+            border-radius: 6px;
+            margin: 15px 0;
+        }
+
+        .success {
+            background: #c6f6d5;
+            color: #22543d;
+            padding: 15px;
+            border-radius: 6px;
+            margin: 15px 0;
+        }
+
+        @media (max-width: 768px) {
+            .container {
+                padding: 10px;
+            }
+            
+            .header h1 {
+                font-size: 2rem;
+            }
+            
+            .endpoint-header {
+                flex-direction: column;
+                align-items: flex-start;
+            }
+            
+            .method {
+                margin-bottom: 10px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>MortgageMatch Pro API Explorer</h1>
+            <p>Interactive API documentation and testing tool</p>
+        </div>
+
+        <div class="auth-section">
+            <h3>🔐 Authentication Required</h3>
+            <p>Most endpoints require authentication. Enter your API key below to test the endpoints.</p>
+            <div class="form-group">
+                <label for="apiKey">API Key:</label>
+                <input type="password" id="apiKey" placeholder="Enter your API key">
+            </div>
+            <button class="btn" onclick="setApiKey()">Set API Key</button>
+        </div>
+
+        <div class="api-section">
+            <h2>Authentication Endpoints</h2>
+            
+            <div class="endpoint">
+                <div class="endpoint-header" onclick="toggleEndpoint(this)">
+                    <div>
+                        <span class="method post">POST</span>
+                        <span class="endpoint-path">/api/auth/register</span>
+                    </div>
+                    <div class="endpoint-description">Register a new user account</div>
+                </div>
+                <div class="endpoint-content">
+                    <div class="tabs">
+                        <div class="tab active" onclick="switchTab(this, 'register-request')">Request</div>
+                        <div class="tab" onclick="switchTab(this, 'register-response')">Response</div>
+                        <div class="tab" onclick="switchTab(this, 'register-test')">Test</div>
+                    </div>
+                    
+                    <div class="tab-content active" id="register-request">
+                        <h4>Request Body</h4>
+                        <div class="code-block">{
+  "email": "user@example.com",
+  "password": "SecurePassword123!",
+  "firstName": "John",
+  "lastName": "Doe",
+  "phone": "+1234567890",
+  "userType": "borrower"
+}</div>
+                    </div>
+                    
+                    <div class="tab-content" id="register-response">
+                        <h4>Success Response (201)</h4>
+                        <div class="code-block">{
+  "success": true,
+  "message": "User registered successfully",
+  "user": {
+    "id": "user_123456789",
+    "email": "user@example.com",
+    "firstName": "John",
+    "lastName": "Doe",
+    "userType": "borrower",
+    "emailVerified": false,
+    "createdAt": "2024-12-19T10:30:00Z"
+  }
+}</div>
+                    </div>
+                    
+                    <div class="tab-content" id="register-test">
+                        <h4>Test Registration</h4>
+                        <div class="form-group">
+                            <label>Email:</label>
+                            <input type="email" id="register-email" value="test@example.com">
+                        </div>
+                        <div class="form-group">
+                            <label>Password:</label>
+                            <input type="password" id="register-password" value="TestPassword123!">
+                        </div>
+                        <div class="form-group">
+                            <label>First Name:</label>
+                            <input type="text" id="register-firstName" value="Test">
+                        </div>
+                        <div class="form-group">
+                            <label>Last Name:</label>
+                            <input type="text" id="register-lastName" value="User">
+                        </div>
+                        <div class="form-group">
+                            <label>Phone:</label>
+                            <input type="tel" id="register-phone" value="+1234567890">
+                        </div>
+                        <div class="form-group">
+                            <label>User Type:</label>
+                            <select id="register-userType">
+                                <option value="borrower">Borrower</option>
+                                <option value="broker">Broker</option>
+                            </select>
+                        </div>
+                        <button class="btn" onclick="testRegister()">Test Registration</button>
+                        <div class="loading" id="register-loading">
+                            <div class="spinner"></div>
+                            Testing registration...
+                        </div>
+                        <div id="register-result"></div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="endpoint">
+                <div class="endpoint-header" onclick="toggleEndpoint(this)">
+                    <div>
+                        <span class="method post">POST</span>
+                        <span class="endpoint-path">/api/auth/login</span>
+                    </div>
+                    <div class="endpoint-description">Authenticate user and get JWT token</div>
+                </div>
+                <div class="endpoint-content">
+                    <div class="tabs">
+                        <div class="tab active" onclick="switchTab(this, 'login-request')">Request</div>
+                        <div class="tab" onclick="switchTab(this, 'login-response')">Response</div>
+                        <div class="tab" onclick="switchTab(this, 'login-test')">Test</div>
+                    </div>
+                    
+                    <div class="tab-content active" id="login-request">
+                        <h4>Request Body</h4>
+                        <div class="code-block">{
+  "email": "user@example.com",
+  "password": "SecurePassword123!"
+}</div>
+                    </div>
+                    
+                    <div class="tab-content" id="login-response">
+                        <h4>Success Response (200)</h4>
+                        <div class="code-block">{
+  "success": true,
+  "message": "Login successful",
+  "user": {
+    "id": "user_123456789",
+    "email": "user@example.com",
+    "firstName": "John",
+    "lastName": "Doe",
+    "userType": "borrower"
+  },
+  "token": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...",
+  "expiresIn": 3600
+}</div>
+                    </div>
+                    
+                    <div class="tab-content" id="login-test">
+                        <h4>Test Login</h4>
+                        <div class="form-group">
+                            <label>Email:</label>
+                            <input type="email" id="login-email" value="test@example.com">
+                        </div>
+                        <div class="form-group">
+                            <label>Password:</label>
+                            <input type="password" id="login-password" value="TestPassword123!">
+                        </div>
+                        <button class="btn" onclick="testLogin()">Test Login</button>
+                        <div class="loading" id="login-loading">
+                            <div class="spinner"></div>
+                            Testing login...
+                        </div>
+                        <div id="login-result"></div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="api-section">
+            <h2>Mortgage Calculation Endpoints</h2>
+            
+            <div class="endpoint">
+                <div class="endpoint-header" onclick="toggleEndpoint(this)">
+                    <div>
+                        <span class="method post">POST</span>
+                        <span class="endpoint-path">/api/mortgage/calculate</span>
+                    </div>
+                    <div class="endpoint-description">Calculate mortgage affordability and options</div>
+                </div>
+                <div class="endpoint-content">
+                    <div class="tabs">
+                        <div class="tab active" onclick="switchTab(this, 'calculate-request')">Request</div>
+                        <div class="tab" onclick="switchTab(this, 'calculate-response')">Response</div>
+                        <div class="tab" onclick="switchTab(this, 'calculate-test')">Test</div>
+                    </div>
+                    
+                    <div class="tab-content active" id="calculate-request">
+                        <h4>Request Body</h4>
+                        <div class="code-block">{
+  "income": 100000,
+  "monthlyDebts": 500,
+  "downPayment": 50000,
+  "propertyPrice": 500000,
+  "interestRate": 3.5,
+  "termYears": 25,
+  "propertyType": "single_family",
+  "location": {
+    "city": "Toronto",
+    "province": "ON",
+    "postalCode": "M5V 3A8"
+  }
+}</div>
+                    </div>
+                    
+                    <div class="tab-content" id="calculate-response">
+                        <h4>Success Response (200)</h4>
+                        <div class="code-block">{
+  "success": true,
+  "calculation": {
+    "id": "calc_123456789",
+    "monthlyPayment": 2456.78,
+    "totalInterest": 236627.00,
+    "totalCost": 736627.00,
+    "affordability": {
+      "maxAffordablePrice": 525000,
+      "debtToIncomeRatio": 0.35,
+      "grossDebtServiceRatio": 0.32,
+      "totalDebtServiceRatio": 0.28
+    },
+    "recommendations": [
+      {
+        "type": "down_payment",
+        "message": "Consider increasing down payment to 20% to avoid CMHC insurance",
+        "impact": "savings",
+        "amount": 15000
+      }
+    ],
+    "rates": {
+      "current": 3.5,
+      "bestAvailable": 3.25,
+      "source": "RateHub.ca"
+    }
+  },
+  "timestamp": "2024-12-19T10:30:00Z"
+}</div>
+                    </div>
+                    
+                    <div class="tab-content" id="calculate-test">
+                        <h4>Test Mortgage Calculation</h4>
+                        <div class="form-group">
+                            <label>Annual Income:</label>
+                            <input type="number" id="calc-income" value="100000">
+                        </div>
+                        <div class="form-group">
+                            <label>Monthly Debts:</label>
+                            <input type="number" id="calc-monthlyDebts" value="500">
+                        </div>
+                        <div class="form-group">
+                            <label>Down Payment:</label>
+                            <input type="number" id="calc-downPayment" value="50000">
+                        </div>
+                        <div class="form-group">
+                            <label>Property Price:</label>
+                            <input type="number" id="calc-propertyPrice" value="500000">
+                        </div>
+                        <div class="form-group">
+                            <label>Interest Rate (%):</label>
+                            <input type="number" id="calc-interestRate" value="3.5" step="0.1">
+                        </div>
+                        <div class="form-group">
+                            <label>Term (Years):</label>
+                            <input type="number" id="calc-termYears" value="25">
+                        </div>
+                        <div class="form-group">
+                            <label>Property Type:</label>
+                            <select id="calc-propertyType">
+                                <option value="single_family">Single Family</option>
+                                <option value="condo">Condo</option>
+                                <option value="townhouse">Townhouse</option>
+                            </select>
+                        </div>
+                        <button class="btn" onclick="testCalculate()">Test Calculation</button>
+                        <div class="loading" id="calculate-loading">
+                            <div class="spinner"></div>
+                            Calculating mortgage...
+                        </div>
+                        <div id="calculate-result"></div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="api-section">
+            <h2>Rate Information Endpoints</h2>
+            
+            <div class="endpoint">
+                <div class="endpoint-header" onclick="toggleEndpoint(this)">
+                    <div>
+                        <span class="method get">GET</span>
+                        <span class="endpoint-path">/api/rates/current</span>
+                    </div>
+                    <div class="endpoint-description">Get current mortgage rates from multiple sources</div>
+                </div>
+                <div class="endpoint-content">
+                    <div class="tabs">
+                        <div class="tab active" onclick="switchTab(this, 'rates-request')">Request</div>
+                        <div class="tab" onclick="switchTab(this, 'rates-response')">Response</div>
+                        <div class="tab" onclick="switchTab(this, 'rates-test')">Test</div>
+                    </div>
+                    
+                    <div class="tab-content active" id="rates-request">
+                        <h4>Query Parameters</h4>
+                        <div class="code-block">?propertyType=single_family&term=5&amortization=25</div>
+                    </div>
+                    
+                    <div class="tab-content" id="rates-response">
+                        <h4>Success Response (200)</h4>
+                        <div class="code-block">{
+  "success": true,
+  "rates": {
+    "fixed": [
+      {
+        "term": 5,
+        "rate": 3.25,
+        "source": "RateHub.ca",
+        "lastUpdated": "2024-12-19T10:30:00Z",
+        "lender": "TD Bank",
+        "features": ["Portable", "Prepayment options"]
+      }
+    ],
+    "variable": [
+      {
+        "term": 5,
+        "rate": 2.95,
+        "source": "Freddie Mac",
+        "lastUpdated": "2024-12-19T10:30:00Z",
+        "lender": "RBC",
+        "features": ["Convertible", "Prepayment options"]
+      }
+    ]
+  },
+  "lastUpdated": "2024-12-19T10:30:00Z"
+}</div>
+                    </div>
+                    
+                    <div class="tab-content" id="rates-test">
+                        <h4>Test Rate Information</h4>
+                        <div class="form-group">
+                            <label>Property Type:</label>
+                            <select id="rates-propertyType">
+                                <option value="single_family">Single Family</option>
+                                <option value="condo">Condo</option>
+                                <option value="townhouse">Townhouse</option>
+                            </select>
+                        </div>
+                        <div class="form-group">
+                            <label>Term (Years):</label>
+                            <select id="rates-term">
+                                <option value="1">1 Year</option>
+                                <option value="2">2 Years</option>
+                                <option value="3">3 Years</option>
+                                <option value="4">4 Years</option>
+                                <option value="5" selected>5 Years</option>
+                                <option value="7">7 Years</option>
+                                <option value="10">10 Years</option>
+                            </select>
+                        </div>
+                        <div class="form-group">
+                            <label>Amortization (Years):</label>
+                            <select id="rates-amortization">
+                                <option value="15">15 Years</option>
+                                <option value="20">20 Years</option>
+                                <option value="25" selected>25 Years</option>
+                                <option value="30">30 Years</option>
+                            </select>
+                        </div>
+                        <button class="btn" onclick="testRates()">Get Current Rates</button>
+                        <div class="loading" id="rates-loading">
+                            <div class="spinner"></div>
+                            Fetching rates...
+                        </div>
+                        <div id="rates-result"></div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        let apiKey = '';
+        const baseURL = 'https://mortgagematch-pro.vercel.app/api';
+
+        function setApiKey() {
+            apiKey = document.getElementById('apiKey').value;
+            if (apiKey) {
+                document.querySelector('.auth-section').innerHTML = `
+                    <h3>✅ Authentication Set</h3>
+                    <p>API key configured. You can now test the endpoints.</p>
+                `;
+            }
+        }
+
+        function toggleEndpoint(header) {
+            const content = header.nextElementSibling;
+            const isActive = content.classList.contains('active');
+            
+            // Close all other endpoints
+            document.querySelectorAll('.endpoint-content').forEach(el => {
+                el.classList.remove('active');
+            });
+            
+            // Toggle current endpoint
+            if (!isActive) {
+                content.classList.add('active');
+            }
+        }
+
+        function switchTab(tab, contentId) {
+            // Remove active class from all tabs in this endpoint
+            const endpoint = tab.closest('.endpoint-content');
+            endpoint.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
+            endpoint.querySelectorAll('.tab-content').forEach(t => t.classList.remove('active'));
+            
+            // Add active class to clicked tab and corresponding content
+            tab.classList.add('active');
+            document.getElementById(contentId).classList.add('active');
+        }
+
+        async function makeRequest(method, endpoint, data = null) {
+            const url = `${baseURL}${endpoint}`;
+            const options = {
+                method,
+                headers: {
+                    'Content-Type': 'application/json',
+                }
+            };
+
+            if (apiKey) {
+                options.headers['Authorization'] = `Bearer ${apiKey}`;
+            }
+
+            if (data) {
+                options.body = JSON.stringify(data);
+            }
+
+            try {
+                const response = await fetch(url, options);
+                const result = await response.json();
+                return { status: response.status, data: result };
+            } catch (error) {
+                return { status: 0, data: { error: error.message } };
+            }
+        }
+
+        function showLoading(elementId) {
+            document.getElementById(elementId).style.display = 'block';
+        }
+
+        function hideLoading(elementId) {
+            document.getElementById(elementId).style.display = 'none';
+        }
+
+        function showResult(elementId, result, isSuccess = true) {
+            const element = document.getElementById(elementId);
+            const statusClass = isSuccess ? 'status-success' : 'status-error';
+            const statusText = isSuccess ? 'Success' : 'Error';
+            
+            element.innerHTML = `
+                <div class="response">
+                    <div class="response-header ${statusClass}">${statusText} (${result.status})</div>
+                    <div class="response-content">${JSON.stringify(result.data, null, 2)}</div>
+                </div>
+            `;
+        }
+
+        async function testRegister() {
+            showLoading('register-loading');
+            
+            const data = {
+                email: document.getElementById('register-email').value,
+                password: document.getElementById('register-password').value,
+                firstName: document.getElementById('register-firstName').value,
+                lastName: document.getElementById('register-lastName').value,
+                phone: document.getElementById('register-phone').value,
+                userType: document.getElementById('register-userType').value
+            };
+
+            const result = await makeRequest('POST', '/auth/register', data);
+            hideLoading('register-loading');
+            showResult('register-result', result, result.status < 400);
+        }
+
+        async function testLogin() {
+            showLoading('login-loading');
+            
+            const data = {
+                email: document.getElementById('login-email').value,
+                password: document.getElementById('login-password').value
+            };
+
+            const result = await makeRequest('POST', '/auth/login', data);
+            hideLoading('login-loading');
+            showResult('login-result', result, result.status < 400);
+            
+            // If login successful, update API key
+            if (result.status === 200 && result.data.token) {
+                apiKey = result.data.token;
+                document.getElementById('apiKey').value = apiKey;
+            }
+        }
+
+        async function testCalculate() {
+            showLoading('calculate-loading');
+            
+            const data = {
+                income: parseFloat(document.getElementById('calc-income').value),
+                monthlyDebts: parseFloat(document.getElementById('calc-monthlyDebts').value),
+                downPayment: parseFloat(document.getElementById('calc-downPayment').value),
+                propertyPrice: parseFloat(document.getElementById('calc-propertyPrice').value),
+                interestRate: parseFloat(document.getElementById('calc-interestRate').value),
+                termYears: parseInt(document.getElementById('calc-termYears').value),
+                propertyType: document.getElementById('calc-propertyType').value,
+                location: {
+                    city: "Toronto",
+                    province: "ON",
+                    postalCode: "M5V 3A8"
+                }
+            };
+
+            const result = await makeRequest('POST', '/mortgage/calculate', data);
+            hideLoading('calculate-loading');
+            showResult('calculate-result', result, result.status < 400);
+        }
+
+        async function testRates() {
+            showLoading('rates-loading');
+            
+            const params = new URLSearchParams({
+                propertyType: document.getElementById('rates-propertyType').value,
+                term: document.getElementById('rates-term').value,
+                amortization: document.getElementById('rates-amortization').value
+            });
+
+            const result = await makeRequest('GET', `/rates/current?${params}`);
+            hideLoading('rates-loading');
+            showResult('rates-result', result, result.status < 400);
+        }
+
+        // Copy to clipboard functionality
+        function copyToClipboard(text) {
+            navigator.clipboard.writeText(text).then(() => {
+                alert('Copied to clipboard!');
+            });
+        }
+
+        // Add copy buttons to code blocks
+        document.addEventListener('DOMContentLoaded', function() {
+            const codeBlocks = document.querySelectorAll('.code-block');
+            codeBlocks.forEach(block => {
+                const copyBtn = document.createElement('button');
+                copyBtn.textContent = 'Copy';
+                copyBtn.className = 'copy-btn';
+                copyBtn.onclick = () => copyToClipboard(block.textContent);
+                block.parentNode.insertBefore(copyBtn, block.nextSibling);
+            });
+        });
+    </script>
+</body>
+</html>
