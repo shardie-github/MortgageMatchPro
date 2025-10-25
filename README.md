@@ -1,6 +1,6 @@
-# MortgageMatch Pro
+# MortgageMatch Pro v1.2.0
 
-AI-Powered Mortgage Intelligence Platform with Advanced Mobile Optimization
+AI-Powered Mortgage Intelligence Platform with Personalization, Fine-Tuning & Partner Integrations
 
 ## 🚀 Features
 
@@ -12,6 +12,20 @@ AI-Powered Mortgage Intelligence Platform with Advanced Mobile Optimization
 - **User Authentication**: Secure sign-in with email/password and Google OAuth
 - **Session Persistence**: Save and reload mortgage scenarios
 
+### v1.2.0 - AI Personalization & Intelligence
+- **Personalization Engine**: Context-aware AI that learns user preferences and adapts recommendations
+- **Adaptive AI Prompting**: Dynamic prompt templates that factor in user context and session history
+- **Fine-Tuning Pipeline**: Continuous learning from user interactions with model improvement
+- **Trust & Explainability**: Confidence indicators, reasoning explanations, and transparency features
+- **Regional Data Intelligence**: Real-time rate feeds from central banks and market data providers
+
+### Partner Integrations & Enterprise
+- **Broker & Lender APIs**: Modular integration system for financial institution partnerships
+- **CRM Lead Routing**: Export leads to HubSpot, Salesforce, Pipedrive, and custom systems
+- **Regional Rate Feeds**: Bank of Canada, Federal Reserve, and Bank of England data
+- **Feature Flags**: Enterprise-ready feature toggles for controlled rollouts
+- **Developer Tools**: Playground for AI testing and experimentation
+
 ### Mobile-First Design
 - **Responsive Design**: Mobile-first approach with comprehensive breakpoint system
 - **Touch Optimization**: 44pt minimum touch targets for accessibility
@@ -20,11 +34,53 @@ AI-Powered Mortgage Intelligence Platform with Advanced Mobile Optimization
 - **Real-time Monitoring**: Performance dashboard with live metrics
 
 ### Advanced Features
-- **AI-Powered Insights**: ChatGPT integration for mortgage advice
+- **AI-Powered Insights**: ChatGPT integration with personalized prompting
 - **Circuit Breaker Pattern**: Resilient API calls with automatic fallbacks
 - **Performance Monitoring**: Real-time bundle size and performance tracking
 - **Comprehensive Testing**: Automated mobile and performance testing
 - **Production Ready**: Enterprise-grade error handling and monitoring
+- **Data Ethics Framework**: Privacy protection, bias detection, and ethical AI practices
+
+## 🧠 AI Personalization & Intelligence (v1.2.0)
+
+### Personalization Engine
+- **ProfileContext Service**: Stores non-PII user preferences (loan type, risk comfort, credit tier)
+- **Adaptive Prompting**: AI prompts that adapt to user context and communication style
+- **Form Defaults**: Personalized form pre-filling based on user history
+- **Copy Tone Adaptation**: Casual vs professional tone based on user preferences
+
+### Fine-Tuning & Continuous Learning
+- **Dataset Preparation**: Automated cleaning and anonymization of user interactions
+- **OpenAI Fine-Tuning**: Continuous model improvement using user feedback
+- **Performance Monitoring**: Track accuracy, confidence, and cost metrics
+- **Model Rollback**: Quick rollback to base model if performance degrades
+
+### Trust & Explainability
+- **Confidence Indicators**: Visual confidence bars (0-100%) for all recommendations
+- **"Why This Result?" Modals**: Detailed explanations of AI reasoning
+- **Key Factors Display**: Shows DTI, LTV, credit score range, and rate source
+- **Compare Lenders**: Side-by-side comparison of top 3 results
+- **Disclaimer Sections**: Expandable compliance and legal information
+
+## 🔗 Partner Integrations & Enterprise (v1.2.0)
+
+### Lender & Broker Integrations
+- **DummyBank API**: Mock REST API adapter for demonstration
+- **Integration Registry**: Centralized management of all partner connections
+- **Health Monitoring**: Real-time status and performance tracking
+- **Rate Limit Management**: Intelligent request throttling and optimization
+
+### CRM & Lead Management
+- **Multi-Platform Export**: Zapier, HubSpot, Salesforce, Pipedrive support
+- **Lead Scoring**: AI-powered lead qualification and routing
+- **Field Mapping**: Flexible data transformation for different CRM systems
+- **Webhook Support**: Real-time lead notifications and updates
+
+### Regional Data Intelligence
+- **Central Bank Feeds**: Bank of Canada, Federal Reserve, Bank of England
+- **Market Data**: Real-time rate updates and trend analysis
+- **Benchmark Comparison**: Show rate deltas vs market benchmarks
+- **Trend Visualization**: Historical rate charts and predictions
 
 ## 🛠️ Tech Stack
 
@@ -69,6 +125,63 @@ AI-Powered Mortgage Intelligence Platform with Advanced Mobile Optimization
 - Android SDK 21+ (Android 5.0+)
 - iOS 11.0+ (for iOS development)
 - Physical device or emulator for testing
+
+## 🚀 Quick Start
+
+### v1.2.0 New Commands
+
+#### AI Training & Fine-Tuning
+```bash
+# Prepare training dataset
+npm run training:prepare
+
+# Run fine-tuning job
+npm run training:run run ./datasets/dataset.json
+
+# List training jobs
+npm run training:list-jobs
+
+# Test fine-tuned model
+npm run training:test ft-abc123 "Test prompt"
+```
+
+#### Feature Management
+```bash
+# Toggle features
+npm run toggle:personalization
+npm run toggle:crm_export
+npm run toggle:fine_tune
+npm run toggle:regional_rates
+npm run toggle:explainability
+npm run toggle:confidence_indicators
+npm run toggle:developer_playground
+npm run toggle:advanced_analytics
+```
+
+#### Monitoring & Analytics
+```bash
+# View metrics
+npm run metrics:ai
+npm run metrics:regional
+npm run metrics:training
+npm run metrics:health
+
+# Ethics and compliance
+npm run ethics:report
+npm run ethics:fairness
+
+# Developer tools
+npm run playground:test
+npm run playground:history
+```
+
+#### Integration Management
+```bash
+# Check integration status
+npm run integration:status
+npm run integration:test
+npm run integration:health
+```
 
 ## 🚀 Quick Start
 

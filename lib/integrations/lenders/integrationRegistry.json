@@ -1,0 +1,142 @@
+{
+  "version": "1.2.0",
+  "lastUpdated": "2024-01-15T10:30:00.000Z",
+  "integrations": [
+    {
+      "id": "dummybank-api",
+      "name": "DummyBank API",
+      "type": "api",
+      "status": "active",
+      "lastChecked": "2024-01-15T10:30:00.000Z",
+      "configuration": {
+        "baseUrl": "https://api.dummybank.com",
+        "apiKey": "demo-key",
+        "timeout": 30000
+      },
+      "capabilities": [
+        "rate_fetching",
+        "application_submission",
+        "pre_approval",
+        "rate_history"
+      ],
+      "rateLimit": {
+        "requestsPerMinute": 100,
+        "requestsPerDay": 10000,
+        "currentUsage": 0
+      },
+      "health": {
+        "uptime": 0.99,
+        "responseTime": 250,
+        "errorRate": 0.01
+      }
+    },
+    {
+      "id": "market-data-feed",
+      "name": "Market Data Feed",
+      "type": "feed",
+      "status": "active",
+      "lastChecked": "2024-01-15T10:30:00.000Z",
+      "configuration": {
+        "feedUrl": "https://feeds.marketdata.com/rates",
+        "updateInterval": 300000,
+        "retryAttempts": 3
+      },
+      "capabilities": [
+        "rate_updates",
+        "market_trends",
+        "benchmark_rates"
+      ],
+      "rateLimit": {
+        "requestsPerMinute": 60,
+        "requestsPerDay": 1440,
+        "currentUsage": 0
+      },
+      "health": {
+        "uptime": 0.98,
+        "responseTime": 500,
+        "errorRate": 0.02
+      }
+    },
+    {
+      "id": "rate-webhook",
+      "name": "Rate Update Webhook",
+      "type": "webhook",
+      "status": "active",
+      "lastChecked": "2024-01-15T10:30:00.000Z",
+      "configuration": {
+        "webhookUrl": "https://api.mortgagematch.com/webhooks/rate-updates",
+        "secret": "webhook-secret",
+        "timeout": 5000
+      },
+      "capabilities": [
+        "real_time_updates",
+        "rate_change_notifications"
+      ],
+      "rateLimit": {
+        "requestsPerMinute": 200,
+        "requestsPerDay": 20000,
+        "currentUsage": 0
+      },
+      "health": {
+        "uptime": 0.995,
+        "responseTime": 100,
+        "errorRate": 0.005
+      }
+    },
+    {
+      "id": "bank-of-canada-feed",
+      "name": "Bank of Canada Rate Feed",
+      "type": "feed",
+      "status": "active",
+      "lastChecked": "2024-01-15T10:30:00.000Z",
+      "configuration": {
+        "feedUrl": "https://www.bankofcanada.ca/valet/observations/group/MORTGAGE_RATES/json",
+        "updateInterval": 3600000,
+        "retryAttempts": 5
+      },
+      "capabilities": [
+        "official_rates",
+        "central_bank_data",
+        "canadian_benchmarks"
+      ],
+      "rateLimit": {
+        "requestsPerMinute": 10,
+        "requestsPerDay": 100,
+        "currentUsage": 0
+      },
+      "health": {
+        "uptime": 0.99,
+        "responseTime": 1000,
+        "errorRate": 0.01
+      }
+    },
+    {
+      "id": "federal-reserve-feed",
+      "name": "Federal Reserve Rate Feed",
+      "type": "feed",
+      "status": "active",
+      "lastChecked": "2024-01-15T10:30:00.000Z",
+      "configuration": {
+        "feedUrl": "https://api.stlouisfed.org/fred/series/observations",
+        "apiKey": "fred-api-key",
+        "updateInterval": 3600000,
+        "retryAttempts": 5
+      },
+      "capabilities": [
+        "federal_funds_rate",
+        "treasury_rates",
+        "us_benchmarks"
+      ],
+      "rateLimit": {
+        "requestsPerMinute": 20,
+        "requestsPerDay": 200,
+        "currentUsage": 0
+      },
+      "health": {
+        "uptime": 0.99,
+        "responseTime": 800,
+        "errorRate": 0.01
+      }
+    }
+  ]
+}
