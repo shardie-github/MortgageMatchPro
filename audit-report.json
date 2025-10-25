@@ -1,0 +1,2380 @@
+{
+  "timestamp": "2025-10-25T21:18:44.305Z",
+  "version": "1.4.0",
+  "summary": {
+    "totalFiles": 0,
+    "totalLines": 0,
+    "totalDependencies": 72,
+    "unusedDependencies": 49,
+    "circularDependencies": 0,
+    "duplicateCodeBlocks": 25,
+    "qualityScore": 45,
+    "bundleSize": 0,
+    "recommendations": 2
+  },
+  "details": {
+    "summary": {},
+    "dependencies": {
+      "total": 72,
+      "direct": 57,
+      "dev": 15,
+      "unused": [
+        "react-native-screens",
+        "react-native-reanimated",
+        "react-native-vector-icons",
+        "react-native-svg",
+        "react-native-image-picker",
+        "react-native-document-picker",
+        "react-native-fs",
+        "react-native-share",
+        "react-native-pdf",
+        "react-native-camera",
+        "react-native-permissions",
+        "react-native-keychain",
+        "react-native-biometrics",
+        "@supabase/auth-helpers-nextjs",
+        "@supabase/auth-helpers-react",
+        "@supabase/auth-ui-react",
+        "@supabase/auth-ui-shared",
+        "react-hook-form",
+        "@hookform/resolvers",
+        "date-fns",
+        "react-native-calendars",
+        "react-native-modal",
+        "react-native-super-grid",
+        "react-native-skeleton-placeholder",
+        "react-native-snap-carousel",
+        "react-native-swipe-gestures",
+        "react-native-pull-to-refresh",
+        "react-native-device-info",
+        "react-native-network-info",
+        "react-native-background-job",
+        "react-native-push-notification",
+        "react-native-firebase",
+        "react-native-sqlite-storage",
+        "react-native-elements",
+        "react-native-ui-lib",
+        "@babel/core",
+        "@babel/preset-env",
+        "@babel/runtime",
+        "@react-native/eslint-config",
+        "@tsconfig/react-native",
+        "@types/react",
+        "@types/react-test-renderer",
+        "babel-jest",
+        "eslint",
+        "jest",
+        "metro-react-native-babel-preset",
+        "prettier",
+        "react-test-renderer",
+        "typescript"
+      ],
+      "transitive": {
+        "total": 0,
+        "duplicates": 0,
+        "outdated": 0
+      },
+      "security": [],
+      "duplicates": []
+    },
+    "architecture": {
+      "domains": {
+        "ai": {
+          "fileCount": 2,
+          "lines": 0,
+          "complexity": 0,
+          "avgComplexity": 0
+        },
+        "billing": {
+          "fileCount": 2,
+          "lines": 0,
+          "complexity": 0,
+          "avgComplexity": 0
+        },
+        "tenant": {
+          "fileCount": 0,
+          "lines": 0,
+          "complexity": 0,
+          "avgComplexity": 0
+        },
+        "analytics": {
+          "fileCount": 1,
+          "lines": 0,
+          "complexity": 0,
+          "avgComplexity": 0
+        },
+        "crm": {
+          "fileCount": 0,
+          "lines": 0,
+          "complexity": 0,
+          "avgComplexity": 0
+        },
+        "integrations": {
+          "fileCount": 13,
+          "lines": 0,
+          "complexity": 0,
+          "avgComplexity": 0
+        },
+        "ui": {
+          "fileCount": 0,
+          "lines": 0,
+          "complexity": 0,
+          "avgComplexity": 0
+        },
+        "api": {
+          "fileCount": 5,
+          "lines": 0,
+          "complexity": 0,
+          "avgComplexity": 0
+        },
+        "auth": {
+          "fileCount": 2,
+          "lines": 0,
+          "complexity": 0,
+          "avgComplexity": 0
+        },
+        "monitoring": {
+          "fileCount": 2,
+          "lines": 0,
+          "complexity": 0,
+          "avgComplexity": 0
+        }
+      },
+      "fileCounts": {
+        "ai": 2,
+        "billing": 2,
+        "tenant": 0,
+        "analytics": 1,
+        "crm": 0,
+        "integrations": 13,
+        "ui": 0,
+        "api": 5,
+        "auth": 2,
+        "monitoring": 2
+      },
+      "importPatterns": {
+        "internal": 0,
+        "external": 0,
+        "circular": 0
+      },
+      "circularDependencies": [],
+      "coupling": {
+        "high": 0,
+        "medium": 0,
+        "low": 0
+      }
+    },
+    "performance": {
+      "bundleSize": {
+        "total": 0,
+        "chunks": {},
+        "assets": {}
+      },
+      "fileSizes": [
+        {
+          "file": "lib/agents/sustainable-products-agent.ts",
+          "size": 32
+        },
+        {
+          "file": "lib/testing/cross-border-sandbox.ts",
+          "size": 30
+        },
+        {
+          "file": "app/page.tsx",
+          "size": 26
+        },
+        {
+          "file": "components/dashboard/UserDashboard.tsx",
+          "size": 25
+        },
+        {
+          "file": "lib/agents/workflow-automation-agent.ts",
+          "size": 25
+        },
+        {
+          "file": "components/dashboard/BrokerDashboard.tsx",
+          "size": 24
+        },
+        {
+          "file": "lib/agents/global-compliance-agent.ts",
+          "size": 24
+        },
+        {
+          "file": "lib/agents/green-score-agent.ts",
+          "size": 24
+        },
+        {
+          "file": "lib/agents/treasury-risk-agent.ts",
+          "size": 24
+        },
+        {
+          "file": "lib/customer-success/customer-health-scoring.ts",
+          "size": 24
+        },
+        {
+          "file": "lib/experimentation/personalization-engine.ts",
+          "size": 24
+        },
+        {
+          "file": "components/canvas/ScenarioInputPanel.tsx",
+          "size": 23
+        },
+        {
+          "file": "lib/agents/prescriptive-agent.ts",
+          "size": 23
+        },
+        {
+          "file": "lib/billing/billing-service.ts",
+          "size": 23
+        },
+        {
+          "file": "components/dashboard/FutureOutlookDashboard.tsx",
+          "size": 22
+        },
+        {
+          "file": "components/dashboard/PredictiveStorytellingDashboard.tsx",
+          "size": 22
+        },
+        {
+          "file": "lib/experimentation/ai-growth-agents.ts",
+          "size": 22
+        },
+        {
+          "file": "components/canvas/LeadGenModal.tsx",
+          "size": 21
+        },
+        {
+          "file": "lib/agents/document-ai-agent.ts",
+          "size": 21
+        },
+        {
+          "file": "components/canvas/ScenarioComparisonChart.tsx",
+          "size": 20
+        },
+        {
+          "file": "lib/agents/regtech-agent.ts",
+          "size": 20
+        },
+        {
+          "file": "lib/ai/AdaptivePrompting.ts",
+          "size": 20
+        },
+        {
+          "file": "components/dashboard/GlobalExpansionDashboard.tsx",
+          "size": 19
+        },
+        {
+          "file": "lib/agents/enhanced-explainability-agent.ts",
+          "size": 19
+        },
+        {
+          "file": "lib/experimentation/compliance-controls.ts",
+          "size": 19
+        },
+        {
+          "file": "lib/integrations/multi-region-api-governance.ts",
+          "size": 19
+        },
+        {
+          "file": "lib/integrations/open-banking.ts",
+          "size": 19
+        },
+        {
+          "file": "__tests__/accessibility/accessibility.test.tsx",
+          "size": 18
+        },
+        {
+          "file": "lib/agents/retainbot-agent.ts",
+          "size": 18
+        },
+        {
+          "file": "lib/experimentation/llm-experimentation.ts",
+          "size": 18
+        },
+        {
+          "file": "lib/integrations/analytics-billing.ts",
+          "size": 18
+        },
+        {
+          "file": "lib/integrations/global-payment-rails.ts",
+          "size": 18
+        },
+        {
+          "file": "scripts/test-supabase-security-and-reliability.js",
+          "size": 18
+        },
+        {
+          "file": "lib/agents/explainability-agent.ts",
+          "size": 17
+        },
+        {
+          "file": "lib/agents/predictive-orchestrator.ts",
+          "size": 17
+        },
+        {
+          "file": "lib/integrations/crm/CRMBridge.ts",
+          "size": 17
+        },
+        {
+          "file": "lib/integrations/programmable-banking.ts",
+          "size": 17
+        },
+        {
+          "file": "__tests__/predictive-insights.test.ts",
+          "size": 16
+        },
+        {
+          "file": "lib/agents/scenario-simulator.ts",
+          "size": 16
+        },
+        {
+          "file": "lib/api-service.ts",
+          "size": 16
+        },
+        {
+          "file": "lib/integrations/api-marketplace.ts",
+          "size": 16
+        },
+        {
+          "file": "lib/monitoring/EnhancedMetrics.ts",
+          "size": 16
+        },
+        {
+          "file": "lib/operations/operational-readiness.ts",
+          "size": 16
+        },
+        {
+          "file": "training/prepareDataset.ts",
+          "size": 16
+        },
+        {
+          "file": "components/admin/BrandingManagement.tsx",
+          "size": 15
+        },
+        {
+          "file": "lib/agents/refinance-agent.ts",
+          "size": 15
+        },
+        {
+          "file": "lib/database.types.ts",
+          "size": 15
+        },
+        {
+          "file": "lib/integrations/ai-pricing.ts",
+          "size": 15
+        },
+        {
+          "file": "lib/integrations/embedded-payments.ts",
+          "size": 15
+        },
+        {
+          "file": "lib/monetization.ts",
+          "size": 15
+        },
+        {
+          "file": "lib/security/DataEthics.ts",
+          "size": 15
+        },
+        {
+          "file": "lib/webhooks/webhook-service.ts",
+          "size": 15
+        },
+        {
+          "file": "__tests__/edge-cases/api-edge-cases.test.ts",
+          "size": 14
+        },
+        {
+          "file": "lib/agents/openai-agent-sdk.ts",
+          "size": 14
+        },
+        {
+          "file": "lib/agents/welcome-flow-agent.ts",
+          "size": 14
+        },
+        {
+          "file": "lib/api/public-api-service.ts",
+          "size": 14
+        },
+        {
+          "file": "lib/auth-service.ts",
+          "size": 14
+        },
+        {
+          "file": "lib/context/ProfileContext.ts",
+          "size": 14
+        },
+        {
+          "file": "lib/database-service.ts",
+          "size": 14
+        },
+        {
+          "file": "lib/experimentation/ab-testing.ts",
+          "size": 14
+        },
+        {
+          "file": "lib/integrations/security-compliance.ts",
+          "size": 14
+        },
+        {
+          "file": "lib/operations/load-balancer.ts",
+          "size": 14
+        },
+        {
+          "file": "lib/optimization/cost-optimizer.ts",
+          "size": 14
+        },
+        {
+          "file": "lib/rate-apis.ts",
+          "size": 14
+        },
+        {
+          "file": "lib/ai/cost-governance-service.ts",
+          "size": 13
+        },
+        {
+          "file": "lib/data/feeds/RegionalRateFeeds.ts",
+          "size": 13
+        },
+        {
+          "file": "lib/experimentation/experiment-framework.ts",
+          "size": 13
+        },
+        {
+          "file": "lib/explainability-agent.ts",
+          "size": 13
+        },
+        {
+          "file": "lib/features/FeatureFlags.ts",
+          "size": 13
+        },
+        {
+          "file": "lib/performance-monitoring.ts",
+          "size": 13
+        },
+        {
+          "file": "lib/scenario-manager.ts",
+          "size": 13
+        },
+        {
+          "file": "scripts/deploy-secure-supabase.js",
+          "size": 13
+        },
+        {
+          "file": "src/utils/mobilePerformance.ts",
+          "size": 13
+        },
+        {
+          "file": "__tests__/error-handling.test.ts",
+          "size": 12
+        },
+        {
+          "file": "lib/agents/forecasting-agent.ts",
+          "size": 12
+        },
+        {
+          "file": "lib/billing/metering-service.ts",
+          "size": 12
+        },
+        {
+          "file": "lib/compliance.ts",
+          "size": 12
+        },
+        {
+          "file": "lib/health-check.ts",
+          "size": 12
+        },
+        {
+          "file": "lib/integrations/real-estate-apis.ts",
+          "size": 12
+        },
+        {
+          "file": "lib/operations/sre-metrics.ts",
+          "size": 12
+        },
+        {
+          "file": "lib/optimization/optimization-manager.ts",
+          "size": 12
+        },
+        {
+          "file": "lib/realtime-service.ts",
+          "size": 12
+        },
+        {
+          "file": "lib/tenancy/organization-service.ts",
+          "size": 12
+        },
+        {
+          "file": "lib/white-label/theme-service.ts",
+          "size": 12
+        },
+        {
+          "file": "scripts/test-improvements.js",
+          "size": 12
+        },
+        {
+          "file": "__tests__/lib/hooks/useApi.test.ts",
+          "size": 11
+        },
+        {
+          "file": "components/PrivacyConsent.tsx",
+          "size": 11
+        },
+        {
+          "file": "components/admin/MembersManagement.tsx",
+          "size": 11
+        },
+        {
+          "file": "components/ui/ConfidenceIndicator.tsx",
+          "size": 11
+        },
+        {
+          "file": "lib/export-service.ts",
+          "size": 11
+        },
+        {
+          "file": "lib/feedback-system.ts",
+          "size": 11
+        },
+        {
+          "file": "lib/intent-matching.ts",
+          "size": 11
+        },
+        {
+          "file": "lib/lead-monitoring.ts",
+          "size": 11
+        },
+        {
+          "file": "lib/lead-qualification.ts",
+          "size": 11
+        },
+        {
+          "file": "lib/monitoring.ts",
+          "size": 11
+        },
+        {
+          "file": "lib/rate-limiting/distributed-rate-limiter.ts",
+          "size": 11
+        },
+        {
+          "file": "lib/security-enhanced.ts",
+          "size": 11
+        },
+        {
+          "file": "lib/security.ts",
+          "size": 11
+        },
+        {
+          "file": "__tests__/lib/api/request-manager.test.ts",
+          "size": 10
+        },
+        {
+          "file": "components/canvas/AffordabilityInputPanel.tsx",
+          "size": 10
+        },
+        {
+          "file": "components/dashboard/BrokerDashboardModular.tsx",
+          "size": 10
+        },
+        {
+          "file": "lib/alerting.ts",
+          "size": 10
+        },
+        {
+          "file": "lib/api/request-manager.ts",
+          "size": 10
+        },
+        {
+          "file": "lib/integrations/lenders/DummyBankAdapter.ts",
+          "size": 10
+        },
+        {
+          "file": "lib/integrations/lenders/LenderIntegrationRegistry.ts",
+          "size": 10
+        },
+        {
+          "file": "lib/openai-enhanced.ts",
+          "size": 10
+        },
+        {
+          "file": "lib/openai.ts",
+          "size": 10
+        },
+        {
+          "file": "lib/optimization/resource-manager.ts",
+          "size": 10
+        },
+        {
+          "file": "lib/stripe.ts",
+          "size": 10
+        },
+        {
+          "file": "lib/tenancy/api-key-service.ts",
+          "size": 10
+        },
+        {
+          "file": "lib/tenancy/rbac.ts",
+          "size": 10
+        },
+        {
+          "file": "lib/tenancy/scoping.ts",
+          "size": 10
+        },
+        {
+          "file": "scripts/performance-audit.js",
+          "size": 10
+        },
+        {
+          "file": "scripts/security-audit.js",
+          "size": 10
+        },
+        {
+          "file": "src/services/enhancedApiService.ts",
+          "size": 10
+        },
+        {
+          "file": "src/types/index.ts",
+          "size": 10
+        },
+        {
+          "file": "__tests__/integration/operational-optimization.test.ts",
+          "size": 9
+        },
+        {
+          "file": "__tests__/lib/openai.test.ts",
+          "size": 9
+        },
+        {
+          "file": "components/canvas/AmortizationChart.tsx",
+          "size": 9
+        },
+        {
+          "file": "components/dashboard/modules/LeadManagement.tsx",
+          "size": 9
+        },
+        {
+          "file": "lib/agents/data-ingestion-agent.ts",
+          "size": 9
+        },
+        {
+          "file": "lib/broker-notifications.ts",
+          "size": 9
+        },
+        {
+          "file": "lib/error-handling.ts",
+          "size": 9
+        },
+        {
+          "file": "lib/graphql/schema.ts",
+          "size": 9
+        },
+        {
+          "file": "lib/post-launch-integration.ts",
+          "size": 9
+        },
+        {
+          "file": "scripts/optimize-bundle.js",
+          "size": 9
+        },
+        {
+          "file": "__tests__/e2e/app.test.ts",
+          "size": 8
+        },
+        {
+          "file": "__tests__/lib/optimization/cost-optimizer.test.ts",
+          "size": 8
+        },
+        {
+          "file": "components/dashboard/UserDashboardModular.tsx",
+          "size": 8
+        },
+        {
+          "file": "lib/api/endpoints.ts",
+          "size": 8
+        },
+        {
+          "file": "lib/hooks/useApi.ts",
+          "size": 8
+        },
+        {
+          "file": "lib/optimization/performance-monitor.ts",
+          "size": 8
+        },
+        {
+          "file": "lib/performance-monitor.ts",
+          "size": 8
+        },
+        {
+          "file": "pages/admin/index.tsx",
+          "size": 8
+        },
+        {
+          "file": "pages/api/webhooks/stripe.ts",
+          "size": 8
+        },
+        {
+          "file": "scripts/assign-mentor.js",
+          "size": 8
+        },
+        {
+          "file": "scripts/generate-onboarding-tasks.js",
+          "size": 8
+        },
+        {
+          "file": "src/components/calculator/MortgageProductSelector.tsx",
+          "size": 8
+        },
+        {
+          "file": "src/components/performance/PerformanceDashboard.tsx",
+          "size": 8
+        },
+        {
+          "file": "src/screens/main/HomeScreen.tsx",
+          "size": 8
+        },
+        {
+          "file": "__tests__/integration/api.test.ts",
+          "size": 7
+        },
+        {
+          "file": "__tests__/lib/lead-routing.test.ts",
+          "size": 7
+        },
+        {
+          "file": "__tests__/lib/rate-limiting/distributed-rate-limiter.test.ts",
+          "size": 7
+        },
+        {
+          "file": "components/canvas/ConversationalInterface.tsx",
+          "size": 7
+        },
+        {
+          "file": "components/canvas/RateComparisonTable.tsx",
+          "size": 7
+        },
+        {
+          "file": "components/dashboard/modules/BrokerMetrics.tsx",
+          "size": 7
+        },
+        {
+          "file": "lib/api/api-service.ts",
+          "size": 7
+        },
+        {
+          "file": "pages/auth/login.tsx",
+          "size": 7
+        },
+        {
+          "file": "scripts/setup-database.js",
+          "size": 7
+        },
+        {
+          "file": "src/components/calculator/AffordabilityInputForm.tsx",
+          "size": 7
+        },
+        {
+          "file": "src/screens/broker/BrokerDashboardScreen.tsx",
+          "size": 7
+        },
+        {
+          "file": "src/services/mortgageService.ts",
+          "size": 7
+        },
+        {
+          "file": "src/utils/mobileTesting.ts",
+          "size": 7
+        },
+        {
+          "file": "__tests__/api/rates.test.ts",
+          "size": 6
+        },
+        {
+          "file": "__tests__/e2e/lead-generation.test.ts",
+          "size": 6
+        },
+        {
+          "file": "__tests__/lib/scenario-analysis.test.ts",
+          "size": 6
+        },
+        {
+          "file": "components/PostLaunchDemo.tsx",
+          "size": 6
+        },
+        {
+          "file": "components/admin/AdminLayout.tsx",
+          "size": 6
+        },
+        {
+          "file": "components/dashboard/modules/ScenarioList.tsx",
+          "size": 6
+        },
+        {
+          "file": "lib/config/keys.ts",
+          "size": 6
+        },
+        {
+          "file": "lib/types/billing.ts",
+          "size": 6
+        },
+        {
+          "file": "pages/api/admin/dashboard.ts",
+          "size": 6
+        },
+        {
+          "file": "src/components/mobile/MobileOptimizedImage.tsx",
+          "size": 6
+        },
+        {
+          "file": "__tests__/api/affordability.test.ts",
+          "size": 5
+        },
+        {
+          "file": "__tests__/api/leads.test.ts",
+          "size": 5
+        },
+        {
+          "file": "__tests__/lib/affordability.test.ts",
+          "size": 5
+        },
+        {
+          "file": "__tests__/lib/config/keys.test.ts",
+          "size": 5
+        },
+        {
+          "file": "__tests__/lib/lead-qualification.test.ts",
+          "size": 5
+        },
+        {
+          "file": "components/dashboard/modules/AffordabilityTrends.tsx",
+          "size": 5
+        },
+        {
+          "file": "components/ui/select.tsx",
+          "size": 5
+        },
+        {
+          "file": "jest.setup.js",
+          "size": 5
+        },
+        {
+          "file": "lib/analytics.ts",
+          "size": 5
+        },
+        {
+          "file": "lib/scenario-types.ts",
+          "size": 5
+        },
+        {
+          "file": "lib/types/tenancy.ts",
+          "size": 5
+        },
+        {
+          "file": "pages/api/leads.ts",
+          "size": 5
+        },
+        {
+          "file": "pages/api/rates.ts",
+          "size": 5
+        },
+        {
+          "file": "scripts/run-migrations.js",
+          "size": 5
+        },
+        {
+          "file": "scripts/update-onboarding-progress.js",
+          "size": 5
+        },
+        {
+          "file": "src/navigation/MainNavigator.tsx",
+          "size": 5
+        },
+        {
+          "file": "src/screens/OnboardingScreen.tsx",
+          "size": 5
+        },
+        {
+          "file": "src/screens/auth/LoginScreen.tsx",
+          "size": 5
+        },
+        {
+          "file": "src/screens/main/CalculatorScreen.tsx",
+          "size": 5
+        },
+        {
+          "file": "src/utils/performance.ts",
+          "size": 5
+        },
+        {
+          "file": "store/mortgageStore.ts",
+          "size": 5
+        },
+        {
+          "file": "__tests__/components/dashboard/modules/EngagementMetrics.test.tsx",
+          "size": 4
+        },
+        {
+          "file": "__tests__/lib/rate-intelligence.test.ts",
+          "size": 4
+        },
+        {
+          "file": "components/dashboard/modules/QuickActions.tsx",
+          "size": 4
+        },
+        {
+          "file": "components/ui/dialog.tsx",
+          "size": 4
+        },
+        {
+          "file": "pages/api/admin/webhooks.ts",
+          "size": 4
+        },
+        {
+          "file": "pages/api/broker/dashboard.ts",
+          "size": 4
+        },
+        {
+          "file": "pages/api/broker/leads/[leadId].ts",
+          "size": 4
+        },
+        {
+          "file": "scripts/show-metrics.js",
+          "size": 4
+        },
+        {
+          "file": "src/components/home/MarketInsightsCard.tsx",
+          "size": 4
+        },
+        {
+          "file": "src/components/home/RecentActivityCard.tsx",
+          "size": 4
+        },
+        {
+          "file": "src/contexts/AuthContext.tsx",
+          "size": 4
+        },
+        {
+          "file": "src/contexts/I18nContext.tsx",
+          "size": 4
+        },
+        {
+          "file": "src/navigation/BrokerNavigator.tsx",
+          "size": 4
+        },
+        {
+          "file": "src/utils/responsive.ts",
+          "size": 4
+        },
+        {
+          "file": "__tests__/components/AffordabilityInputPanel.test.tsx",
+          "size": 3
+        },
+        {
+          "file": "components/ui/table.tsx",
+          "size": 3
+        },
+        {
+          "file": "lib/auth.tsx",
+          "size": 3
+        },
+        {
+          "file": "lib/supabase.ts",
+          "size": 3
+        },
+        {
+          "file": "lib/tenancy/context.ts",
+          "size": 3
+        },
+        {
+          "file": "mortgage-mobile-app/metro.config.js",
+          "size": 3
+        },
+        {
+          "file": "mortgage-mobile-app/src/navigation/AppNavigator.tsx",
+          "size": 3
+        },
+        {
+          "file": "mortgage-mobile-app/src/screens/auth/AuthScreen.tsx",
+          "size": 3
+        },
+        {
+          "file": "mortgage-mobile-app/src/screens/calculator/CalculatorScreen.tsx",
+          "size": 3
+        },
+        {
+          "file": "mortgage-mobile-app/src/store/mortgageStore.ts",
+          "size": 3
+        },
+        {
+          "file": "pages/api/admin/api-keys.ts",
+          "size": 3
+        },
+        {
+          "file": "pages/api/admin/billing.ts",
+          "size": 3
+        },
+        {
+          "file": "pages/api/admin/members.ts",
+          "size": 3
+        },
+        {
+          "file": "pages/api/affordability.ts",
+          "size": 3
+        },
+        {
+          "file": "pages/api/calculate.ts",
+          "size": 3
+        },
+        {
+          "file": "pages/api/cost-optimization-test.ts",
+          "size": 3
+        },
+        {
+          "file": "pages/api/optimization-test.ts",
+          "size": 3
+        },
+        {
+          "file": "pages/api/performance-test.ts",
+          "size": 3
+        },
+        {
+          "file": "pages/api/resource-test.ts",
+          "size": 3
+        },
+        {
+          "file": "pages/api/scenario-simulations.ts",
+          "size": 3
+        },
+        {
+          "file": "src/components/home/QuickActionsCard.tsx",
+          "size": 3
+        },
+        {
+          "file": "src/components/ui/ResponsiveButton.tsx",
+          "size": 3
+        },
+        {
+          "file": "src/services/authService.ts",
+          "size": 3
+        },
+        {
+          "file": "src/utils/toastConfig.ts",
+          "size": 3
+        },
+        {
+          "file": ".eslintrc.js",
+          "size": 2
+        },
+        {
+          "file": "components/dashboard/modules/EngagementMetrics.tsx",
+          "size": 2
+        },
+        {
+          "file": "components/ui/button.tsx",
+          "size": 2
+        },
+        {
+          "file": "components/ui/card.tsx",
+          "size": 2
+        },
+        {
+          "file": "components/ui/tabs.tsx",
+          "size": 2
+        },
+        {
+          "file": "metro.config.js",
+          "size": 2
+        },
+        {
+          "file": "mortgage-mobile-app/src/App.tsx",
+          "size": 2
+        },
+        {
+          "file": "mortgage-mobile-app/src/screens/dashboard/DashboardScreen.tsx",
+          "size": 2
+        },
+        {
+          "file": "mortgage-mobile-app/src/screens/documents/DocumentsScreen.tsx",
+          "size": 2
+        },
+        {
+          "file": "mortgage-mobile-app/src/screens/profile/ProfileScreen.tsx",
+          "size": 2
+        },
+        {
+          "file": "mortgage-mobile-app/src/screens/settings/SettingsScreen.tsx",
+          "size": 2
+        },
+        {
+          "file": "mortgage-mobile-app/src/services/api/mortgageApi.ts",
+          "size": 2
+        },
+        {
+          "file": "pages/api/admin/branding.ts",
+          "size": 2
+        },
+        {
+          "file": "pages/api/forecasts.ts",
+          "size": 2
+        },
+        {
+          "file": "pages/api/predictive-insights.ts",
+          "size": 2
+        },
+        {
+          "file": "pages/api/rate-limit-test.ts",
+          "size": 2
+        },
+        {
+          "file": "pages/api/scenarios.ts",
+          "size": 2
+        },
+        {
+          "file": "pages/api/webhooks/verify.ts",
+          "size": 2
+        },
+        {
+          "file": "scripts/toggle-feature.js",
+          "size": 2
+        },
+        {
+          "file": "src/App.tsx",
+          "size": 2
+        },
+        {
+          "file": "src/components/home/MetricsCard.tsx",
+          "size": 2
+        },
+        {
+          "file": "src/components/layout/ResponsiveGrid.tsx",
+          "size": 2
+        },
+        {
+          "file": "src/components/layout/ResponsiveLayout.tsx",
+          "size": 2
+        },
+        {
+          "file": "src/constants/api.ts",
+          "size": 2
+        },
+        {
+          "file": "src/constants/theme.ts",
+          "size": 2
+        },
+        {
+          "file": "src/contexts/ThemeContext.tsx",
+          "size": 2
+        },
+        {
+          "file": "tailwind.config.js",
+          "size": 2
+        },
+        {
+          "file": "babel.config.js",
+          "size": 1
+        },
+        {
+          "file": "components/ui/badge.tsx",
+          "size": 1
+        },
+        {
+          "file": "components/ui/input.tsx",
+          "size": 1
+        },
+        {
+          "file": "components/ui/label.tsx",
+          "size": 1
+        },
+        {
+          "file": "components/ui/slider.tsx",
+          "size": 1
+        },
+        {
+          "file": "components/ui/textarea.tsx",
+          "size": 1
+        },
+        {
+          "file": "jest.config.js",
+          "size": 1
+        },
+        {
+          "file": "lib/graphql/context.ts",
+          "size": 1
+        },
+        {
+          "file": "metro.config.optimized.js",
+          "size": 1
+        },
+        {
+          "file": "mortgage-mobile-app/jest.config.js",
+          "size": 1
+        },
+        {
+          "file": "mortgage-mobile-app/jest.setup.js",
+          "size": 1
+        },
+        {
+          "file": "mortgage-mobile-app/src/constants/theme.ts",
+          "size": 1
+        },
+        {
+          "file": "mortgage-mobile-app/src/services/api/apiClient.ts",
+          "size": 1
+        },
+        {
+          "file": "mortgage-mobile-app/src/store/authStore.ts",
+          "size": 1
+        },
+        {
+          "file": "mortgage-mobile-app/src/types/mortgage.ts",
+          "size": 1
+        },
+        {
+          "file": "next.config.js",
+          "size": 1
+        },
+        {
+          "file": "pages/admin/branding.tsx",
+          "size": 1
+        },
+        {
+          "file": "pages/admin/members.tsx",
+          "size": 1
+        },
+        {
+          "file": "pages/api/feedback.ts",
+          "size": 1
+        },
+        {
+          "file": "pages/api/health.ts",
+          "size": 1
+        },
+        {
+          "file": "pages/api/prediction-alerts.ts",
+          "size": 1
+        },
+        {
+          "file": "pages/api/prescriptive-recommendations.ts",
+          "size": 1
+        },
+        {
+          "file": "pages/api/refinance-watchlist.ts",
+          "size": 1
+        },
+        {
+          "file": "pages/api/v1/matches.ts",
+          "size": 1
+        },
+        {
+          "file": "pages/api/v1/rates.ts",
+          "size": 1
+        },
+        {
+          "file": "pages/api/v1/reports.ts",
+          "size": 1
+        },
+        {
+          "file": "pages/api/v1/scenarios.ts",
+          "size": 1
+        },
+        {
+          "file": "pages/api/v2/api-keys/generate.ts",
+          "size": 1
+        },
+        {
+          "file": "pages/api/v2/open-banking/connect.ts",
+          "size": 1
+        },
+        {
+          "file": "pages/api/v2/payments/create-intent.ts",
+          "size": 1
+        },
+        {
+          "file": "pages/auth/callback.tsx",
+          "size": 1
+        },
+        {
+          "file": "playwright.config.ts",
+          "size": 1
+        },
+        {
+          "file": "src/components/ui/ResponsiveContainer.tsx",
+          "size": 1
+        },
+        {
+          "file": "src/components/ui/ResponsiveText.tsx",
+          "size": 1
+        },
+        {
+          "file": "src/i18n/index.ts",
+          "size": 1
+        },
+        {
+          "file": "src/navigation/AppNavigator.tsx",
+          "size": 1
+        },
+        {
+          "file": "src/navigation/AuthNavigator.tsx",
+          "size": 1
+        },
+        {
+          "file": "src/screens/LoadingScreen.tsx",
+          "size": 1
+        },
+        {
+          "file": "index.js",
+          "size": 0
+        },
+        {
+          "file": "lib/utils.ts",
+          "size": 0
+        },
+        {
+          "file": "mortgage-mobile-app/babel.config.js",
+          "size": 0
+        },
+        {
+          "file": "mortgage-mobile-app/index.js",
+          "size": 0
+        },
+        {
+          "file": "mortgage-mobile-app/src/types/navigation.ts",
+          "size": 0
+        },
+        {
+          "file": "pages/_app.tsx",
+          "size": 0
+        },
+        {
+          "file": "pages/api/graphql.ts",
+          "size": 0
+        },
+        {
+          "file": "pages/api/healthz.ts",
+          "size": 0
+        }
+      ],
+      "patterns": {
+        "heavyImports": [],
+        "largeComponents": [],
+        "inefficientPatterns": []
+      },
+      "recommendations": []
+    },
+    "quality": {
+      "linting": {
+        "success": false,
+        "errors": 1,
+        "warnings": 0
+      },
+      "types": {
+        "success": false,
+        "errors": 1
+      },
+      "coverage": {
+        "percentage": 0,
+        "success": false
+      },
+      "complexity": {
+        "highComplexityFiles": []
+      },
+      "overall": 45,
+      "duplicates": [
+        {
+          "files": [
+            "/workspace/lib/agents/global-compliance-agent.ts",
+            "/workspace/lib/agents/green-score-agent.ts"
+          ],
+          "similarity": 1,
+          "lines": 1
+        },
+        {
+          "files": [
+            "/workspace/lib/agents/enhanced-explainability-agent.ts",
+            "/workspace/lib/agents/regtech-agent.ts"
+          ],
+          "similarity": 1,
+          "lines": 1
+        },
+        {
+          "files": [
+            "/workspace/lib/agents/global-compliance-agent.ts",
+            "/workspace/lib/agents/sustainable-products-agent.ts"
+          ],
+          "similarity": 1,
+          "lines": 1
+        },
+        {
+          "files": [
+            "/workspace/lib/agents/enhanced-explainability-agent.ts",
+            "/workspace/lib/agents/workflow-automation-agent.ts"
+          ],
+          "similarity": 1,
+          "lines": 1
+        },
+        {
+          "files": [
+            "/workspace/lib/config/keys.ts",
+            "/workspace/lib/features/FeatureFlags.ts"
+          ],
+          "similarity": 1,
+          "lines": 1
+        },
+        {
+          "files": [
+            "/workspace/lib/integrations/ai-pricing.ts",
+            "/workspace/lib/integrations/analytics-billing.ts"
+          ],
+          "similarity": 1,
+          "lines": 1
+        },
+        {
+          "files": [
+            "/workspace/lib/data/feeds/RegionalRateFeeds.ts",
+            "/workspace/lib/integrations/crm/CRMBridge.ts"
+          ],
+          "similarity": 1,
+          "lines": 1
+        },
+        {
+          "files": [
+            "/workspace/lib/integrations/ai-pricing.ts",
+            "/workspace/lib/integrations/embedded-payments.ts"
+          ],
+          "similarity": 1,
+          "lines": 1
+        },
+        {
+          "files": [
+            "/workspace/lib/data/feeds/RegionalRateFeeds.ts",
+            "/workspace/lib/integrations/lenders/DummyBankAdapter.ts"
+          ],
+          "similarity": 1,
+          "lines": 1
+        },
+        {
+          "files": [
+            "/workspace/lib/integrations/global-payment-rails.ts",
+            "/workspace/lib/integrations/multi-region-api-governance.ts"
+          ],
+          "similarity": 1,
+          "lines": 1
+        },
+        {
+          "files": [
+            "/workspace/lib/integrations/ai-pricing.ts",
+            "/workspace/lib/integrations/open-banking.ts"
+          ],
+          "similarity": 1,
+          "lines": 1
+        },
+        {
+          "files": [
+            "/workspace/lib/integrations/ai-pricing.ts",
+            "/workspace/lib/integrations/programmable-banking.ts"
+          ],
+          "similarity": 1,
+          "lines": 1
+        },
+        {
+          "files": [
+            "/workspace/lib/integrations/api-marketplace.ts",
+            "/workspace/lib/integrations/security-compliance.ts"
+          ],
+          "similarity": 1,
+          "lines": 1
+        },
+        {
+          "files": [
+            "/workspace/lib/config/keys.ts",
+            "/workspace/lib/monitoring/EnhancedMetrics.ts"
+          ],
+          "similarity": 1,
+          "lines": 1
+        },
+        {
+          "files": [
+            "/workspace/lib/config/keys.ts",
+            "/workspace/lib/scenario-types.ts"
+          ],
+          "similarity": 1,
+          "lines": 1
+        },
+        {
+          "files": [
+            "/workspace/lib/api/endpoints.ts",
+            "/workspace/lib/types/billing.ts"
+          ],
+          "similarity": 1,
+          "lines": 1
+        },
+        {
+          "files": [
+            "/workspace/lib/api/endpoints.ts",
+            "/workspace/lib/types/tenancy.ts"
+          ],
+          "similarity": 1,
+          "lines": 1
+        },
+        {
+          "files": [
+            "/workspace/metro.config.js",
+            "/workspace/metro.config.optimized.js"
+          ],
+          "similarity": 1,
+          "lines": 1
+        },
+        {
+          "files": [
+            "/workspace/metro.config.js",
+            "/workspace/mortgage-mobile-app/metro.config.js"
+          ],
+          "similarity": 1,
+          "lines": 1
+        },
+        {
+          "files": [
+            "/workspace/scripts/optimize-bundle.js",
+            "/workspace/scripts/run-migrations.js"
+          ],
+          "similarity": 1,
+          "lines": 1
+        },
+        {
+          "files": [
+            "/workspace/scripts/optimize-bundle.js",
+            "/workspace/scripts/setup-database.js"
+          ],
+          "similarity": 1,
+          "lines": 1
+        },
+        {
+          "files": [
+            "/workspace/scripts/optimize-bundle.js",
+            "/workspace/scripts/test-improvements.js"
+          ],
+          "similarity": 1,
+          "lines": 1
+        },
+        {
+          "files": [
+            "/workspace/scripts/assign-mentor.js",
+            "/workspace/scripts/update-onboarding-progress.js"
+          ],
+          "similarity": 1,
+          "lines": 1
+        },
+        {
+          "files": [
+            "/workspace/lib/api/endpoints.ts",
+            "/workspace/src/constants/api.ts"
+          ],
+          "similarity": 1,
+          "lines": 1
+        },
+        {
+          "files": [
+            "/workspace/lib/api/endpoints.ts",
+            "/workspace/src/types/index.ts"
+          ],
+          "similarity": 1,
+          "lines": 1
+        }
+      ],
+      "asyncIssues": [
+        {
+          "type": "unawaited_promise",
+          "file": "/workspace/__tests__/accessibility/accessibility.test.tsx",
+          "line": 1,
+          "description": "Promise not awaited"
+        },
+        {
+          "type": "potential_race_condition",
+          "file": "/workspace/__tests__/edge-cases/api-edge-cases.test.ts",
+          "line": 314,
+          "description": "Potential race condition in Promise.all"
+        },
+        {
+          "type": "unawaited_promise",
+          "file": "/workspace/__tests__/lib/optimization/cost-optimizer.test.ts",
+          "line": 1,
+          "description": "Promise not awaited"
+        },
+        {
+          "type": "unawaited_promise",
+          "file": "/workspace/components/canvas/ScenarioComparisonChart.tsx",
+          "line": 1,
+          "description": "Promise not awaited"
+        },
+        {
+          "type": "potential_race_condition",
+          "file": "/workspace/components/dashboard/FutureOutlookDashboard.tsx",
+          "line": 1,
+          "description": "Potential race condition in Promise.all"
+        },
+        {
+          "type": "unawaited_promise",
+          "file": "/workspace/components/ui/ConfidenceIndicator.tsx",
+          "line": 1,
+          "description": "Promise not awaited"
+        },
+        {
+          "type": "unawaited_promise",
+          "file": "/workspace/lib/agents/data-ingestion-agent.ts",
+          "line": 1,
+          "description": "Promise not awaited"
+        },
+        {
+          "type": "potential_race_condition",
+          "file": "/workspace/lib/agents/data-ingestion-agent.ts",
+          "line": 1,
+          "description": "Potential race condition in Promise.all"
+        },
+        {
+          "type": "potential_race_condition",
+          "file": "/workspace/lib/agents/enhanced-explainability-agent.ts",
+          "line": 1,
+          "description": "Potential race condition in Promise.all"
+        },
+        {
+          "type": "unawaited_promise",
+          "file": "/workspace/lib/agents/forecasting-agent.ts",
+          "line": 1,
+          "description": "Promise not awaited"
+        },
+        {
+          "type": "potential_race_condition",
+          "file": "/workspace/lib/agents/green-score-agent.ts",
+          "line": 1,
+          "description": "Potential race condition in Promise.all"
+        },
+        {
+          "type": "unawaited_promise",
+          "file": "/workspace/lib/agents/openai-agent-sdk.ts",
+          "line": 1,
+          "description": "Promise not awaited"
+        },
+        {
+          "type": "unawaited_promise",
+          "file": "/workspace/lib/agents/prescriptive-agent.ts",
+          "line": 1,
+          "description": "Promise not awaited"
+        },
+        {
+          "type": "unawaited_promise",
+          "file": "/workspace/lib/agents/regtech-agent.ts",
+          "line": 1,
+          "description": "Promise not awaited"
+        },
+        {
+          "type": "potential_race_condition",
+          "file": "/workspace/lib/agents/regtech-agent.ts",
+          "line": 1,
+          "description": "Potential race condition in Promise.all"
+        },
+        {
+          "type": "unawaited_promise",
+          "file": "/workspace/lib/agents/scenario-simulator.ts",
+          "line": 1,
+          "description": "Promise not awaited"
+        },
+        {
+          "type": "unawaited_promise",
+          "file": "/workspace/lib/agents/treasury-risk-agent.ts",
+          "line": 1,
+          "description": "Promise not awaited"
+        },
+        {
+          "type": "unawaited_promise",
+          "file": "/workspace/lib/agents/welcome-flow-agent.ts",
+          "line": 1,
+          "description": "Promise not awaited"
+        },
+        {
+          "type": "potential_race_condition",
+          "file": "/workspace/lib/agents/workflow-automation-agent.ts",
+          "line": 1,
+          "description": "Potential race condition in Promise.all"
+        },
+        {
+          "type": "unawaited_promise",
+          "file": "/workspace/lib/api/api-service.ts",
+          "line": 1,
+          "description": "Promise not awaited"
+        },
+        {
+          "type": "potential_race_condition",
+          "file": "/workspace/lib/api/api-service.ts",
+          "line": 148,
+          "description": "Potential race condition in Promise.all"
+        },
+        {
+          "type": "unawaited_promise",
+          "file": "/workspace/lib/api/public-api-service.ts",
+          "line": 1,
+          "description": "Promise not awaited"
+        },
+        {
+          "type": "unawaited_promise",
+          "file": "/workspace/lib/billing/metering-service.ts",
+          "line": 1,
+          "description": "Promise not awaited"
+        },
+        {
+          "type": "unawaited_promise",
+          "file": "/workspace/lib/broker-notifications.ts",
+          "line": 1,
+          "description": "Promise not awaited"
+        },
+        {
+          "type": "unawaited_promise",
+          "file": "/workspace/lib/config/keys.ts",
+          "line": 1,
+          "description": "Promise not awaited"
+        },
+        {
+          "type": "potential_race_condition",
+          "file": "/workspace/lib/customer-success/customer-health-scoring.ts",
+          "line": 1,
+          "description": "Potential race condition in Promise.all"
+        },
+        {
+          "type": "unawaited_promise",
+          "file": "/workspace/lib/data/feeds/RegionalRateFeeds.ts",
+          "line": 1,
+          "description": "Promise not awaited"
+        },
+        {
+          "type": "potential_race_condition",
+          "file": "/workspace/lib/database-service.ts",
+          "line": 1,
+          "description": "Potential race condition in Promise.all"
+        },
+        {
+          "type": "unawaited_promise",
+          "file": "/workspace/lib/error-handling.ts",
+          "line": 1,
+          "description": "Promise not awaited"
+        },
+        {
+          "type": "unawaited_promise",
+          "file": "/workspace/lib/experimentation/ab-testing.ts",
+          "line": 1,
+          "description": "Promise not awaited"
+        },
+        {
+          "type": "potential_race_condition",
+          "file": "/workspace/lib/experimentation/llm-experimentation.ts",
+          "line": 1,
+          "description": "Potential race condition in Promise.all"
+        },
+        {
+          "type": "unawaited_promise",
+          "file": "/workspace/lib/explainability-agent.ts",
+          "line": 1,
+          "description": "Promise not awaited"
+        },
+        {
+          "type": "unawaited_promise",
+          "file": "/workspace/lib/export-service.ts",
+          "line": 1,
+          "description": "Promise not awaited"
+        },
+        {
+          "type": "unawaited_promise",
+          "file": "/workspace/lib/features/FeatureFlags.ts",
+          "line": 1,
+          "description": "Promise not awaited"
+        },
+        {
+          "type": "unawaited_promise",
+          "file": "/workspace/lib/feedback-system.ts",
+          "line": 1,
+          "description": "Promise not awaited"
+        },
+        {
+          "type": "potential_race_condition",
+          "file": "/workspace/lib/hooks/useApi.ts",
+          "line": 1,
+          "description": "Potential race condition in Promise.all"
+        },
+        {
+          "type": "potential_race_condition",
+          "file": "/workspace/lib/integrations/ai-pricing.ts",
+          "line": 1,
+          "description": "Potential race condition in Promise.all"
+        },
+        {
+          "type": "unawaited_promise",
+          "file": "/workspace/lib/integrations/analytics-billing.ts",
+          "line": 1,
+          "description": "Promise not awaited"
+        },
+        {
+          "type": "unawaited_promise",
+          "file": "/workspace/lib/integrations/crm/CRMBridge.ts",
+          "line": 1,
+          "description": "Promise not awaited"
+        },
+        {
+          "type": "potential_race_condition",
+          "file": "/workspace/lib/integrations/crm/CRMBridge.ts",
+          "line": 200,
+          "description": "Potential race condition in Promise.all"
+        },
+        {
+          "type": "unawaited_promise",
+          "file": "/workspace/lib/integrations/programmable-banking.ts",
+          "line": 1,
+          "description": "Promise not awaited"
+        },
+        {
+          "type": "unawaited_promise",
+          "file": "/workspace/lib/intent-matching.ts",
+          "line": 1,
+          "description": "Promise not awaited"
+        },
+        {
+          "type": "unawaited_promise",
+          "file": "/workspace/lib/monitoring/EnhancedMetrics.ts",
+          "line": 1,
+          "description": "Promise not awaited"
+        },
+        {
+          "type": "unawaited_promise",
+          "file": "/workspace/lib/monitoring.ts",
+          "line": 1,
+          "description": "Promise not awaited"
+        },
+        {
+          "type": "unawaited_promise",
+          "file": "/workspace/lib/optimization/cost-optimizer.ts",
+          "line": 1,
+          "description": "Promise not awaited"
+        },
+        {
+          "type": "unawaited_promise",
+          "file": "/workspace/lib/optimization/performance-monitor.ts",
+          "line": 1,
+          "description": "Promise not awaited"
+        },
+        {
+          "type": "unawaited_promise",
+          "file": "/workspace/lib/rate-apis.ts",
+          "line": 1,
+          "description": "Promise not awaited"
+        },
+        {
+          "type": "unawaited_promise",
+          "file": "/workspace/lib/rate-limiting/distributed-rate-limiter.ts",
+          "line": 1,
+          "description": "Promise not awaited"
+        },
+        {
+          "type": "potential_race_condition",
+          "file": "/workspace/lib/rate-limiting/distributed-rate-limiter.ts",
+          "line": 287,
+          "description": "Potential race condition in Promise.all"
+        },
+        {
+          "type": "unawaited_promise",
+          "file": "/workspace/lib/scenario-manager.ts",
+          "line": 1,
+          "description": "Promise not awaited"
+        },
+        {
+          "type": "potential_race_condition",
+          "file": "/workspace/lib/scenario-manager.ts",
+          "line": 1,
+          "description": "Potential race condition in Promise.all"
+        },
+        {
+          "type": "unawaited_promise",
+          "file": "/workspace/lib/security-enhanced.ts",
+          "line": 1,
+          "description": "Promise not awaited"
+        },
+        {
+          "type": "unawaited_promise",
+          "file": "/workspace/lib/security.ts",
+          "line": 1,
+          "description": "Promise not awaited"
+        },
+        {
+          "type": "unawaited_promise",
+          "file": "/workspace/lib/tenancy/api-key-service.ts",
+          "line": 1,
+          "description": "Promise not awaited"
+        },
+        {
+          "type": "unawaited_promise",
+          "file": "/workspace/lib/tenancy/scoping.ts",
+          "line": 1,
+          "description": "Promise not awaited"
+        },
+        {
+          "type": "unawaited_promise",
+          "file": "/workspace/lib/testing/cross-border-sandbox.ts",
+          "line": 1,
+          "description": "Promise not awaited"
+        },
+        {
+          "type": "potential_race_condition",
+          "file": "/workspace/lib/webhooks/webhook-service.ts",
+          "line": 1,
+          "description": "Potential race condition in Promise.all"
+        },
+        {
+          "type": "unawaited_promise",
+          "file": "/workspace/lib/white-label/theme-service.ts",
+          "line": 1,
+          "description": "Promise not awaited"
+        },
+        {
+          "type": "unawaited_promise",
+          "file": "/workspace/metro.config.js",
+          "line": 1,
+          "description": "Promise not awaited"
+        },
+        {
+          "type": "unawaited_promise",
+          "file": "/workspace/metro.config.optimized.js",
+          "line": 1,
+          "description": "Promise not awaited"
+        },
+        {
+          "type": "unawaited_promise",
+          "file": "/workspace/mortgage-mobile-app/jest.setup.js",
+          "line": 5,
+          "description": "Promise not awaited"
+        },
+        {
+          "type": "unawaited_promise",
+          "file": "/workspace/mortgage-mobile-app/metro.config.js",
+          "line": 1,
+          "description": "Promise not awaited"
+        },
+        {
+          "type": "unawaited_promise",
+          "file": "/workspace/mortgage-mobile-app/src/App.tsx",
+          "line": 1,
+          "description": "Promise not awaited"
+        },
+        {
+          "type": "unawaited_promise",
+          "file": "/workspace/mortgage-mobile-app/src/constants/theme.ts",
+          "line": 1,
+          "description": "Promise not awaited"
+        },
+        {
+          "type": "unawaited_promise",
+          "file": "/workspace/mortgage-mobile-app/src/navigation/AppNavigator.tsx",
+          "line": 20,
+          "description": "Promise not awaited"
+        },
+        {
+          "type": "unawaited_promise",
+          "file": "/workspace/mortgage-mobile-app/src/screens/auth/AuthScreen.tsx",
+          "line": 1,
+          "description": "Promise not awaited"
+        },
+        {
+          "type": "unawaited_promise",
+          "file": "/workspace/mortgage-mobile-app/src/screens/calculator/CalculatorScreen.tsx",
+          "line": 1,
+          "description": "Promise not awaited"
+        },
+        {
+          "type": "unawaited_promise",
+          "file": "/workspace/mortgage-mobile-app/src/screens/dashboard/DashboardScreen.tsx",
+          "line": 1,
+          "description": "Promise not awaited"
+        },
+        {
+          "type": "unawaited_promise",
+          "file": "/workspace/mortgage-mobile-app/src/screens/documents/DocumentsScreen.tsx",
+          "line": 1,
+          "description": "Promise not awaited"
+        },
+        {
+          "type": "unawaited_promise",
+          "file": "/workspace/mortgage-mobile-app/src/screens/profile/ProfileScreen.tsx",
+          "line": 1,
+          "description": "Promise not awaited"
+        },
+        {
+          "type": "unawaited_promise",
+          "file": "/workspace/mortgage-mobile-app/src/screens/settings/SettingsScreen.tsx",
+          "line": 1,
+          "description": "Promise not awaited"
+        },
+        {
+          "type": "unawaited_promise",
+          "file": "/workspace/mortgage-mobile-app/src/services/api/apiClient.ts",
+          "line": 1,
+          "description": "Promise not awaited"
+        },
+        {
+          "type": "unawaited_promise",
+          "file": "/workspace/mortgage-mobile-app/src/services/api/mortgageApi.ts",
+          "line": 1,
+          "description": "Promise not awaited"
+        },
+        {
+          "type": "unawaited_promise",
+          "file": "/workspace/mortgage-mobile-app/src/store/authStore.ts",
+          "line": 1,
+          "description": "Promise not awaited"
+        },
+        {
+          "type": "unawaited_promise",
+          "file": "/workspace/mortgage-mobile-app/src/store/mortgageStore.ts",
+          "line": 1,
+          "description": "Promise not awaited"
+        },
+        {
+          "type": "unawaited_promise",
+          "file": "/workspace/next.config.js",
+          "line": 1,
+          "description": "Promise not awaited"
+        },
+        {
+          "type": "unawaited_promise",
+          "file": "/workspace/scripts/assign-mentor.js",
+          "line": 1,
+          "description": "Promise not awaited"
+        },
+        {
+          "type": "unawaited_promise",
+          "file": "/workspace/scripts/deploy-secure-supabase.js",
+          "line": 9,
+          "description": "Promise not awaited"
+        },
+        {
+          "type": "unawaited_promise",
+          "file": "/workspace/scripts/generate-onboarding-tasks.js",
+          "line": 4,
+          "description": "Promise not awaited"
+        },
+        {
+          "type": "unawaited_promise",
+          "file": "/workspace/scripts/optimize-bundle.js",
+          "line": 8,
+          "description": "Promise not awaited"
+        },
+        {
+          "type": "unawaited_promise",
+          "file": "/workspace/scripts/performance-audit.js",
+          "line": 8,
+          "description": "Promise not awaited"
+        },
+        {
+          "type": "unawaited_promise",
+          "file": "/workspace/scripts/run-migrations.js",
+          "line": 13,
+          "description": "Promise not awaited"
+        },
+        {
+          "type": "unawaited_promise",
+          "file": "/workspace/scripts/security-audit.js",
+          "line": 8,
+          "description": "Promise not awaited"
+        },
+        {
+          "type": "unawaited_promise",
+          "file": "/workspace/scripts/setup-database.js",
+          "line": 21,
+          "description": "Promise not awaited"
+        },
+        {
+          "type": "unawaited_promise",
+          "file": "/workspace/scripts/test-improvements.js",
+          "line": 8,
+          "description": "Promise not awaited"
+        },
+        {
+          "type": "unawaited_promise",
+          "file": "/workspace/scripts/test-supabase-security-and-reliability.js",
+          "line": 9,
+          "description": "Promise not awaited"
+        },
+        {
+          "type": "unawaited_promise",
+          "file": "/workspace/scripts/update-onboarding-progress.js",
+          "line": 1,
+          "description": "Promise not awaited"
+        },
+        {
+          "type": "unawaited_promise",
+          "file": "/workspace/src/App.tsx",
+          "line": 1,
+          "description": "Promise not awaited"
+        },
+        {
+          "type": "unawaited_promise",
+          "file": "/workspace/src/components/calculator/AffordabilityInputForm.tsx",
+          "line": 1,
+          "description": "Promise not awaited"
+        },
+        {
+          "type": "unawaited_promise",
+          "file": "/workspace/src/components/calculator/MortgageProductSelector.tsx",
+          "line": 1,
+          "description": "Promise not awaited"
+        },
+        {
+          "type": "unawaited_promise",
+          "file": "/workspace/src/components/home/MarketInsightsCard.tsx",
+          "line": 1,
+          "description": "Promise not awaited"
+        },
+        {
+          "type": "unawaited_promise",
+          "file": "/workspace/src/components/home/MetricsCard.tsx",
+          "line": 1,
+          "description": "Promise not awaited"
+        },
+        {
+          "type": "unawaited_promise",
+          "file": "/workspace/src/components/home/QuickActionsCard.tsx",
+          "line": 1,
+          "description": "Promise not awaited"
+        },
+        {
+          "type": "unawaited_promise",
+          "file": "/workspace/src/components/home/RecentActivityCard.tsx",
+          "line": 1,
+          "description": "Promise not awaited"
+        },
+        {
+          "type": "unawaited_promise",
+          "file": "/workspace/src/components/layout/ResponsiveGrid.tsx",
+          "line": 1,
+          "description": "Promise not awaited"
+        },
+        {
+          "type": "unawaited_promise",
+          "file": "/workspace/src/components/layout/ResponsiveLayout.tsx",
+          "line": 1,
+          "description": "Promise not awaited"
+        },
+        {
+          "type": "unawaited_promise",
+          "file": "/workspace/src/components/mobile/MobileOptimizedImage.tsx",
+          "line": 58,
+          "description": "Promise not awaited"
+        },
+        {
+          "type": "unawaited_promise",
+          "file": "/workspace/src/components/performance/PerformanceDashboard.tsx",
+          "line": 1,
+          "description": "Promise not awaited"
+        },
+        {
+          "type": "unawaited_promise",
+          "file": "/workspace/src/components/ui/ResponsiveButton.tsx",
+          "line": 1,
+          "description": "Promise not awaited"
+        },
+        {
+          "type": "unawaited_promise",
+          "file": "/workspace/src/components/ui/ResponsiveContainer.tsx",
+          "line": 1,
+          "description": "Promise not awaited"
+        },
+        {
+          "type": "unawaited_promise",
+          "file": "/workspace/src/components/ui/ResponsiveText.tsx",
+          "line": 1,
+          "description": "Promise not awaited"
+        },
+        {
+          "type": "unawaited_promise",
+          "file": "/workspace/src/constants/api.ts",
+          "line": 1,
+          "description": "Promise not awaited"
+        },
+        {
+          "type": "unawaited_promise",
+          "file": "/workspace/src/contexts/AuthContext.tsx",
+          "line": 27,
+          "description": "Promise not awaited"
+        },
+        {
+          "type": "unawaited_promise",
+          "file": "/workspace/src/contexts/I18nContext.tsx",
+          "line": 14,
+          "description": "Promise not awaited"
+        },
+        {
+          "type": "unawaited_promise",
+          "file": "/workspace/src/contexts/ThemeContext.tsx",
+          "line": 13,
+          "description": "Promise not awaited"
+        },
+        {
+          "type": "unawaited_promise",
+          "file": "/workspace/src/i18n/index.ts",
+          "line": 1,
+          "description": "Promise not awaited"
+        },
+        {
+          "type": "unawaited_promise",
+          "file": "/workspace/src/navigation/AppNavigator.tsx",
+          "line": 10,
+          "description": "Promise not awaited"
+        },
+        {
+          "type": "unawaited_promise",
+          "file": "/workspace/src/navigation/AuthNavigator.tsx",
+          "line": 8,
+          "description": "Promise not awaited"
+        },
+        {
+          "type": "unawaited_promise",
+          "file": "/workspace/src/navigation/BrokerNavigator.tsx",
+          "line": 19,
+          "description": "Promise not awaited"
+        },
+        {
+          "type": "unawaited_promise",
+          "file": "/workspace/src/navigation/MainNavigator.tsx",
+          "line": 22,
+          "description": "Promise not awaited"
+        },
+        {
+          "type": "unawaited_promise",
+          "file": "/workspace/src/screens/LoadingScreen.tsx",
+          "line": 1,
+          "description": "Promise not awaited"
+        },
+        {
+          "type": "unawaited_promise",
+          "file": "/workspace/src/screens/OnboardingScreen.tsx",
+          "line": 61,
+          "description": "Promise not awaited"
+        },
+        {
+          "type": "unawaited_promise",
+          "file": "/workspace/src/screens/auth/LoginScreen.tsx",
+          "line": 1,
+          "description": "Promise not awaited"
+        },
+        {
+          "type": "unawaited_promise",
+          "file": "/workspace/src/screens/broker/BrokerDashboardScreen.tsx",
+          "line": 23,
+          "description": "Promise not awaited"
+        },
+        {
+          "type": "potential_race_condition",
+          "file": "/workspace/src/screens/broker/BrokerDashboardScreen.tsx",
+          "line": 1,
+          "description": "Potential race condition in Promise.all"
+        },
+        {
+          "type": "unawaited_promise",
+          "file": "/workspace/src/screens/main/CalculatorScreen.tsx",
+          "line": 1,
+          "description": "Promise not awaited"
+        },
+        {
+          "type": "unawaited_promise",
+          "file": "/workspace/src/screens/main/HomeScreen.tsx",
+          "line": 23,
+          "description": "Promise not awaited"
+        },
+        {
+          "type": "potential_race_condition",
+          "file": "/workspace/src/screens/main/HomeScreen.tsx",
+          "line": 1,
+          "description": "Potential race condition in Promise.all"
+        },
+        {
+          "type": "unawaited_promise",
+          "file": "/workspace/src/services/authService.ts",
+          "line": 1,
+          "description": "Promise not awaited"
+        },
+        {
+          "type": "unawaited_promise",
+          "file": "/workspace/src/services/enhancedApiService.ts",
+          "line": 1,
+          "description": "Promise not awaited"
+        },
+        {
+          "type": "unawaited_promise",
+          "file": "/workspace/src/services/mortgageService.ts",
+          "line": 21,
+          "description": "Promise not awaited"
+        },
+        {
+          "type": "unawaited_promise",
+          "file": "/workspace/src/utils/mobilePerformance.ts",
+          "line": 1,
+          "description": "Promise not awaited"
+        },
+        {
+          "type": "unawaited_promise",
+          "file": "/workspace/src/utils/mobileTesting.ts",
+          "line": 1,
+          "description": "Promise not awaited"
+        },
+        {
+          "type": "unawaited_promise",
+          "file": "/workspace/src/utils/performance.ts",
+          "line": 23,
+          "description": "Promise not awaited"
+        },
+        {
+          "type": "unawaited_promise",
+          "file": "/workspace/src/utils/responsive.ts",
+          "line": 1,
+          "description": "Promise not awaited"
+        },
+        {
+          "type": "unawaited_promise",
+          "file": "/workspace/src/utils/toastConfig.ts",
+          "line": 1,
+          "description": "Promise not awaited"
+        },
+        {
+          "type": "unawaited_promise",
+          "file": "/workspace/training/prepareDataset.ts",
+          "line": 1,
+          "description": "Promise not awaited"
+        }
+      ]
+    },
+    "recommendations": [
+      {
+        "category": "dependencies",
+        "priority": "high",
+        "title": "Remove unused dependencies",
+        "description": "Found 49 unused dependencies",
+        "action": "Remove: react-native-screens, react-native-reanimated, react-native-vector-icons, react-native-svg, react-native-image-picker, react-native-document-picker, react-native-fs, react-native-share, react-native-pdf, react-native-camera, react-native-permissions, react-native-keychain, react-native-biometrics, @supabase/auth-helpers-nextjs, @supabase/auth-helpers-react, @supabase/auth-ui-react, @supabase/auth-ui-shared, react-hook-form, @hookform/resolvers, date-fns, react-native-calendars, react-native-modal, react-native-super-grid, react-native-skeleton-placeholder, react-native-snap-carousel, react-native-swipe-gestures, react-native-pull-to-refresh, react-native-device-info, react-native-network-info, react-native-background-job, react-native-push-notification, react-native-firebase, react-native-sqlite-storage, react-native-elements, react-native-ui-lib, @babel/core, @babel/preset-env, @babel/runtime, @react-native/eslint-config, @tsconfig/react-native, @types/react, @types/react-test-renderer, babel-jest, eslint, jest, metro-react-native-babel-preset, prettier, react-test-renderer, typescript"
+      },
+      {
+        "category": "quality",
+        "priority": "high",
+        "title": "Improve code quality",
+        "description": "Quality score 45/100 is below threshold",
+        "action": "Address linting errors and improve test coverage"
+      }
+    ]
+  },
+  "recommendations": [
+    {
+      "category": "dependencies",
+      "priority": "high",
+      "title": "Remove unused dependencies",
+      "description": "Found 49 unused dependencies",
+      "action": "Remove: react-native-screens, react-native-reanimated, react-native-vector-icons, react-native-svg, react-native-image-picker, react-native-document-picker, react-native-fs, react-native-share, react-native-pdf, react-native-camera, react-native-permissions, react-native-keychain, react-native-biometrics, @supabase/auth-helpers-nextjs, @supabase/auth-helpers-react, @supabase/auth-ui-react, @supabase/auth-ui-shared, react-hook-form, @hookform/resolvers, date-fns, react-native-calendars, react-native-modal, react-native-super-grid, react-native-skeleton-placeholder, react-native-snap-carousel, react-native-swipe-gestures, react-native-pull-to-refresh, react-native-device-info, react-native-network-info, react-native-background-job, react-native-push-notification, react-native-firebase, react-native-sqlite-storage, react-native-elements, react-native-ui-lib, @babel/core, @babel/preset-env, @babel/runtime, @react-native/eslint-config, @tsconfig/react-native, @types/react, @types/react-test-renderer, babel-jest, eslint, jest, metro-react-native-babel-preset, prettier, react-test-renderer, typescript"
+    },
+    {
+      "category": "quality",
+      "priority": "high",
+      "title": "Improve code quality",
+      "description": "Quality score 45/100 is below threshold",
+      "action": "Address linting errors and improve test coverage"
+    }
+  ]
+}
