@@ -1,0 +1,564 @@
+openapi: 3.0.3
+info:
+  title: MortgageMatchPro API
+  description: Multi-tenant SaaS API for mortgage matching and analysis
+  version: 1.3.0
+  contact:
+    name: API Support
+    email: support@mortgagematchpro.com
+  license:
+    name: MIT
+    url: https://opensource.org/licenses/MIT
+
+servers:
+  - url: https://api.mortgagematchpro.com/v1
+    description: Production server
+  - url: https://staging-api.mortgagematchpro.com/v1
+    description: Staging server
+
+security:
+  - ApiKeyAuth: []
+
+paths:
+  /scenarios:
+    get:
+      summary: Get mortgage scenarios
+      description: Retrieve all mortgage scenarios for the organization
+      tags:
+        - Scenarios
+      responses:
+        '200':
+          description: Successful response
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  success:
+                    type: boolean
+                  data:
+                    type: array
+                    items:
+                      $ref: '#/components/schemas/MortgageScenario'
+                  meta:
+                    $ref: '#/components/schemas/ResponseMeta'
+        '400':
+          description: Bad request
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '401':
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '429':
+          description: Rate limit exceeded
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+
+    post:
+      summary: Create mortgage scenario
+      description: Create a new mortgage scenario for analysis
+      tags:
+        - Scenarios
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/CreateScenarioRequest'
+      responses:
+        '201':
+          description: Scenario created successfully
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  success:
+                    type: boolean
+                  data:
+                    $ref: '#/components/schemas/MortgageScenario'
+                  meta:
+                    $ref: '#/components/schemas/ResponseMeta'
+        '400':
+          description: Bad request
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '401':
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '429':
+          description: Rate limit exceeded
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+
+  /matches:
+    get:
+      summary: Get mortgage matches
+      description: Retrieve mortgage matches for a specific scenario
+      tags:
+        - Matches
+      parameters:
+        - name: scenarioId
+          in: query
+          required: true
+          schema:
+            type: string
+          description: ID of the scenario to get matches for
+      responses:
+        '200':
+          description: Successful response
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  success:
+                    type: boolean
+                  data:
+                    type: array
+                    items:
+                      $ref: '#/components/schemas/MortgageMatch'
+                  meta:
+                    $ref: '#/components/schemas/ResponseMeta'
+        '400':
+          description: Bad request
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '401':
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '429':
+          description: Rate limit exceeded
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+
+  /reports:
+    get:
+      summary: Get reports
+      description: Retrieve all reports for the organization
+      tags:
+        - Reports
+      responses:
+        '200':
+          description: Successful response
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  success:
+                    type: boolean
+                  data:
+                    type: array
+                    items:
+                      $ref: '#/components/schemas/Report'
+                  meta:
+                    $ref: '#/components/schemas/ResponseMeta'
+        '400':
+          description: Bad request
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '401':
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '429':
+          description: Rate limit exceeded
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+
+    post:
+      summary: Generate report
+      description: Generate a new report for the organization
+      tags:
+        - Reports
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/CreateReportRequest'
+      responses:
+        '201':
+          description: Report generation started
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  success:
+                    type: boolean
+                  data:
+                    $ref: '#/components/schemas/Report'
+                  meta:
+                    $ref: '#/components/schemas/ResponseMeta'
+        '400':
+          description: Bad request
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '401':
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '429':
+          description: Rate limit exceeded
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+
+  /rates:
+    get:
+      summary: Get current rates
+      description: Retrieve current mortgage rates
+      tags:
+        - Rates
+      responses:
+        '200':
+          description: Successful response
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  success:
+                    type: boolean
+                  data:
+                    $ref: '#/components/schemas/RateCheck'
+                  meta:
+                    $ref: '#/components/schemas/ResponseMeta'
+        '400':
+          description: Bad request
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '401':
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '429':
+          description: Rate limit exceeded
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+
+components:
+  securitySchemes:
+    ApiKeyAuth:
+      type: apiKey
+      in: header
+      name: X-API-Key
+      description: API key for authentication
+
+  schemas:
+    MortgageScenario:
+      type: object
+      properties:
+        id:
+          type: string
+          description: Unique identifier for the scenario
+        organizationId:
+          type: string
+          description: Organization ID
+        propertyValue:
+          type: number
+          description: Property value in dollars
+        downPayment:
+          type: number
+          description: Down payment amount in dollars
+        loanAmount:
+          type: number
+          description: Loan amount in dollars
+        loanTerm:
+          type: integer
+          description: Loan term in years
+        interestRate:
+          type: number
+          description: Interest rate as a decimal
+        propertyType:
+          type: string
+          enum: [single_family, condo, townhouse, multi_family]
+          description: Type of property
+        occupancy:
+          type: string
+          enum: [primary, secondary, investment]
+          description: Occupancy type
+        creditScore:
+          type: integer
+          minimum: 300
+          maximum: 850
+          description: Credit score
+        income:
+          type: number
+          description: Annual income in dollars
+        debts:
+          type: number
+          description: Monthly debt payments in dollars
+        createdAt:
+          type: string
+          format: date-time
+          description: Creation timestamp
+
+    CreateScenarioRequest:
+      type: object
+      required:
+        - propertyValue
+        - downPayment
+        - loanTerm
+        - propertyType
+        - occupancy
+        - creditScore
+        - income
+      properties:
+        propertyValue:
+          type: number
+          description: Property value in dollars
+        downPayment:
+          type: number
+          description: Down payment amount in dollars
+        loanTerm:
+          type: integer
+          description: Loan term in years
+        interestRate:
+          type: number
+          description: Interest rate as a decimal
+        propertyType:
+          type: string
+          enum: [single_family, condo, townhouse, multi_family]
+          description: Type of property
+        occupancy:
+          type: string
+          enum: [primary, secondary, investment]
+          description: Occupancy type
+        creditScore:
+          type: integer
+          minimum: 300
+          maximum: 850
+          description: Credit score
+        income:
+          type: number
+          description: Annual income in dollars
+        debts:
+          type: number
+          description: Monthly debt payments in dollars
+
+    MortgageMatch:
+      type: object
+      properties:
+        id:
+          type: string
+          description: Unique identifier for the match
+        scenarioId:
+          type: string
+          description: ID of the scenario this match belongs to
+        brokerId:
+          type: string
+          description: ID of the broker
+        score:
+          type: number
+          minimum: 0
+          maximum: 100
+          description: Match score (0-100)
+        interestRate:
+          type: number
+          description: Offered interest rate
+        monthlyPayment:
+          type: number
+          description: Monthly payment amount
+        totalCost:
+          type: number
+          description: Total cost of the loan
+        broker:
+          $ref: '#/components/schemas/Broker'
+        createdAt:
+          type: string
+          format: date-time
+          description: Creation timestamp
+
+    Broker:
+      type: object
+      properties:
+        id:
+          type: string
+          description: Unique identifier for the broker
+        name:
+          type: string
+          description: Broker name
+        company:
+          type: string
+          description: Company name
+        contactInfo:
+          type: object
+          properties:
+            email:
+              type: string
+              format: email
+            phone:
+              type: string
+            website:
+              type: string
+              format: uri
+
+    Report:
+      type: object
+      properties:
+        id:
+          type: string
+          description: Unique identifier for the report
+        organizationId:
+          type: string
+          description: Organization ID
+        type:
+          type: string
+          enum: [market_analysis, rate_trends, broker_performance]
+          description: Report type
+        status:
+          type: string
+          enum: [generating, completed, failed]
+          description: Report status
+        data:
+          type: object
+          description: Report data (varies by type)
+        createdAt:
+          type: string
+          format: date-time
+          description: Creation timestamp
+        completedAt:
+          type: string
+          format: date-time
+          description: Completion timestamp
+
+    CreateReportRequest:
+      type: object
+      required:
+        - type
+      properties:
+        type:
+          type: string
+          enum: [market_analysis, rate_trends, broker_performance]
+          description: Report type
+        parameters:
+          type: object
+          description: Report-specific parameters
+
+    RateCheck:
+      type: object
+      properties:
+        id:
+          type: string
+          description: Unique identifier for the rate check
+        organizationId:
+          type: string
+          description: Organization ID
+        rates:
+          type: object
+          properties:
+            conventional30:
+              type: number
+              description: 30-year conventional rate
+            conventional15:
+              type: number
+              description: 15-year conventional rate
+            fha30:
+              type: number
+              description: 30-year FHA rate
+            va30:
+              type: number
+              description: 30-year VA rate
+        createdAt:
+          type: string
+          format: date-time
+          description: Creation timestamp
+
+    ResponseMeta:
+      type: object
+      properties:
+        requestId:
+          type: string
+          description: Unique request identifier
+        timestamp:
+          type: string
+          format: date-time
+          description: Response timestamp
+        rateLimit:
+          $ref: '#/components/schemas/RateLimitInfo'
+
+    RateLimitInfo:
+      type: object
+      properties:
+        limit:
+          type: integer
+          description: Rate limit per day
+        remaining:
+          type: integer
+          description: Remaining requests today
+        resetAt:
+          type: string
+          format: date-time
+          description: When the rate limit resets
+
+    ErrorResponse:
+      type: object
+      properties:
+        success:
+          type: boolean
+          example: false
+        error:
+          type: object
+          properties:
+            code:
+              type: string
+              description: Error code
+            message:
+              type: string
+              description: Error message
+            details:
+              type: object
+              description: Additional error details
+        meta:
+          $ref: '#/components/schemas/ResponseMeta'
+
+tags:
+  - name: Scenarios
+    description: Mortgage scenario management
+  - name: Matches
+    description: Mortgage match retrieval
+  - name: Reports
+    description: Report generation and retrieval
+  - name: Rates
+    description: Current mortgage rates
