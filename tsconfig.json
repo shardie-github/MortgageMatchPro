@@ -15,16 +15,18 @@
     "skipLibCheck": true,
     "baseUrl": ".",
     "paths": {
-      "@/*": ["src/*"],
-      "@components/*": ["src/components/*"],
-      "@screens/*": ["src/screens/*"],
-      "@navigation/*": ["src/navigation/*"],
-      "@services/*": ["src/services/*"],
-      "@store/*": ["src/store/*"],
-      "@utils/*": ["src/utils/*"],
-      "@types/*": ["src/types/*"],
-      "@assets/*": ["src/assets/*"],
-      "@constants/*": ["src/constants/*"]
+      "@/*": ["apps/web/*"],
+      "@core/*": ["core/*"],
+      "@shared/*": ["shared/*"],
+      "@tests/*": ["tests/*"],
+      "@docs/*": ["docs/*"],
+      "@config/*": ["config/*"],
+      "@components/*": ["shared/components/*"],
+      "@utils/*": ["shared/utils/*"],
+      "@types/*": ["shared/types/*"],
+      "@services/*": ["core/*"],
+      "@hooks/*": ["shared/hooks/*"],
+      "@constants/*": ["shared/constants/*"]
     }
   },
   "exclude": [
