@@ -263,32 +263,62 @@ export const performHealthCheck = async () => {
   }
 
   try {
-    // Check database
-    const { supabaseAdmin } = await import('./supabase')
-    const { error: dbError } = await supabaseAdmin
-      .from('users')
-      .select('count')
-      .limit(1)
+    // Check database with timeout
+    const dbCheckPromise = new Promise<boolean>((resolve) => {
+      const timeout = setTimeout(() => resolve(false), 5000)
+      
+      import('./supabase').then(({ supabaseAdmin }) => {
+        supabaseAdmin
+          .from('users')
+          .select('count')
+          .limit(1)
+          .then(({ error }) => {
+            clearTimeout(timeout)
+            resolve(!error)
+          })
+          .catch(() => {
+            clearTimeout(timeout)
+            resolve(false)
+          })
+      }).catch(() => {
+        clearTimeout(timeout)
+        resolve(false)
+      })
+    })
     
-    checks.database = !dbError
+    checks.database = await dbCheckPromise
 
     // Check Redis (if available)
     try {
-      // This would be implemented based on your Redis setup
-      checks.redis = true
-    } catch {
+      if (process.env.REDIS_URL) {
+        const { createClient } = await import('redis')
+        const redis = createClient({ url: process.env.REDIS_URL })
+        await redis.connect()
+        await redis.ping()
+        await redis.disconnect()
+        checks.redis = true
+      } else {
+        checks.redis = true // Skip Redis check if not configured
+      }
+    } catch (error) {
+      console.warn('Redis health check failed:', error)
       checks.redis = false
     }
 
-    // Check external APIs
+    // Check external APIs with timeout
     try {
-      // Check rate API
+      const controller = new AbortController()
+      const timeoutId = setTimeout(() => controller.abort(), 5000)
+      
       const response = await fetch('/api/rates?country=CA&termYears=25&rateType=fixed&propertyPrice=500000&downPayment=50000', {
         method: 'GET',
-        timeout: 5000,
+        signal: controller.signal,
       })
+      
+      clearTimeout(timeoutId)
       checks.external_apis = response.ok
-    } catch {
+    } catch (error) {
+      console.warn('External API health check failed:', error)
       checks.external_apis = false
     }
 

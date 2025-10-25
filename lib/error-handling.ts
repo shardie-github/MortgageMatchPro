@@ -1,524 +1,350 @@
-import { SupabaseError } from './supabase'
-import { analytics } from './monitoring'
+/**
+ * Comprehensive Error Handling System
+ * Provides standardized error handling across the application
+ */
 
-// Enhanced error handling service
-export class ErrorHandlingService {
-  // Error types
-  static readonly ERROR_TYPES = {
-    VALIDATION_ERROR: 'validation_error',
-    AUTHENTICATION_ERROR: 'authentication_error',
-    AUTHORIZATION_ERROR: 'authorization_error',
-    DATABASE_ERROR: 'database_error',
-    NETWORK_ERROR: 'network_error',
-    RATE_LIMIT_ERROR: 'rate_limit_error',
-    NOT_FOUND_ERROR: 'not_found_error',
-    CONFLICT_ERROR: 'conflict_error',
-    INTERNAL_ERROR: 'internal_error',
-    EXTERNAL_SERVICE_ERROR: 'external_service_error'
-  } as const
+import { NextApiRequest, NextApiResponse } from 'next'
+import { captureException, captureMessage } from './monitoring'
 
-  // Error severity levels
-  static readonly SEVERITY_LEVELS = {
-    LOW: 'low',
-    MEDIUM: 'medium',
-    HIGH: 'high',
-    CRITICAL: 'critical'
-  } as const
+export enum ErrorCode {
+  // Authentication & Authorization
+  UNAUTHORIZED = 'UNAUTHORIZED',
+  FORBIDDEN = 'FORBIDDEN',
+  INVALID_TOKEN = 'INVALID_TOKEN',
+  TOKEN_EXPIRED = 'TOKEN_EXPIRED',
+  
+  // Validation
+  VALIDATION_ERROR = 'VALIDATION_ERROR',
+  INVALID_INPUT = 'INVALID_INPUT',
+  MISSING_REQUIRED_FIELD = 'MISSING_REQUIRED_FIELD',
+  
+  // Business Logic
+  RATE_LIMIT_EXCEEDED = 'RATE_LIMIT_EXCEEDED',
+  INSUFFICIENT_ENTITLEMENTS = 'INSUFFICIENT_ENTITLEMENTS',
+  CALCULATION_ERROR = 'CALCULATION_ERROR',
+  
+  // External Services
+  EXTERNAL_API_ERROR = 'EXTERNAL_API_ERROR',
+  DATABASE_ERROR = 'DATABASE_ERROR',
+  CACHE_ERROR = 'CACHE_ERROR',
+  
+  // System
+  INTERNAL_ERROR = 'INTERNAL_ERROR',
+  SERVICE_UNAVAILABLE = 'SERVICE_UNAVAILABLE',
+  TIMEOUT = 'TIMEOUT',
+}
 
-  // Error context interface
-  interface ErrorContext {
-    userId?: string
-    requestId?: string
-    endpoint?: string
-    method?: string
-    userAgent?: string
-    ipAddress?: string
-    timestamp?: string
-    additionalData?: Record<string, any>
-  }
+export interface ErrorResponse {
+  error: string
+  code: ErrorCode
+  message: string
+  details?: any
+  timestamp: string
+  requestId?: string
+}
 
-  // Enhanced error class
-  export class AppError extends Error {
-    public readonly type: string
-    public readonly severity: string
-    public readonly statusCode: number
-    public readonly context: ErrorContext
-    public readonly isOperational: boolean
-    public readonly timestamp: string
+export class AppError extends Error {
+  public readonly code: ErrorCode
+  public readonly statusCode: number
+  public readonly isOperational: boolean
+  public readonly details?: any
 
-    constructor(
-      message: string,
-      type: string = ErrorHandlingService.ERROR_TYPES.INTERNAL_ERROR,
-      statusCode: number = 500,
-      severity: string = ErrorHandlingService.SEVERITY_LEVELS.MEDIUM,
-      context: ErrorContext = {},
-      isOperational: boolean = true
-    ) {
-      super(message)
-      
-      this.name = 'AppError'
-      this.type = type
-      this.severity = severity
-      this.statusCode = statusCode
-      this.context = {
-        timestamp: new Date().toISOString(),
-        ...context
-      }
-      this.isOperational = isOperational
-
-      // Capture stack trace
-      Error.captureStackTrace(this, this.constructor)
-    }
-
-    // Convert to JSON for logging
-    toJSON() {
-      return {
-        name: this.name,
-        message: this.message,
-        type: this.type,
-        severity: this.severity,
-        statusCode: this.statusCode,
-        context: this.context,
-        isOperational: this.isOperational,
-        stack: this.stack
-      }
-    }
-  }
-
-  // Error factory methods
-  static createValidationError(message: string, context: ErrorContext = {}): AppError {
-    return new AppError(
-      message,
-      this.ERROR_TYPES.VALIDATION_ERROR,
-      400,
-      this.SEVERITY_LEVELS.LOW,
-      context
-    )
-  }
-
-  static createAuthenticationError(message: string, context: ErrorContext = {}): AppError {
-    return new AppError(
-      message,
-      this.ERROR_TYPES.AUTHENTICATION_ERROR,
-      401,
-      this.SEVERITY_LEVELS.MEDIUM,
-      context
-    )
-  }
-
-  static createAuthorizationError(message: string, context: ErrorContext = {}): AppError {
-    return new AppError(
-      message,
-      this.ERROR_TYPES.AUTHORIZATION_ERROR,
-      403,
-      this.SEVERITY_LEVELS.MEDIUM,
-      context
-    )
-  }
-
-  static createNotFoundError(message: string, context: ErrorContext = {}): AppError {
-    return new AppError(
-      message,
-      this.ERROR_TYPES.NOT_FOUND_ERROR,
-      404,
-      this.SEVERITY_LEVELS.LOW,
-      context
-    )
-  }
-
-  static createConflictError(message: string, context: ErrorContext = {}): AppError {
-    return new AppError(
-      message,
-      this.ERROR_TYPES.CONFLICT_ERROR,
-      409,
-      this.SEVERITY_LEVELS.MEDIUM,
-      context
-    )
-  }
-
-  static createRateLimitError(message: string, context: ErrorContext = {}): AppError {
-    return new AppError(
-      message,
-      this.ERROR_TYPES.RATE_LIMIT_ERROR,
-      429,
-      this.SEVERITY_LEVELS.MEDIUM,
-      context
-    )
-  }
-
-  static createDatabaseError(message: string, context: ErrorContext = {}): AppError {
-    return new AppError(
-      message,
-      this.ERROR_TYPES.DATABASE_ERROR,
-      500,
-      this.SEVERITY_LEVELS.HIGH,
-      context
-    )
-  }
-
-  static createInternalError(message: string, context: ErrorContext = {}): AppError {
-    return new AppError(
-      message,
-      this.ERROR_TYPES.INTERNAL_ERROR,
-      500,
-      this.SEVERITY_LEVELS.HIGH,
-      context
-    )
-  }
-
-  static createExternalServiceError(message: string, context: ErrorContext = {}): AppError {
-    return new AppError(
-      message,
-      this.ERROR_TYPES.EXTERNAL_SERVICE_ERROR,
-      502,
-      this.SEVERITY_LEVELS.HIGH,
-      context
-    )
-  }
-
-  // Error handler for API routes
-  static handleApiError(error: any, context: ErrorContext = {}): {
-    statusCode: number
-    message: string
-    type: string
+  constructor(
+    code: ErrorCode,
+    message: string,
+    statusCode: number = 500,
+    isOperational: boolean = true,
     details?: any
-  } {
-    // Log the error
-    this.logError(error, context)
+  ) {
+    super(message)
+    this.name = 'AppError'
+    this.code = code
+    this.statusCode = statusCode
+    this.isOperational = isOperational
+    this.details = details
 
-    // Handle known error types
-    if (error instanceof AppError) {
-      return {
-        statusCode: error.statusCode,
-        message: error.message,
-        type: error.type,
-        details: error.context
+    Error.captureStackTrace(this, this.constructor)
+  }
+}
+
+// Error code to status code mapping
+const ERROR_STATUS_MAP: Record<ErrorCode, number> = {
+  [ErrorCode.UNAUTHORIZED]: 401,
+  [ErrorCode.FORBIDDEN]: 403,
+  [ErrorCode.INVALID_TOKEN]: 401,
+  [ErrorCode.TOKEN_EXPIRED]: 401,
+  [ErrorCode.VALIDATION_ERROR]: 400,
+  [ErrorCode.INVALID_INPUT]: 400,
+  [ErrorCode.MISSING_REQUIRED_FIELD]: 400,
+  [ErrorCode.RATE_LIMIT_EXCEEDED]: 429,
+  [ErrorCode.INSUFFICIENT_ENTITLEMENTS]: 403,
+  [ErrorCode.CALCULATION_ERROR]: 422,
+  [ErrorCode.EXTERNAL_API_ERROR]: 502,
+  [ErrorCode.DATABASE_ERROR]: 503,
+  [ErrorCode.CACHE_ERROR]: 503,
+  [ErrorCode.INTERNAL_ERROR]: 500,
+  [ErrorCode.SERVICE_UNAVAILABLE]: 503,
+  [ErrorCode.TIMEOUT]: 408,
+}
+
+// Generate unique request ID
+const generateRequestId = (): string => {
+  return `req_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`
+}
+
+// Handle different types of errors
+export const handleError = (
+  error: Error | AppError,
+  req: NextApiRequest,
+  res: NextApiResponse,
+  context?: string
+): void => {
+  const requestId = generateRequestId()
+  
+  // Determine if it's an operational error
+  const isOperational = error instanceof AppError ? error.isOperational : false
+  
+  // Get error details
+  const errorCode = error instanceof AppError ? error.code : ErrorCode.INTERNAL_ERROR
+  const statusCode = error instanceof AppError ? error.statusCode : ERROR_STATUS_MAP[errorCode]
+  const message = error.message || 'An unexpected error occurred'
+  
+  // Log error details
+  const errorContext = {
+    requestId,
+    context: context || 'unknown',
+    method: req.method,
+    url: req.url,
+    userAgent: req.headers['user-agent'],
+    ip: req.headers['x-forwarded-for'] || req.connection.remoteAddress,
+    userId: req.body?.userId || req.query?.userId,
+    errorCode,
+    statusCode,
+    isOperational,
+    stack: error.stack,
+  }
+
+  // Capture in monitoring system
+  if (isOperational) {
+    captureMessage(`Operational Error: ${message}`, 'warning', errorContext)
+  } else {
+    captureException(error, errorContext)
+  }
+
+  // Prepare error response
+  const errorResponse: ErrorResponse = {
+    error: errorCode,
+    code: errorCode,
+    message: process.env.NODE_ENV === 'production' && !isOperational 
+      ? 'An unexpected error occurred. Please try again later.'
+      : message,
+    timestamp: new Date().toISOString(),
+    requestId,
+  }
+
+  // Add details in development or for operational errors
+  if (process.env.NODE_ENV === 'development' || isOperational) {
+    errorResponse.details = error instanceof AppError ? error.details : undefined
+  }
+
+  // Send response
+  res.status(statusCode).json(errorResponse)
+}
+
+// Validation error handler
+export const handleValidationError = (
+  errors: any[],
+  req: NextApiRequest,
+  res: NextApiResponse
+): void => {
+  const error = new AppError(
+    ErrorCode.VALIDATION_ERROR,
+    'Validation failed',
+    400,
+    true,
+    { validationErrors: errors }
+  )
+  
+  handleError(error, req, res, 'validation')
+}
+
+// Rate limit error handler
+export const handleRateLimitError = (
+  req: NextApiRequest,
+  res: NextApiResponse,
+  retryAfter?: number
+): void => {
+  const error = new AppError(
+    ErrorCode.RATE_LIMIT_EXCEEDED,
+    'Rate limit exceeded',
+    429,
+    true,
+    { retryAfter }
+  )
+  
+  handleError(error, req, res, 'rate_limit')
+}
+
+// Database error handler
+export const handleDatabaseError = (
+  error: Error,
+  req: NextApiRequest,
+  res: NextApiResponse,
+  operation: string
+): void => {
+  const appError = new AppError(
+    ErrorCode.DATABASE_ERROR,
+    `Database operation failed: ${operation}`,
+    503,
+    false,
+    { originalError: error.message, operation }
+  )
+  
+  handleError(appError, req, res, 'database')
+}
+
+// External API error handler
+export const handleExternalApiError = (
+  error: Error,
+  req: NextApiRequest,
+  res: NextApiResponse,
+  service: string
+): void => {
+  const appError = new AppError(
+    ErrorCode.EXTERNAL_API_ERROR,
+    `External service error: ${service}`,
+    502,
+    false,
+    { originalError: error.message, service }
+  )
+  
+  handleError(appError, req, res, 'external_api')
+}
+
+// Timeout error handler
+export const handleTimeoutError = (
+  req: NextApiRequest,
+  res: NextApiResponse,
+  operation: string,
+  timeoutMs: number
+): void => {
+  const error = new AppError(
+    ErrorCode.TIMEOUT,
+    `Operation timed out: ${operation}`,
+    408,
+    true,
+    { operation, timeoutMs }
+  )
+  
+  handleError(error, req, res, 'timeout')
+}
+
+// Async error wrapper
+export const asyncHandler = (
+  fn: (req: NextApiRequest, res: NextApiResponse) => Promise<any>
+) => {
+  return async (req: NextApiRequest, res: NextApiResponse) => {
+    try {
+      await fn(req, res)
+    } catch (error) {
+      handleError(error as Error, req, res)
+    }
+  }
+}
+
+// Retry mechanism with exponential backoff
+export const withRetry = async <T>(
+  operation: () => Promise<T>,
+  maxRetries: number = 3,
+  baseDelay: number = 1000
+): Promise<T> => {
+  let lastError: Error
+
+  for (let attempt = 0; attempt <= maxRetries; attempt++) {
+    try {
+      return await operation()
+    } catch (error) {
+      lastError = error as Error
+      
+      if (attempt === maxRetries) {
+        throw lastError
       }
-    }
 
-    // Handle Supabase errors
-    if (error instanceof SupabaseError) {
-      return this.handleSupabaseError(error, context)
-    }
-
-    // Handle validation errors
-    if (error.name === 'ValidationError' || error.name === 'ZodError') {
-      return {
-        statusCode: 400,
-        message: 'Validation failed',
-        type: this.ERROR_TYPES.VALIDATION_ERROR,
-        details: error.details || error.issues
-      }
-    }
-
-    // Handle network errors
-    if (error.code === 'ENOTFOUND' || error.code === 'ECONNREFUSED') {
-      return {
-        statusCode: 502,
-        message: 'Service temporarily unavailable',
-        type: this.ERROR_TYPES.NETWORK_ERROR
-      }
-    }
-
-    // Handle rate limiting
-    if (error.status === 429) {
-      return {
-        statusCode: 429,
-        message: 'Too many requests',
-        type: this.ERROR_TYPES.RATE_LIMIT_ERROR
-      }
-    }
-
-    // Default to internal server error
-    return {
-      statusCode: 500,
-      message: 'Internal server error',
-      type: this.ERROR_TYPES.INTERNAL_ERROR
+      // Exponential backoff with jitter
+      const delay = baseDelay * Math.pow(2, attempt) + Math.random() * 1000
+      await new Promise(resolve => setTimeout(resolve, delay))
     }
   }
 
-  // Handle Supabase specific errors
-  private static handleSupabaseError(error: SupabaseError, context: ErrorContext): {
-    statusCode: number
-    message: string
-    type: string
-    details?: any
-  } {
-    const errorCode = error.code || 'unknown'
-    
-    switch (errorCode) {
-      case 'PGRST116':
-        return {
-          statusCode: 404,
-          message: 'Resource not found',
-          type: this.ERROR_TYPES.NOT_FOUND_ERROR
-        }
-      
-      case '23505': // Unique constraint violation
-        return {
-          statusCode: 409,
-          message: 'Resource already exists',
-          type: this.ERROR_TYPES.CONFLICT_ERROR
-        }
-      
-      case '23503': // Foreign key constraint violation
-        return {
-          statusCode: 400,
-          message: 'Invalid reference',
-          type: this.ERROR_TYPES.VALIDATION_ERROR
-        }
-      
-      case '42501': // Insufficient privilege
-        return {
-          statusCode: 403,
-          message: 'Insufficient permissions',
-          type: this.ERROR_TYPES.AUTHORIZATION_ERROR
-        }
-      
-      case '42P01': // Undefined table
-        return {
-          statusCode: 500,
-          message: 'Database configuration error',
-          type: this.ERROR_TYPES.DATABASE_ERROR
-        }
-      
-      default:
-        return {
-          statusCode: 500,
-          message: error.message || 'Database error',
-          type: this.ERROR_TYPES.DATABASE_ERROR,
-          details: {
-            code: errorCode,
-            hint: error.hint,
-            details: error.details
-          }
-        }
-    }
-  }
+  throw lastError!
+}
 
-  // Error logging
-  static logError(error: any, context: ErrorContext = {}): void {
-    const errorData = {
-      message: error.message || 'Unknown error',
-      type: error.type || 'unknown',
-      severity: error.severity || this.SEVERITY_LEVELS.MEDIUM,
-      stack: error.stack,
-      context: {
-        ...context,
-        timestamp: new Date().toISOString()
-      }
-    }
+// Circuit breaker pattern
+export class CircuitBreaker {
+  private failureCount = 0
+  private lastFailureTime = 0
+  private state: 'CLOSED' | 'OPEN' | 'HALF_OPEN' = 'CLOSED'
 
-    // Log to console in development
-    if (process.env.NODE_ENV === 'development') {
-      console.error('Error:', errorData)
-    }
+  constructor(
+    private threshold: number = 5,
+    private timeout: number = 60000, // 1 minute
+    private resetTimeout: number = 30000 // 30 seconds
+  ) {}
 
-    // Track error analytics
-    analytics.trackError({
-      errorType: errorData.type,
-      severity: errorData.severity,
-      message: errorData.message,
-      context: errorData.context
-    })
-
-    // Log to external service in production
-    if (process.env.NODE_ENV === 'production') {
-      this.logToExternalService(errorData)
-    }
-  }
-
-  // Log to external service (e.g., Sentry, LogRocket, etc.)
-  private static logToExternalService(errorData: any): void {
-    // Implement your external logging service here
-    // Example: Sentry.captureException(error)
-    console.log('External logging:', errorData)
-  }
-
-  // Error recovery strategies
-  static async retryOperation<T>(
-    operation: () => Promise<T>,
-    maxRetries: number = 3,
-    delay: number = 1000
-  ): Promise<T> {
-    let lastError: any
-
-    for (let attempt = 1; attempt <= maxRetries; attempt++) {
-      try {
-        return await operation()
-      } catch (error) {
-        lastError = error
-        
-        // Don't retry certain error types
-        if (error instanceof AppError && 
-            (error.type === this.ERROR_TYPES.VALIDATION_ERROR ||
-             error.type === this.ERROR_TYPES.AUTHENTICATION_ERROR ||
-             error.type === this.ERROR_TYPES.AUTHORIZATION_ERROR)) {
-          throw error
-        }
-
-        // Wait before retrying
-        if (attempt < maxRetries) {
-          await new Promise(resolve => setTimeout(resolve, delay * attempt))
-        }
-      }
-    }
-
-    throw lastError
-  }
-
-  // Circuit breaker pattern
-  private static circuitBreakers: Map<string, {
-    state: 'CLOSED' | 'OPEN' | 'HALF_OPEN'
-    failureCount: number
-    lastFailureTime: number
-    successCount: number
-  }> = new Map()
-
-  static async executeWithCircuitBreaker<T>(
-    key: string,
-    operation: () => Promise<T>,
-    options: {
-      failureThreshold?: number
-      timeout?: number
-      resetTimeout?: number
-    } = {}
-  ): Promise<T> {
-    const {
-      failureThreshold = 5,
-      timeout = 5000,
-      resetTimeout = 60000
-    } = options
-
-    const breaker = this.circuitBreakers.get(key) || {
-      state: 'CLOSED',
-      failureCount: 0,
-      lastFailureTime: 0,
-      successCount: 0
-    }
-
-    // Check if circuit is open
-    if (breaker.state === 'OPEN') {
-      if (Date.now() - breaker.lastFailureTime > resetTimeout) {
-        breaker.state = 'HALF_OPEN'
-        breaker.successCount = 0
+  async execute<T>(operation: () => Promise<T>): Promise<T> {
+    if (this.state === 'OPEN') {
+      if (Date.now() - this.lastFailureTime > this.resetTimeout) {
+        this.state = 'HALF_OPEN'
       } else {
-        throw this.createExternalServiceError('Service temporarily unavailable')
+        throw new AppError(
+          ErrorCode.SERVICE_UNAVAILABLE,
+          'Circuit breaker is open',
+          503,
+          true
+        )
       }
     }
 
     try {
-      const result = await Promise.race([
-        operation(),
-        new Promise<never>((_, reject) => 
-          setTimeout(() => reject(new Error('Operation timeout')), timeout)
-        )
-      ])
-
-      // Success - reset circuit breaker
-      if (breaker.state === 'HALF_OPEN') {
-        breaker.successCount++
-        if (breaker.successCount >= 3) {
-          breaker.state = 'CLOSED'
-          breaker.failureCount = 0
-        }
-      } else {
-        breaker.failureCount = 0
-      }
-
-      this.circuitBreakers.set(key, breaker)
+      const result = await operation()
+      this.onSuccess()
       return result
-
     } catch (error) {
-      // Failure - update circuit breaker
-      breaker.failureCount++
-      breaker.lastFailureTime = Date.now()
-
-      if (breaker.failureCount >= failureThreshold) {
-        breaker.state = 'OPEN'
-      }
-
-      this.circuitBreakers.set(key, breaker)
+      this.onFailure()
       throw error
     }
   }
 
-  // Error monitoring and alerting
-  static async checkErrorThresholds(): Promise<void> {
-    // This would typically check error rates and send alerts
-    // Implementation depends on your monitoring setup
-    console.log('Checking error thresholds...')
+  private onSuccess() {
+    this.failureCount = 0
+    this.state = 'CLOSED'
   }
 
-  // Graceful shutdown error handling
-  static setupGracefulShutdown(): void {
-    const signals = ['SIGTERM', 'SIGINT', 'SIGUSR2']
+  private onFailure() {
+    this.failureCount++
+    this.lastFailureTime = Date.now()
     
-    signals.forEach(signal => {
-      process.on(signal, async () => {
-        console.log(`Received ${signal}, shutting down gracefully...`)
-        
-        try {
-          // Cleanup resources
-          await this.cleanup()
-          process.exit(0)
-        } catch (error) {
-          console.error('Error during graceful shutdown:', error)
-          process.exit(1)
-        }
-      })
-    })
-  }
-
-  private static async cleanup(): Promise<void> {
-    // Implement cleanup logic here
-    console.log('Cleaning up resources...')
-  }
-}
-
-// Error boundary for React components
-export class ErrorBoundary extends React.Component<
-  { children: React.ReactNode; fallback?: React.ComponentType<{ error: Error }> },
-  { hasError: boolean; error?: Error }
-> {
-  constructor(props: any) {
-    super(props)
-    this.state = { hasError: false }
-  }
-
-  static getDerivedStateFromError(error: Error) {
-    return { hasError: true, error }
-  }
-
-  componentDidCatch(error: Error, errorInfo: any) {
-    ErrorHandlingService.logError(error, {
-      additionalData: errorInfo
-    })
-  }
-
-  render() {
-    if (this.state.hasError) {
-      const FallbackComponent = this.props.fallback || DefaultErrorFallback
-      return <FallbackComponent error={this.state.error!} />
+    if (this.failureCount >= this.threshold) {
+      this.state = 'OPEN'
     }
-
-    return this.props.children
   }
 }
 
-// Default error fallback component
-function DefaultErrorFallback({ error }: { error: Error }) {
-  return (
-    <div className="error-boundary">
-      <h2>Something went wrong</h2>
-      <p>{error.message}</p>
-      <button onClick={() => window.location.reload()}>
-        Reload Page
-      </button>
-    </div>
-  )
-}
+// Global error handler for unhandled rejections
+export const setupGlobalErrorHandlers = () => {
+  process.on('unhandledRejection', (reason, promise) => {
+    captureException(new Error(`Unhandled Rejection: ${reason}`), {
+      context: 'unhandled_rejection',
+      promise: promise.toString(),
+    })
+  })
 
-// Export error handling utilities
-export const errorHandler = ErrorHandlingService
-export const AppError = ErrorHandlingService.AppError
+  process.on('uncaughtException', (error) => {
+    captureException(error, {
+      context: 'uncaught_exception',
+    })
+    
+    // Exit process after logging
+    process.exit(1)
+  })
+}

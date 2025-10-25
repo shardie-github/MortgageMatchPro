@@ -20,12 +20,28 @@ const RateQuerySchema = z.object({
   userId: z.string().optional(),
 })
 
-const redis = createClient({
-  url: process.env.REDIS_URL || 'redis://localhost:6379'
-})
+let redis: any = null
 
-redis.on('error', (err) => console.log('Redis Client Error', err))
-redis.connect()
+const getRedisClient = async () => {
+  if (!redis) {
+    redis = createClient({
+      url: process.env.REDIS_URL || 'redis://localhost:6379'
+    })
+    
+    redis.on('error', (err: Error) => {
+      console.error('Redis Client Error:', err)
+      redis = null // Reset connection on error
+    })
+    
+    try {
+      await redis.connect()
+    } catch (error) {
+      console.error('Failed to connect to Redis:', error)
+      redis = null
+    }
+  }
+  return redis
+}
 
 async function handler(req: NextApiRequest, res: NextApiResponse) {
   try {
@@ -56,14 +72,17 @@ async function handler(req: NextApiRequest, res: NextApiResponse) {
     
     // Try to get from cache first
     try {
-      const cached = await redis.get(cacheKey)
-      if (cached) {
-        const cachedData = JSON.parse(cached)
-        return res.status(200).json({
-          rates: cachedData,
-          cached: true,
-          lastUpdated: new Date().toISOString()
-        })
+      const redisClient = await getRedisClient()
+      if (redisClient) {
+        const cached = await redisClient.get(cacheKey)
+        if (cached) {
+          const cachedData = JSON.parse(cached)
+          return res.status(200).json({
+            rates: cachedData,
+            cached: true,
+            lastUpdated: new Date().toISOString()
+          })
+        }
       }
     } catch (cacheError) {
       console.warn('Cache read error:', cacheError)
@@ -81,7 +100,10 @@ async function handler(req: NextApiRequest, res: NextApiResponse) {
 
     // Cache the results for 1 hour
     try {
-      await redis.setEx(cacheKey, 3600, JSON.stringify(rates))
+      const redisClient = await getRedisClient()
+      if (redisClient) {
+        await redisClient.setEx(cacheKey, 3600, JSON.stringify(rates))
+      }
     } catch (cacheError) {
       console.warn('Cache write error:', cacheError)
     }

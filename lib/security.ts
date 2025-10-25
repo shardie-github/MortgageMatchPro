@@ -317,21 +317,39 @@ export async function logAuditEvent(
 export function encryptSensitiveData(data: string): string {
   const algorithm = 'aes-256-gcm'
   const key = Buffer.from(process.env.ENCRYPTION_KEY || 'default-key-32-chars-long', 'utf8')
-  const iv = Buffer.alloc(16, 0)
   
-  const cipher = require('crypto').createCipher(algorithm, key)
+  // Generate a random IV for each encryption
+  const iv = require('crypto').randomBytes(16)
+  
+  const cipher = require('crypto').createCipherGCM(algorithm, key, iv)
   let encrypted = cipher.update(data, 'utf8', 'hex')
   encrypted += cipher.final('hex')
   
-  return encrypted
+  // Get the auth tag
+  const authTag = cipher.getAuthTag()
+  
+  // Return IV + authTag + encrypted data
+  return iv.toString('hex') + ':' + authTag.toString('hex') + ':' + encrypted
 }
 
 export function decryptSensitiveData(encryptedData: string): string {
   const algorithm = 'aes-256-gcm'
   const key = Buffer.from(process.env.ENCRYPTION_KEY || 'default-key-32-chars-long', 'utf8')
   
-  const decipher = require('crypto').createDecipher(algorithm, key)
-  let decrypted = decipher.update(encryptedData, 'hex', 'utf8')
+  // Split the encrypted data
+  const parts = encryptedData.split(':')
+  if (parts.length !== 3) {
+    throw new Error('Invalid encrypted data format')
+  }
+  
+  const iv = Buffer.from(parts[0], 'hex')
+  const authTag = Buffer.from(parts[1], 'hex')
+  const encrypted = parts[2]
+  
+  const decipher = require('crypto').createDecipherGCM(algorithm, key, iv)
+  decipher.setAuthTag(authTag)
+  
+  let decrypted = decipher.update(encrypted, 'hex', 'utf8')
   decrypted += decipher.final('utf8')
   
   return decrypted
