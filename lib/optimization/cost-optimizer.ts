@@ -1,397 +1,508 @@
-import { getOpenAIKey, isProduction } from '../config/keys'
-
-// Cost tracking interface
-interface CostTracking {
-  service: string
-  operation: string
-  cost: number
-  timestamp: number
-  metadata?: Record<string, any>
-}
+import { ApiService } from '../api/api-service'
+import { keyManager } from '../config/keys'
 
 // Cost optimization strategies
-interface CostOptimizationStrategy {
-  name: string
-  description: string
-  apply: (request: any) => any
-  priority: number
+export enum CostOptimizationStrategy {
+  CACHING = 'caching',
+  BATCHING = 'batching',
+  COMPRESSION = 'compression',
+  DEDUPLICATION = 'deduplication',
+  PRIORITIZATION = 'prioritization',
+  THROTTLING = 'throttling',
+  RESOURCE_POOLING = 'resource_pooling'
 }
 
-// Cost optimizer class
+// Cost metrics
+export interface CostMetrics {
+  totalCost: number
+  costPerRequest: number
+  costPerUser: number
+  costPerEndpoint: Map<string, number>
+  optimizationSavings: number
+  savingsPercentage: number
+}
+
+// Request cost configuration
+export interface RequestCostConfig {
+  endpoint: string
+  baseCost: number
+  costPerMB: number
+  costPerSecond: number
+  priority: number
+  maxCost: number
+  optimizationEnabled: boolean
+}
+
+// Cache configuration
+export interface CacheConfig {
+  ttl: number
+  maxSize: number
+  strategy: 'LRU' | 'LFU' | 'TTL'
+  compressionEnabled: boolean
+}
+
+// Batch configuration
+export interface BatchConfig {
+  maxBatchSize: number
+  maxWaitTime: number
+  enabled: boolean
+}
+
+// Cost Optimizer
 export class CostOptimizer {
-  private costHistory: CostTracking[] = []
-  private strategies: CostOptimizationStrategy[] = []
-  private dailyBudget: number = 100 // USD
-  private monthlyBudget: number = 3000 // USD
+  private apiService: ApiService
+  private requestCosts: Map<string, RequestCostConfig> = new Map()
+  private cache: Map<string, { data: any; timestamp: number; ttl: number }> = new Map()
+  private batchQueue: Map<string, Array<{ request: any; resolve: Function; reject: Function }>> = new Map()
+  private batchTimers: Map<string, NodeJS.Timeout> = new Map()
+  private metrics: CostMetrics
+  private cacheConfig: CacheConfig
+  private batchConfig: BatchConfig
 
-  constructor() {
-    this.initializeStrategies()
+  constructor(
+    apiService: ApiService,
+    cacheConfig: CacheConfig = {
+      ttl: 300000, // 5 minutes
+      maxSize: 1000,
+      strategy: 'LRU',
+      compressionEnabled: true
+    },
+    batchConfig: BatchConfig = {
+      maxBatchSize: 10,
+      maxWaitTime: 1000, // 1 second
+      enabled: true
+    }
+  ) {
+    this.apiService = apiService
+    this.cacheConfig = cacheConfig
+    this.batchConfig = batchConfig
+    this.metrics = {
+      totalCost: 0,
+      costPerRequest: 0,
+      costPerUser: 0,
+      costPerEndpoint: new Map(),
+      optimizationSavings: 0,
+      savingsPercentage: 0
+    }
+
+    // Initialize default cost configurations
+    this.initializeDefaultCosts()
   }
 
-  // Initialize cost optimization strategies
-  private initializeStrategies() {
-    this.strategies = [
+  // Initialize default cost configurations
+  private initializeDefaultCosts(): void {
+    const defaultCosts: RequestCostConfig[] = [
       {
-        name: 'model_selection',
-        description: 'Select most cost-effective model for the task',
+        endpoint: '/openai/chat',
+        baseCost: 0.002,
+        costPerMB: 0.001,
+        costPerSecond: 0.0001,
         priority: 1,
-        apply: this.optimizeModelSelection.bind(this)
+        maxCost: 0.1,
+        optimizationEnabled: true
       },
       {
-        name: 'prompt_optimization',
-        description: 'Optimize prompts to reduce token usage',
+        endpoint: '/openai/embeddings',
+        baseCost: 0.0001,
+        costPerMB: 0.0005,
+        costPerSecond: 0.00005,
         priority: 2,
-        apply: this.optimizePrompt.bind(this)
+        maxCost: 0.05,
+        optimizationEnabled: true
       },
       {
-        name: 'caching',
-        description: 'Implement intelligent caching for repeated requests',
+        endpoint: '/supabase/query',
+        baseCost: 0.00001,
+        costPerMB: 0.000001,
+        costPerSecond: 0.000001,
         priority: 3,
-        apply: this.optimizeCaching.bind(this)
-      },
-      {
-        name: 'batch_processing',
-        description: 'Batch multiple requests together',
-        priority: 4,
-        apply: this.optimizeBatching.bind(this)
-      },
-      {
-        name: 'rate_limiting',
-        description: 'Implement intelligent rate limiting',
-        priority: 5,
-        apply: this.optimizeRateLimiting.bind(this)
+        maxCost: 0.01,
+        optimizationEnabled: true
       }
     ]
+
+    defaultCosts.forEach(config => {
+      this.requestCosts.set(config.endpoint, config)
+    })
   }
 
-  // Track cost for an operation
-  trackCost(service: string, operation: string, cost: number, metadata?: Record<string, any>) {
-    const costEntry: CostTracking = {
-      service,
-      operation,
-      cost,
+  // Register cost configuration for an endpoint
+  registerEndpointCost(endpoint: string, config: RequestCostConfig): void {
+    this.requestCosts.set(endpoint, config)
+  }
+
+  // Calculate request cost
+  private calculateRequestCost(
+    endpoint: string,
+    dataSize: number,
+    duration: number
+  ): number {
+    const config = this.requestCosts.get(endpoint)
+    if (!config) {
+      return 0
+    }
+
+    const sizeCost = (dataSize / (1024 * 1024)) * config.costPerMB
+    const timeCost = (duration / 1000) * config.costPerSecond
+    const totalCost = config.baseCost + sizeCost + timeCost
+
+    return Math.min(totalCost, config.maxCost)
+  }
+
+  // Cache management
+  private getCacheKey(endpoint: string, params: any): string {
+    return `${endpoint}:${JSON.stringify(params)}`
+  }
+
+  private getFromCache(key: string): any | null {
+    const cached = this.cache.get(key)
+    if (!cached) {
+      return null
+    }
+
+    const now = Date.now()
+    if (now - cached.timestamp > cached.ttl) {
+      this.cache.delete(key)
+      return null
+    }
+
+    return cached.data
+  }
+
+  private setCache(key: string, data: any, ttl?: number): void {
+    // Implement LRU eviction if cache is full
+    if (this.cache.size >= this.cacheConfig.maxSize) {
+      const oldestKey = this.cache.keys().next().value
+      this.cache.delete(oldestKey)
+    }
+
+    this.cache.set(key, {
+      data,
       timestamp: Date.now(),
-      metadata
+      ttl: ttl || this.cacheConfig.ttl
+    })
+  }
+
+  // Batch processing
+  private addToBatch(endpoint: string, request: any): Promise<any> {
+    return new Promise((resolve, reject) => {
+      if (!this.batchQueue.has(endpoint)) {
+        this.batchQueue.set(endpoint, [])
+      }
+
+      const queue = this.batchQueue.get(endpoint)!
+      queue.push({ request, resolve, reject })
+
+      // Process batch if it's full
+      if (queue.length >= this.batchConfig.maxBatchSize) {
+        this.processBatch(endpoint)
+      } else {
+        // Set timer for batch processing
+        if (!this.batchTimers.has(endpoint)) {
+          const timer = setTimeout(() => {
+            this.processBatch(endpoint)
+          }, this.batchConfig.maxWaitTime)
+          this.batchTimers.set(endpoint, timer)
+        }
+      }
+    })
+  }
+
+  private async processBatch(endpoint: string): Promise<void> {
+    const queue = this.batchQueue.get(endpoint)
+    if (!queue || queue.length === 0) {
+      return
     }
 
-    this.costHistory.push(costEntry)
-
-    // Keep only last 1000 entries to prevent memory issues
-    if (this.costHistory.length > 1000) {
-      this.costHistory = this.costHistory.slice(-1000)
-    }
-
-    // Log cost in production
-    if (isProduction) {
-      console.log(`Cost tracked: ${service}.${operation} = $${cost.toFixed(4)}`)
-    }
-  }
-
-  // Get daily cost
-  getDailyCost(): number {
-    const today = new Date()
-    today.setHours(0, 0, 0, 0)
-    const todayTimestamp = today.getTime()
-
-    return this.costHistory
-      .filter(entry => entry.timestamp >= todayTimestamp)
-      .reduce((total, entry) => total + entry.cost, 0)
-  }
-
-  // Get monthly cost
-  getMonthlyCost(): number {
-    const now = new Date()
-    const firstDayOfMonth = new Date(now.getFullYear(), now.getMonth(), 1)
-    const firstDayTimestamp = firstDayOfMonth.getTime()
-
-    return this.costHistory
-      .filter(entry => entry.timestamp >= firstDayTimestamp)
-      .reduce((total, entry) => total + entry.cost, 0)
-  }
-
-  // Check if budget is exceeded
-  isBudgetExceeded(): boolean {
-    const dailyCost = this.getDailyCost()
-    const monthlyCost = this.getMonthlyCost()
-
-    return dailyCost > this.dailyBudget || monthlyCost > this.monthlyBudget
-  }
-
-  // Get cost breakdown by service
-  getCostBreakdown(period: 'daily' | 'monthly' = 'daily') {
-    const cutoff = period === 'daily' 
-      ? new Date().setHours(0, 0, 0, 0)
-      : new Date(new Date().getFullYear(), new Date().getMonth(), 1).getTime()
-
-    const relevantCosts = this.costHistory.filter(entry => entry.timestamp >= cutoff)
+    // Clear the queue
+    this.batchQueue.set(endpoint, [])
     
-    const breakdown = relevantCosts.reduce((acc, entry) => {
-      if (!acc[entry.service]) {
-        acc[entry.service] = { total: 0, operations: {} }
-      }
-      
-      acc[entry.service].total += entry.cost
-      
-      if (!acc[entry.service].operations[entry.operation]) {
-        acc[entry.service].operations[entry.operation] = 0
-      }
-      
-      acc[entry.service].operations[entry.operation] += entry.cost
-      
-      return acc
-    }, {} as Record<string, { total: number; operations: Record<string, number> }>)
+    // Clear the timer
+    const timer = this.batchTimers.get(endpoint)
+    if (timer) {
+      clearTimeout(timer)
+      this.batchTimers.delete(endpoint)
+    }
 
-    return breakdown
+    try {
+      // Process batch request
+      const batchData = queue.map(item => item.request)
+      const response = await this.apiService.post(`${endpoint}/batch`, batchData)
+
+      // Resolve all promises
+      queue.forEach((item, index) => {
+        if (response.success) {
+          item.resolve(response.data[index] || response.data)
+        } else {
+          item.reject(new Error(response.message))
+        }
+      })
+    } catch (error) {
+      // Reject all promises
+      queue.forEach(item => {
+        item.reject(error)
+      })
+    }
   }
 
-  // Optimize OpenAI request
-  optimizeOpenAIRequest(request: any): any {
-    let optimizedRequest = { ...request }
+  // Optimized request method
+  async optimizedRequest<T = any>(
+    method: 'GET' | 'POST' | 'PUT' | 'PATCH' | 'DELETE',
+    endpoint: string,
+    data?: any,
+    options: {
+      useCache?: boolean
+      useBatch?: boolean
+      priority?: number
+      userId?: string
+    } = {}
+  ): Promise<T> {
+    const startTime = Date.now()
+    const cacheKey = this.getCacheKey(endpoint, data)
+    
+    // Check cache first
+    if (options.useCache !== false && method === 'GET') {
+      const cached = this.getFromCache(cacheKey)
+      if (cached) {
+        this.updateMetrics(endpoint, 0, 0, true)
+        return cached
+      }
+    }
 
-    // Apply strategies in priority order
-    for (const strategy of this.strategies.sort((a, b) => a.priority - b.priority)) {
+    // Use batching for compatible requests
+    if (options.useBatch !== false && this.batchConfig.enabled && method === 'POST') {
       try {
-        optimizedRequest = strategy.apply(optimizedRequest)
+        const result = await this.addToBatch(endpoint, data)
+        this.updateMetrics(endpoint, 0, Date.now() - startTime, false)
+        return result
       } catch (error) {
-        console.error(`Error applying strategy ${strategy.name}:`, error)
+        // Fall back to individual request
       }
     }
 
-    return optimizedRequest
+    // Make individual request
+    const response = await this.apiService.request(method, endpoint, data)
+    const duration = Date.now() - startTime
+    const dataSize = JSON.stringify(response.data || {}).length
+
+    // Calculate cost
+    const cost = this.calculateRequestCost(endpoint, dataSize, duration)
+    this.updateMetrics(endpoint, cost, duration, false)
+
+    // Cache successful GET requests
+    if (response.success && method === 'GET' && options.useCache !== false) {
+      this.setCache(cacheKey, response.data)
+    }
+
+    if (!response.success) {
+      throw new Error(response.message || 'Request failed')
+    }
+
+    return response.data
   }
 
-  // Strategy: Optimize model selection
-  private optimizeModelSelection(request: any): any {
-    if (!request.model) return request
+  // Update cost metrics
+  private updateMetrics(
+    endpoint: string,
+    cost: number,
+    duration: number,
+    fromCache: boolean
+  ): void {
+    this.metrics.totalCost += cost
+    this.metrics.costPerRequest = this.metrics.totalCost / (this.metrics.costPerRequest + 1)
 
-    const modelCosts = {
-      'gpt-4': 0.03,
-      'gpt-4-turbo': 0.01,
-      'gpt-3.5-turbo': 0.002,
-      'gpt-4o-mini': 0.00015
-    }
+    const endpointCost = this.metrics.costPerEndpoint.get(endpoint) || 0
+    this.metrics.costPerEndpoint.set(endpoint, endpointCost + cost)
 
-    // For simple tasks, use cheaper models
-    if (request.messages && request.messages.length === 1) {
-      const message = request.messages[0].content
-      
-      // Simple calculations or basic queries
-      if (message.length < 100 && !message.includes('complex') && !message.includes('detailed')) {
-        request.model = 'gpt-4o-mini'
+    if (fromCache) {
+      // Estimate savings from cache hit
+      const config = this.requestCosts.get(endpoint)
+      if (config) {
+        const estimatedCost = this.calculateRequestCost(endpoint, 0, duration)
+        this.metrics.optimizationSavings += estimatedCost
       }
     }
-
-    return request
   }
 
-  // Strategy: Optimize prompts
-  private optimizePrompt(request: any): any {
-    if (!request.messages) return request
+  // Get cost metrics
+  getMetrics(): CostMetrics {
+    const totalRequests = this.metrics.costPerRequest > 0 ? this.metrics.totalCost / this.metrics.costPerRequest : 0
+    this.metrics.savingsPercentage = totalRequests > 0 ? (this.metrics.optimizationSavings / this.metrics.totalCost) * 100 : 0
 
-    const optimizedMessages = request.messages.map((message: any) => {
-      if (message.role === 'system') {
-        // Optimize system prompts
-        message.content = this.optimizeSystemPrompt(message.content)
-      } else if (message.role === 'user') {
-        // Optimize user prompts
-        message.content = this.optimizeUserPrompt(message.content)
-      }
-      
-      return message
+    return { ...this.metrics }
+  }
+
+  // Get cost breakdown by endpoint
+  getCostBreakdown(): Array<{ endpoint: string; cost: number; percentage: number }> {
+    const total = this.metrics.totalCost
+    const breakdown: Array<{ endpoint: string; cost: number; percentage: number }> = []
+
+    this.metrics.costPerEndpoint.forEach((cost, endpoint) => {
+      breakdown.push({
+        endpoint,
+        cost,
+        percentage: total > 0 ? (cost / total) * 100 : 0
+      })
     })
 
-    return { ...request, messages: optimizedMessages }
+    return breakdown.sort((a, b) => b.cost - a.cost)
   }
 
-  // Optimize system prompt
-  private optimizeSystemPrompt(prompt: string): string {
-    // Remove redundant instructions
-    let optimized = prompt
-      .replace(/\s+/g, ' ') // Remove extra whitespace
-      .replace(/\.\s*\./g, '.') // Remove double periods
-      .trim()
-
-    // Remove common redundant phrases
-    const redundantPhrases = [
-      'Please make sure to',
-      'It is important to note that',
-      'Keep in mind that',
-      'Remember to',
-      'Be sure to'
-    ]
-
-    for (const phrase of redundantPhrases) {
-      optimized = optimized.replace(new RegExp(phrase, 'gi'), '')
-    }
-
-    return optimized
-  }
-
-  // Optimize user prompt
-  private optimizeUserPrompt(prompt: string): string {
-    // Remove unnecessary words and phrases
-    let optimized = prompt
-      .replace(/\s+/g, ' ')
-      .replace(/\b(please|kindly|would you|could you)\b/gi, '')
-      .replace(/\b(thank you|thanks)\b/gi, '')
-      .trim()
-
-    return optimized
-  }
-
-  // Strategy: Implement caching
-  private optimizeCaching(request: any): any {
-    // Add cache key for identical requests
-    if (request.messages) {
-      const cacheKey = this.generateCacheKey(request)
-      request.cacheKey = cacheKey
-    }
-
-    return request
-  }
-
-  // Generate cache key for request
-  private generateCacheKey(request: any): string {
-    const content = JSON.stringify({
-      model: request.model,
-      messages: request.messages,
-      temperature: request.temperature,
-      max_tokens: request.max_tokens
-    })
-
-    return Buffer.from(content).toString('base64').slice(0, 32)
-  }
-
-  // Strategy: Optimize batching
-  private optimizeBatching(request: any): any {
-    // For multiple similar requests, suggest batching
-    if (request.messages && request.messages.length > 1) {
-      request.batchable = true
-    }
-
-    return request
-  }
-
-  // Strategy: Optimize rate limiting
-  private optimizeRateLimiting(request: any): any {
-    // Add intelligent delays based on cost
-    const modelCosts = {
-      'gpt-4': 0.03,
-      'gpt-4-turbo': 0.01,
-      'gpt-3.5-turbo': 0.002,
-      'gpt-4o-mini': 0.00015
-    }
-
-    const modelCost = modelCosts[request.model as keyof typeof modelCosts] || 0.01
+  // Optimize cache configuration
+  optimizeCache(): void {
+    const hitRate = this.calculateCacheHitRate()
     
-    if (modelCost > 0.01) {
-      request.priority = 'low'
+    if (hitRate < 0.3) {
+      // Low hit rate - increase TTL
+      this.cacheConfig.ttl = Math.min(this.cacheConfig.ttl * 1.5, 1800000) // Max 30 minutes
+    } else if (hitRate > 0.8) {
+      // High hit rate - decrease TTL to save memory
+      this.cacheConfig.ttl = Math.max(this.cacheConfig.ttl * 0.8, 60000) // Min 1 minute
     }
-
-    return request
   }
 
-  // Estimate cost for OpenAI request
-  estimateOpenAICost(request: any): number {
-    const modelCosts = {
-      'gpt-4': { input: 0.03, output: 0.06 },
-      'gpt-4-turbo': { input: 0.01, output: 0.03 },
-      'gpt-3.5-turbo': { input: 0.002, output: 0.002 },
-      'gpt-4o-mini': { input: 0.00015, output: 0.0006 }
-    }
-
-    const model = request.model || 'gpt-3.5-turbo'
-    const costs = modelCosts[model as keyof typeof modelCosts] || modelCosts['gpt-3.5-turbo']
-
-    // Estimate token count (rough approximation)
-    const inputTokens = this.estimateTokens(request.messages || [])
-    const outputTokens = request.max_tokens || 1000
-
-    const inputCost = (inputTokens / 1000) * costs.input
-    const outputCost = (outputTokens / 1000) * costs.output
-
-    return inputCost + outputCost
+  // Calculate cache hit rate
+  private calculateCacheHitRate(): number {
+    // This would need to be tracked in a real implementation
+    return 0.5 // Placeholder
   }
 
-  // Estimate token count
-  private estimateTokens(messages: any[]): number {
-    const text = messages.map(m => m.content).join(' ')
-    // Rough estimation: 1 token ≈ 4 characters
-    return Math.ceil(text.length / 4)
+  // Cleanup expired cache entries
+  cleanupCache(): number {
+    const now = Date.now()
+    let cleaned = 0
+
+    for (const [key, cached] of this.cache.entries()) {
+      if (now - cached.timestamp > cached.ttl) {
+        this.cache.delete(key)
+        cleaned++
+      }
+    }
+
+    return cleaned
   }
 
   // Get optimization recommendations
-  getOptimizationRecommendations(): string[] {
-    const recommendations: string[] = []
-    const dailyCost = this.getDailyCost()
-    const monthlyCost = this.getMonthlyCost()
-
-    if (dailyCost > this.dailyBudget * 0.8) {
-      recommendations.push('Daily budget is 80% used. Consider reducing request frequency.')
-    }
-
-    if (monthlyCost > this.monthlyBudget * 0.8) {
-      recommendations.push('Monthly budget is 80% used. Consider optimizing model selection.')
-    }
+  getOptimizationRecommendations(): Array<{
+    strategy: CostOptimizationStrategy
+    description: string
+    potentialSavings: number
+    priority: 'high' | 'medium' | 'low'
+  }> {
+    const recommendations: Array<{
+      strategy: CostOptimizationStrategy
+      description: string
+      potentialSavings: number
+      priority: 'high' | 'medium' | 'low'
+    }> = []
 
     const breakdown = this.getCostBreakdown()
-    const openaiCost = breakdown.openai?.total || 0
-    const totalCost = Object.values(breakdown).reduce((sum, service) => sum + service.total, 0)
+    const totalCost = this.metrics.totalCost
 
-    if (openaiCost / totalCost > 0.8) {
-      recommendations.push('OpenAI costs are 80% of total. Consider implementing caching.')
+    // High-cost endpoint recommendations
+    const highCostEndpoints = breakdown.filter(item => item.percentage > 20)
+    if (highCostEndpoints.length > 0) {
+      recommendations.push({
+        strategy: CostOptimizationStrategy.CACHING,
+        description: `Enable aggressive caching for high-cost endpoints: ${highCostEndpoints.map(e => e.endpoint).join(', ')}`,
+        potentialSavings: totalCost * 0.3,
+        priority: 'high'
+      })
+    }
+
+    // Batch processing recommendations
+    if (this.batchQueue.size > 0) {
+      recommendations.push({
+        strategy: CostOptimizationStrategy.BATCHING,
+        description: 'Enable batch processing for similar requests',
+        potentialSavings: totalCost * 0.2,
+        priority: 'medium'
+      })
+    }
+
+    // Compression recommendations
+    if (totalCost > 100) {
+      recommendations.push({
+        strategy: CostOptimizationStrategy.COMPRESSION,
+        description: 'Enable response compression to reduce data transfer costs',
+        potentialSavings: totalCost * 0.15,
+        priority: 'medium'
+      })
     }
 
     return recommendations
   }
 
-  // Set budget limits
-  setBudget(daily: number, monthly: number) {
-    this.dailyBudget = daily
-    this.monthlyBudget = monthly
-  }
-
-  // Get cost statistics
-  getCostStatistics() {
-    const dailyCost = this.getDailyCost()
-    const monthlyCost = this.getMonthlyCost()
-    const breakdown = this.getCostBreakdown()
-
-    return {
-      daily: {
-        cost: dailyCost,
-        budget: this.dailyBudget,
-        remaining: this.dailyBudget - dailyCost,
-        percentage: (dailyCost / this.dailyBudget) * 100
-      },
-      monthly: {
-        cost: monthlyCost,
-        budget: this.monthlyBudget,
-        remaining: this.monthlyBudget - monthlyCost,
-        percentage: (monthlyCost / this.monthlyBudget) * 100
-      },
-      breakdown,
-      recommendations: this.getOptimizationRecommendations()
+  // Reset metrics
+  resetMetrics(): void {
+    this.metrics = {
+      totalCost: 0,
+      costPerRequest: 0,
+      costPerUser: 0,
+      costPerEndpoint: new Map(),
+      optimizationSavings: 0,
+      savingsPercentage: 0
     }
   }
+
+  // Close and cleanup
+  async close(): Promise<void> {
+    // Process any remaining batches
+    for (const endpoint of this.batchQueue.keys()) {
+      await this.processBatch(endpoint)
+    }
+
+    // Clear all timers
+    for (const timer of this.batchTimers.values()) {
+      clearTimeout(timer)
+    }
+
+    // Clear cache
+    this.cache.clear()
+  }
 }
 
-// Export singleton instance
-export const costOptimizer = new CostOptimizer()
+// Cost optimization middleware
+export function createCostOptimizationMiddleware(
+  costOptimizer: CostOptimizer,
+  getUserId: (req: any) => string = (req) => req.user?.id || 'anonymous'
+) {
+  return (req: any, res: any, next: any) => {
+    const originalSend = res.send
+    const startTime = Date.now()
 
-// Export cost tracking utilities
-export function trackOpenAICost(operation: string, request: any, response?: any) {
-  const cost = costOptimizer.estimateOpenAICost(request)
-  costOptimizer.trackCost('openai', operation, cost, {
-    model: request.model,
-    tokens: response?.usage?.total_tokens || 0
-  })
+    res.send = function(data: any) {
+      const duration = Date.now() - startTime
+      const dataSize = JSON.stringify(data).length
+      const endpoint = req.route?.path || req.path
+      const userId = getUserId(req)
+
+      // Update metrics
+      const cost = costOptimizer['calculateRequestCost'](endpoint, dataSize, duration)
+      costOptimizer['updateMetrics'](endpoint, cost, duration, false)
+
+      // Add cost headers
+      res.setHeader('X-Request-Cost', cost.toFixed(6))
+      res.setHeader('X-Request-Duration', duration)
+
+      originalSend.call(this, data)
+    }
+
+    next()
+  }
 }
 
-export function trackSupabaseCost(operation: string, cost: number, metadata?: Record<string, any>) {
-  costOptimizer.trackCost('supabase', operation, cost, metadata)
-}
-
-export function trackStripeCost(operation: string, cost: number, metadata?: Record<string, any>) {
-  costOptimizer.trackCost('stripe', operation, cost, metadata)
-}
+// Export default configurations
+export const DEFAULT_COST_CONFIGS = {
+  CACHE: {
+    ttl: 300000, // 5 minutes
+    maxSize: 1000,
+    strategy: 'LRU' as const,
+    compressionEnabled: true
+  },
+  BATCH: {
+    maxBatchSize: 10,
+    maxWaitTime: 1000, // 1 second
+    enabled: true
+  }
+} as const
