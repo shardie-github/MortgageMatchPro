@@ -1,0 +1,286 @@
+graph TB
+    page-_app["_app"]
+    page-login["login"]
+    page-callback["callback"]
+    page-members["members"]
+    page-index["index"]
+    page-growth["growth"]
+    page-branding["branding"]
+    component-textarea["textarea"]
+    component-tabs["tabs"]
+    component-table["table"]
+    component-slider["slider"]
+    component-select["select"]
+    component-label["label"]
+    component-input["input"]
+    component-dialog["dialog"]
+    component-card["card"]
+    component-button["button"]
+    component-badge["badge"]
+    component-LoadingStates["LoadingStates"]
+    component-ErrorStates["ErrorStates"]
+    component-EnhancedInput["EnhancedInput"]
+    component-EnhancedButton["EnhancedButton"]
+    component-ConfidenceIndicator["ConfidenceIndicator"]
+    component-MembersManagement["MembersManagement"]
+    component-BrandingManagement["BrandingManagement"]
+    component-AdminLayout["AdminLayout"]
+    component-GrowthDashboard["GrowthDashboard"]
+    app-page["page"]
+    api-scenarios["scenarios"]
+    api-scenario-simulations["scenario-simulations"]
+    api-resource-test["resource-test"]
+    api-refinance-watchlist["refinance-watchlist"]
+    api-rates["rates"]
+    api-rate-limit-test["rate-limit-test"]
+    api-prescriptive-recommendations["prescriptive-recommendations"]
+    api-predictive-insights["predictive-insights"]
+    api-prediction-alerts["prediction-alerts"]
+    api-performance-test["performance-test"]
+    api-optimization-test["optimization-test"]
+    api-leads["leads"]
+    api-healthz["healthz"]
+    api-health["health"]
+    api-graphql["graphql"]
+    api-forecasts["forecasts"]
+    api-feedback["feedback"]
+    api-cost-optimization-test["cost-optimization-test"]
+    api-calculate["calculate"]
+    api-affordability["affordability"]
+    api-verify["verify"]
+    api-stripe["stripe"]
+    api-scenarios["scenarios"]
+    api-reports["reports"]
+    api-rates["rates"]
+    api-matches["matches"]
+    api-scheduled["scheduled"]
+    api-metrics["metrics"]
+    api-index["index"]
+    api-export["export"]
+    api-report["report"]
+    api-metrics["metrics"]
+    api-incidents["incidents"]
+    api-health["health"]
+    api-alerts["alerts"]
+    api-dashboard["dashboard"]
+    api-webhooks["webhooks"]
+    api-members["members"]
+    api-dashboard["dashboard"]
+    api-branding["branding"]
+    api-billing["billing"]
+    api-api-keys["api-keys"]
+    api-create-intent["create-intent"]
+    api-connect["connect"]
+    api-generate["generate"]
+    api-[leadId]["[leadId]"]
+    edge-search-ai["search-ai"]
+    core-utils["utils"]
+    core-supabase["supabase"]
+    core-stripe["stripe"]
+    core-security["security"]
+    core-security-enhanced["security-enhanced"]
+    core-scenario-types["scenario-types"]
+    core-scenario-manager["scenario-manager"]
+    core-realtime-service["realtime-service"]
+    core-rate-apis["rate-apis"]
+    core-post-launch-integration["post-launch-integration"]
+    core-performance-monitoring["performance-monitoring"]
+    core-performance-monitor["performance-monitor"]
+    core-openai["openai"]
+    core-openai-enhanced["openai-enhanced"]
+    core-monitoring["monitoring"]
+    core-monetization["monetization"]
+    core-lead-qualification["lead-qualification"]
+    core-lead-monitoring["lead-monitoring"]
+    core-intent-matching["intent-matching"]
+    core-index["index"]
+    core-health-check["health-check"]
+    core-feedback-system["feedback-system"]
+    core-export-service["export-service"]
+    core-explainability-agent["explainability-agent"]
+    core-error-handling["error-handling"]
+    core-database.types["database.types"]
+    core-database-service["database-service"]
+    core-compliance["compliance"]
+    core-broker-notifications["broker-notifications"]
+    core-auth-service["auth-service"]
+    core-api-service["api-service"]
+    core-analytics["analytics"]
+    core-alerting["alerting"]
+    core-theme-service["theme-service"]
+    core-webhook-service["webhook-service"]
+    core-schema-validator["schema-validator"]
+    core-tenancy["tenancy"]
+    core-billing["billing"]
+    core-cross-border-sandbox["cross-border-sandbox"]
+    core-scoping["scoping"]
+    core-rbac["rbac"]
+    core-organization-service["organization-service"]
+    core-context["context"]
+    core-api-key-service["api-key-service"]
+    core-DataEthics["DataEthics"]
+    core-RetryService["RetryService"]
+    core-RequestDeduplicationService["RequestDeduplicationService"]
+    core-CircuitBreakerService["CircuitBreakerService"]
+    core-distributed-rate-limiter["distributed-rate-limiter"]
+    core-profiling-suite["profiling-suite"]
+    core-connection-pool["connection-pool"]
+    core-caching-system["caching-system"]
+    core-resource-manager["resource-manager"]
+    core-performance-monitor["performance-monitor"]
+    core-optimization-manager["optimization-manager"]
+    core-cost-optimizer["cost-optimizer"]
+    core-sre-metrics["sre-metrics"]
+    core-operational-readiness["operational-readiness"]
+    core-load-balancer["load-balancer"]
+    core-telemetry["telemetry"]
+    core-monitoring["monitoring"]
+    core-health-check["health-check"]
+    core-EnhancedMetrics["EnhancedMetrics"]
+    core-marketing-service["marketing-service"]
+    core-security-compliance["security-compliance"]
+    core-real-estate-apis["real-estate-apis"]
+    core-programmable-banking["programmable-banking"]
+    core-open-banking["open-banking"]
+    core-multi-region-api-governance["multi-region-api-governance"]
+    core-global-payment-rails["global-payment-rails"]
+    core-embedded-payments["embedded-payments"]
+    core-api-marketplace["api-marketplace"]
+    core-analytics-billing["analytics-billing"]
+    core-ai-pricing["ai-pricing"]
+    core-useApi["useApi"]
+    core-schema["schema"]
+    core-context["context"]
+    core-FeatureFlags["FeatureFlags"]
+    core-personalization-engine["personalization-engine"]
+    core-llm-experimentation["llm-experimentation"]
+    core-experiment-framework["experiment-framework"]
+    core-compliance-controls["compliance-controls"]
+    core-ai-growth-agents["ai-growth-agents"]
+    core-ab-testing["ab-testing"]
+    core-ErrorService["ErrorService"]
+    core-customer-health-scoring["customer-health-scoring"]
+    core-ProfileContext["ProfileContext"]
+    core-keys["keys"]
+    core-data-retention["data-retention"]
+    core-ModelCacheService["ModelCacheService"]
+    core-CacheService["CacheService"]
+    core-BudgetGuardService["BudgetGuardService"]
+    core-metering-service["metering-service"]
+    core-billing-service["billing-service"]
+    core-report-scheduler["report-scheduler"]
+    core-analytics-service["analytics-service"]
+    core-request-manager["request-manager"]
+    core-public-api-service["public-api-service"]
+    core-endpoints["endpoints"]
+    core-api-service["api-service"]
+    core-cost-governance-service["cost-governance-service"]
+    core-ModelRoutingService["ModelRoutingService"]
+    core-ExplainabilityService["ExplainabilityService"]
+    core-EnhancedPromptTemplates["EnhancedPromptTemplates"]
+    core-AdaptivePrompting["AdaptivePrompting"]
+    core-workflow-automation-agent["workflow-automation-agent"]
+    core-welcome-flow-agent["welcome-flow-agent"]
+    core-treasury-risk-agent["treasury-risk-agent"]
+    core-sustainable-products-agent["sustainable-products-agent"]
+    core-scenario-simulator["scenario-simulator"]
+    core-retainbot-agent["retainbot-agent"]
+    core-regtech-agent["regtech-agent"]
+    core-refinance-agent["refinance-agent"]
+    core-prescriptive-agent["prescriptive-agent"]
+    core-predictive-orchestrator["predictive-orchestrator"]
+    core-openai-agent-sdk["openai-agent-sdk"]
+    core-green-score-agent["green-score-agent"]
+    core-global-compliance-agent["global-compliance-agent"]
+    core-forecasting-agent["forecasting-agent"]
+    core-explainability-agent["explainability-agent"]
+    core-enhanced-explainability-agent["enhanced-explainability-agent"]
+    core-document-ai-agent["document-ai-agent"]
+    core-data-ingestion-agent["data-ingestion-agent"]
+    core-LenderIntegrationRegistry["LenderIntegrationRegistry"]
+    core-DummyBankAdapter["DummyBankAdapter"]
+    core-CRMBridge["CRMBridge"]
+    core-RegionalRateFeeds["RegionalRateFeeds"]
+    ai-self_diagnose["self_diagnose"]
+    ai-privacy_guard["privacy_guard"]
+    ai-ai_autoscale["ai_autoscale"]
+    watcher-watcher_notifier["watcher_notifier"]
+    watcher-db_integrity.watcher["db_integrity.watcher"]
+    watcher-api_contract.watcher["api_contract.watcher"]
+    watcher-ai_performance.watcher["ai_performance.watcher"]
+    workflow-watcher-cron["watcher-cron"]
+    workflow-vercel-promotion["vercel-promotion"]
+    workflow-slo-check["slo-check"]
+    workflow-release-pr["release-pr"]
+    workflow-onboarding["onboarding"]
+    workflow-dr-drill["dr-drill"]
+    workflow-ci["ci"]
+    workflow-ai-audit["ai-audit"]
+    config-package.json["package.json"]
+    config-next.config.js["next.config.js"]
+    config-tailwind.config.js["tailwind.config.js"]
+    config-tsconfig.json["tsconfig.json"]
+    page-members --> config-next.config.js
+    page-index --> config-next.config.js
+    page-growth --> config-next.config.js
+    page-branding --> config-next.config.js
+    api-scenarios --> config-next.config.js
+    api-scenario-simulations --> config-next.config.js
+    api-resource-test --> config-next.config.js
+    api-refinance-watchlist --> config-next.config.js
+    api-rates --> config-next.config.js
+    api-rate-limit-test --> config-next.config.js
+    api-prescriptive-recommendations --> config-next.config.js
+    api-predictive-insights --> config-next.config.js
+    api-prediction-alerts --> config-next.config.js
+    api-performance-test --> config-next.config.js
+    api-optimization-test --> config-next.config.js
+    api-leads --> config-next.config.js
+    api-healthz --> config-next.config.js
+    api-health --> config-next.config.js
+    api-forecasts --> config-next.config.js
+    api-feedback --> config-next.config.js
+    api-cost-optimization-test --> config-next.config.js
+    api-calculate --> config-next.config.js
+    api-affordability --> config-next.config.js
+    api-verify --> config-next.config.js
+    api-stripe --> config-next.config.js
+    api-stripe --> api-stripe
+    api-scenarios --> config-next.config.js
+    api-reports --> config-next.config.js
+    api-rates --> config-next.config.js
+    api-matches --> config-next.config.js
+    api-scheduled --> config-next.config.js
+    api-metrics --> config-next.config.js
+    api-index --> config-next.config.js
+    api-export --> config-next.config.js
+    api-report --> config-next.config.js
+    api-metrics --> config-next.config.js
+    api-incidents --> config-next.config.js
+    api-health --> config-next.config.js
+    api-alerts --> config-next.config.js
+    api-dashboard --> config-next.config.js
+    api-webhooks --> config-next.config.js
+    api-members --> config-next.config.js
+    api-dashboard --> config-next.config.js
+    api-branding --> config-next.config.js
+    api-billing --> config-next.config.js
+    api-api-keys --> config-next.config.js
+    api-create-intent --> config-next.config.js
+    api-connect --> config-next.config.js
+    api-generate --> config-next.config.js
+    api-[leadId] --> config-next.config.js
+    core-stripe --> api-stripe
+    core-security --> config-next.config.js
+    core-security-enhanced --> config-next.config.js
+    core-openai --> core-openai
+    core-openai-enhanced --> core-openai
+    core-explainability-agent --> core-openai
+    core-error-handling --> config-next.config.js
+    core-schema --> api-graphql
+    core-billing-service --> api-stripe
+    core-ModelRoutingService --> core-openai
+    core-workflow-automation-agent --> core-openai
+    core-regtech-agent --> core-openai
+    core-enhanced-explainability-agent --> core-openai
+    core-document-ai-agent --> core-openai

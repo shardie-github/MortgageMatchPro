@@ -1,0 +1,237 @@
+# System Components Summary
+
+Total Components: 221
+
+## Frontend (28)
+
+- **_app**: No description available
+- **login**: No description available
+- **callback**: No description available
+- **members**: No description available
+- **index**: No description available
+- **growth**: No description available
+- **branding**: No description available
+- **textarea**: No description available
+- **tabs**: No description available
+- **table**: No description available
+- **slider**: No description available
+- **select**: No description available
+- **label**: No description available
+- **input**: No description available
+- **dialog**: No description available
+- **card**: No description available
+- **button**: No description available
+- **badge**: No description available
+- **LoadingStates**: No description available
+- **ErrorStates**: No description available
+- **EnhancedInput**: No description available
+- **EnhancedButton**: No description available
+- **ConfidenceIndicator**: No description available
+- **MembersManagement**: No description available
+- **BrandingManagement**: No description available
+- **AdminLayout**: No description available
+- **GrowthDashboard**: No description available
+- **page**: No description available
+
+## Backend (174)
+
+- **scenarios**: No description available
+- **scenario-simulations**: No description available
+- **resource-test**: No description available
+- **refinance-watchlist**: No description available
+- **rates**: No description available
+- **rate-limit-test**: No description available
+- **prescriptive-recommendations**: No description available
+- **predictive-insights**: No description available
+- **prediction-alerts**: No description available
+- **performance-test**: No description available
+- **optimization-test**: No description available
+- **leads**: No description available
+- **healthz**: No description available
+- **health**: No description available
+- **graphql**: No description available
+- **forecasts**: No description available
+- **feedback**: No description available
+- **cost-optimization-test**: No description available
+- **calculate**: No description available
+- **affordability**: No description available
+- **verify**: No description available
+- **stripe**: No description available
+- **scenarios**: No description available
+- **reports**: No description available
+- **rates**: No description available
+- **matches**: No description available
+- **scheduled**: No description available
+- **metrics**: No description available
+- **index**: No description available
+- **export**: No description available
+- **report**: No description available
+- **metrics**: No description available
+- **incidents**: No description available
+- **health**: No description available
+- **alerts**: No description available
+- **dashboard**: No description available
+- **webhooks**: No description available
+- **members**: No description available
+- **dashboard**: No description available
+- **branding**: No description available
+- **billing**: No description available
+- **api-keys**: No description available
+- **create-intent**: No description available
+- **connect**: No description available
+- **generate**: No description available
+- **[leadId]**: No description available
+- **search-ai**: No description available
+- **utils**: No description available
+- **supabase**: No description available
+- **stripe**: No description available
+- **security**: No description available
+- **security-enhanced**: No description available
+- **scenario-types**: No description available
+- **scenario-manager**: No description available
+- **realtime-service**: No description available
+- **rate-apis**: No description available
+- **post-launch-integration**: No description available
+- **performance-monitoring**: No description available
+- **performance-monitor**: No description available
+- **openai**: No description available
+- **openai-enhanced**: No description available
+- **monitoring**: No description available
+- **monetization**: No description available
+- **lead-qualification**: No description available
+- **lead-monitoring**: No description available
+- **intent-matching**: No description available
+- **index**: No description available
+- **health-check**: No description available
+- **feedback-system**: No description available
+- **export-service**: No description available
+- **explainability-agent**: No description available
+- **error-handling**: No description available
+- **database.types**: No description available
+- **database-service**: No description available
+- **compliance**: No description available
+- **broker-notifications**: No description available
+- **auth-service**: No description available
+- **api-service**: No description available
+- **analytics**: No description available
+- **alerting**: No description available
+- **theme-service**: No description available
+- **webhook-service**: No description available
+- **schema-validator**: No description available
+- **tenancy**: No description available
+- **billing**: No description available
+- **cross-border-sandbox**: No description available
+- **scoping**: No description available
+- **rbac**: No description available
+- **organization-service**: No description available
+- **context**: No description available
+- **api-key-service**: No description available
+- **DataEthics**: No description available
+- **RetryService**: No description available
+- **RequestDeduplicationService**: No description available
+- **CircuitBreakerService**: No description available
+- **distributed-rate-limiter**: No description available
+- **profiling-suite**: No description available
+- **connection-pool**: No description available
+- **caching-system**: No description available
+- **resource-manager**: No description available
+- **performance-monitor**: No description available
+- **optimization-manager**: No description available
+- **cost-optimizer**: No description available
+- **sre-metrics**: No description available
+- **operational-readiness**: No description available
+- **load-balancer**: No description available
+- **telemetry**: No description available
+- **monitoring**: No description available
+- **health-check**: No description available
+- **EnhancedMetrics**: No description available
+- **marketing-service**: No description available
+- **security-compliance**: No description available
+- **real-estate-apis**: No description available
+- **programmable-banking**: No description available
+- **open-banking**: No description available
+- **multi-region-api-governance**: No description available
+- **global-payment-rails**: No description available
+- **embedded-payments**: No description available
+- **api-marketplace**: No description available
+- **analytics-billing**: No description available
+- **ai-pricing**: No description available
+- **useApi**: No description available
+- **schema**: No description available
+- **context**: No description available
+- **FeatureFlags**: No description available
+- **personalization-engine**: No description available
+- **llm-experimentation**: No description available
+- **experiment-framework**: No description available
+- **compliance-controls**: No description available
+- **ai-growth-agents**: No description available
+- **ab-testing**: No description available
+- **ErrorService**: No description available
+- **customer-health-scoring**: No description available
+- **ProfileContext**: No description available
+- **keys**: No description available
+- **data-retention**: No description available
+- **ModelCacheService**: No description available
+- **CacheService**: No description available
+- **BudgetGuardService**: No description available
+- **metering-service**: No description available
+- **billing-service**: No description available
+- **report-scheduler**: No description available
+- **analytics-service**: No description available
+- **request-manager**: No description available
+- **public-api-service**: No description available
+- **endpoints**: No description available
+- **api-service**: No description available
+- **cost-governance-service**: No description available
+- **ModelRoutingService**: No description available
+- **ExplainabilityService**: No description available
+- **EnhancedPromptTemplates**: No description available
+- **AdaptivePrompting**: No description available
+- **workflow-automation-agent**: No description available
+- **welcome-flow-agent**: No description available
+- **treasury-risk-agent**: No description available
+- **sustainable-products-agent**: No description available
+- **scenario-simulator**: No description available
+- **retainbot-agent**: No description available
+- **regtech-agent**: No description available
+- **refinance-agent**: No description available
+- **prescriptive-agent**: No description available
+- **predictive-orchestrator**: No description available
+- **openai-agent-sdk**: No description available
+- **green-score-agent**: No description available
+- **global-compliance-agent**: No description available
+- **forecasting-agent**: No description available
+- **explainability-agent**: No description available
+- **enhanced-explainability-agent**: No description available
+- **document-ai-agent**: No description available
+- **data-ingestion-agent**: No description available
+- **LenderIntegrationRegistry**: No description available
+- **DummyBankAdapter**: No description available
+- **CRMBridge**: No description available
+- **RegionalRateFeeds**: No description available
+
+## AI (7)
+
+- **self_diagnose**: No description available
+- **privacy_guard**: No description available
+- **ai_autoscale**: No description available
+- **watcher_notifier**: No description available
+- **db_integrity.watcher**: No description available
+- **api_contract.watcher**: No description available
+- **ai_performance.watcher**: No description available
+
+## Infrastructure (12)
+
+- **watcher-cron**: Autonomous Regression Watchers
+- **vercel-promotion**: Vercel Promotion Workflow
+- **slo-check**: SLO Check
+- **release-pr**: Release PR Workflow
+- **onboarding**: New Developer Onboarding
+- **dr-drill**: Disaster Recovery Drill
+- **ci**: CI/CD Pipeline
+- **ai-audit**: AI Audit & Health Monitoring
+- **package.json**: Configuration file for package.json
+- **next.config.js**: Configuration file for next.config.js
+- **tailwind.config.js**: Configuration file for tailwind.config.js
+- **tsconfig.json**: Configuration file for tsconfig.json
+

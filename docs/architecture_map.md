@@ -1,0 +1,257 @@
+# MortgageMatch Pro Architecture
+
+## System Overview
+
+MortgageMatch Pro is a comprehensive mortgage intelligence platform with AI-powered features and automated monitoring.
+
+## Components
+
+### Frontend
+
+- **_app** (Page): No description available
+- **login** (Page): No description available
+- **callback** (Page): No description available
+- **members** (Page): No description available
+- **index** (Page): No description available
+- **growth** (Page): No description available
+- **branding** (Page): No description available
+- **textarea** (Component): No description available
+- **tabs** (Component): No description available
+- **table** (Component): No description available
+- **slider** (Component): No description available
+- **select** (Component): No description available
+- **label** (Component): No description available
+- **input** (Component): No description available
+- **dialog** (Component): No description available
+- **card** (Component): No description available
+- **button** (Component): No description available
+- **badge** (Component): No description available
+- **LoadingStates** (Component): No description available
+- **ErrorStates** (Component): No description available
+- **EnhancedInput** (Component): No description available
+- **EnhancedButton** (Component): No description available
+- **ConfidenceIndicator** (Component): No description available
+- **MembersManagement** (Component): No description available
+- **BrandingManagement** (Component): No description available
+- **AdminLayout** (Component): No description available
+- **GrowthDashboard** (Component): No description available
+- **page** (App Component): No description available
+
+### Backend
+
+- **scenarios** (API Route): No description available
+- **scenario-simulations** (API Route): No description available
+- **resource-test** (API Route): No description available
+- **refinance-watchlist** (API Route): No description available
+- **rates** (API Route): No description available
+- **rate-limit-test** (API Route): No description available
+- **prescriptive-recommendations** (API Route): No description available
+- **predictive-insights** (API Route): No description available
+- **prediction-alerts** (API Route): No description available
+- **performance-test** (API Route): No description available
+- **optimization-test** (API Route): No description available
+- **leads** (API Route): No description available
+- **healthz** (API Route): No description available
+- **health** (API Route): No description available
+- **graphql** (API Route): No description available
+- **forecasts** (API Route): No description available
+- **feedback** (API Route): No description available
+- **cost-optimization-test** (API Route): No description available
+- **calculate** (API Route): No description available
+- **affordability** (API Route): No description available
+- **verify** (API Route): No description available
+- **stripe** (API Route): No description available
+- **scenarios** (API Route): No description available
+- **reports** (API Route): No description available
+- **rates** (API Route): No description available
+- **matches** (API Route): No description available
+- **scheduled** (API Route): No description available
+- **metrics** (API Route): No description available
+- **index** (API Route): No description available
+- **export** (API Route): No description available
+- **report** (API Route): No description available
+- **metrics** (API Route): No description available
+- **incidents** (API Route): No description available
+- **health** (API Route): No description available
+- **alerts** (API Route): No description available
+- **dashboard** (API Route): No description available
+- **webhooks** (API Route): No description available
+- **members** (API Route): No description available
+- **dashboard** (API Route): No description available
+- **branding** (API Route): No description available
+- **billing** (API Route): No description available
+- **api-keys** (API Route): No description available
+- **create-intent** (API Route): No description available
+- **connect** (API Route): No description available
+- **generate** (API Route): No description available
+- **[leadId]** (API Route): No description available
+- **search-ai** (Edge Function): No description available
+- **utils** (Core Service): No description available
+- **supabase** (Core Service): No description available
+- **stripe** (Core Service): No description available
+- **security** (Core Service): No description available
+- **security-enhanced** (Core Service): No description available
+- **scenario-types** (Core Service): No description available
+- **scenario-manager** (Core Service): No description available
+- **realtime-service** (Core Service): No description available
+- **rate-apis** (Core Service): No description available
+- **post-launch-integration** (Core Service): No description available
+- **performance-monitoring** (Core Service): No description available
+- **performance-monitor** (Core Service): No description available
+- **openai** (Core Service): No description available
+- **openai-enhanced** (Core Service): No description available
+- **monitoring** (Core Service): No description available
+- **monetization** (Core Service): No description available
+- **lead-qualification** (Core Service): No description available
+- **lead-monitoring** (Core Service): No description available
+- **intent-matching** (Core Service): No description available
+- **index** (Core Service): No description available
+- **health-check** (Core Service): No description available
+- **feedback-system** (Core Service): No description available
+- **export-service** (Core Service): No description available
+- **explainability-agent** (Core Service): No description available
+- **error-handling** (Core Service): No description available
+- **database.types** (Core Service): No description available
+- **database-service** (Core Service): No description available
+- **compliance** (Core Service): No description available
+- **broker-notifications** (Core Service): No description available
+- **auth-service** (Core Service): No description available
+- **api-service** (Core Service): No description available
+- **analytics** (Core Service): No description available
+- **alerting** (Core Service): No description available
+- **theme-service** (Core Service): No description available
+- **webhook-service** (Core Service): No description available
+- **schema-validator** (Core Service): No description available
+- **tenancy** (Core Service): No description available
+- **billing** (Core Service): No description available
+- **cross-border-sandbox** (Core Service): No description available
+- **scoping** (Core Service): No description available
+- **rbac** (Core Service): No description available
+- **organization-service** (Core Service): No description available
+- **context** (Core Service): No description available
+- **api-key-service** (Core Service): No description available
+- **DataEthics** (Core Service): No description available
+- **RetryService** (Core Service): No description available
+- **RequestDeduplicationService** (Core Service): No description available
+- **CircuitBreakerService** (Core Service): No description available
+- **distributed-rate-limiter** (Core Service): No description available
+- **profiling-suite** (Core Service): No description available
+- **connection-pool** (Core Service): No description available
+- **caching-system** (Core Service): No description available
+- **resource-manager** (Core Service): No description available
+- **performance-monitor** (Core Service): No description available
+- **optimization-manager** (Core Service): No description available
+- **cost-optimizer** (Core Service): No description available
+- **sre-metrics** (Core Service): No description available
+- **operational-readiness** (Core Service): No description available
+- **load-balancer** (Core Service): No description available
+- **telemetry** (Core Service): No description available
+- **monitoring** (Core Service): No description available
+- **health-check** (Core Service): No description available
+- **EnhancedMetrics** (Core Service): No description available
+- **marketing-service** (Core Service): No description available
+- **security-compliance** (Core Service): No description available
+- **real-estate-apis** (Core Service): No description available
+- **programmable-banking** (Core Service): No description available
+- **open-banking** (Core Service): No description available
+- **multi-region-api-governance** (Core Service): No description available
+- **global-payment-rails** (Core Service): No description available
+- **embedded-payments** (Core Service): No description available
+- **api-marketplace** (Core Service): No description available
+- **analytics-billing** (Core Service): No description available
+- **ai-pricing** (Core Service): No description available
+- **useApi** (Core Service): No description available
+- **schema** (Core Service): No description available
+- **context** (Core Service): No description available
+- **FeatureFlags** (Core Service): No description available
+- **personalization-engine** (Core Service): No description available
+- **llm-experimentation** (Core Service): No description available
+- **experiment-framework** (Core Service): No description available
+- **compliance-controls** (Core Service): No description available
+- **ai-growth-agents** (Core Service): No description available
+- **ab-testing** (Core Service): No description available
+- **ErrorService** (Core Service): No description available
+- **customer-health-scoring** (Core Service): No description available
+- **ProfileContext** (Core Service): No description available
+- **keys** (Core Service): No description available
+- **data-retention** (Core Service): No description available
+- **ModelCacheService** (Core Service): No description available
+- **CacheService** (Core Service): No description available
+- **BudgetGuardService** (Core Service): No description available
+- **metering-service** (Core Service): No description available
+- **billing-service** (Core Service): No description available
+- **report-scheduler** (Core Service): No description available
+- **analytics-service** (Core Service): No description available
+- **request-manager** (Core Service): No description available
+- **public-api-service** (Core Service): No description available
+- **endpoints** (Core Service): No description available
+- **api-service** (Core Service): No description available
+- **cost-governance-service** (Core Service): No description available
+- **ModelRoutingService** (Core Service): No description available
+- **ExplainabilityService** (Core Service): No description available
+- **EnhancedPromptTemplates** (Core Service): No description available
+- **AdaptivePrompting** (Core Service): No description available
+- **workflow-automation-agent** (Core Service): No description available
+- **welcome-flow-agent** (Core Service): No description available
+- **treasury-risk-agent** (Core Service): No description available
+- **sustainable-products-agent** (Core Service): No description available
+- **scenario-simulator** (Core Service): No description available
+- **retainbot-agent** (Core Service): No description available
+- **regtech-agent** (Core Service): No description available
+- **refinance-agent** (Core Service): No description available
+- **prescriptive-agent** (Core Service): No description available
+- **predictive-orchestrator** (Core Service): No description available
+- **openai-agent-sdk** (Core Service): No description available
+- **green-score-agent** (Core Service): No description available
+- **global-compliance-agent** (Core Service): No description available
+- **forecasting-agent** (Core Service): No description available
+- **explainability-agent** (Core Service): No description available
+- **enhanced-explainability-agent** (Core Service): No description available
+- **document-ai-agent** (Core Service): No description available
+- **data-ingestion-agent** (Core Service): No description available
+- **LenderIntegrationRegistry** (Core Service): No description available
+- **DummyBankAdapter** (Core Service): No description available
+- **CRMBridge** (Core Service): No description available
+- **RegionalRateFeeds** (Core Service): No description available
+
+### AI
+
+- **self_diagnose** (AI Agent): No description available
+- **privacy_guard** (AI Agent): No description available
+- **ai_autoscale** (AI Agent): No description available
+- **watcher_notifier** (Watcher): No description available
+- **db_integrity.watcher** (Watcher): No description available
+- **api_contract.watcher** (Watcher): No description available
+- **ai_performance.watcher** (Watcher): No description available
+
+### Infrastructure
+
+- **watcher-cron** (CI/CD Workflow): Autonomous Regression Watchers
+- **vercel-promotion** (CI/CD Workflow): Vercel Promotion Workflow
+- **slo-check** (CI/CD Workflow): SLO Check
+- **release-pr** (CI/CD Workflow): Release PR Workflow
+- **onboarding** (CI/CD Workflow): New Developer Onboarding
+- **dr-drill** (CI/CD Workflow): Disaster Recovery Drill
+- **ci** (CI/CD Workflow): CI/CD Pipeline
+- **ai-audit** (CI/CD Workflow): AI Audit & Health Monitoring
+- **package.json** (Configuration): Configuration file for package.json
+- **next.config.js** (Configuration): Configuration file for next.config.js
+- **tailwind.config.js** (Configuration): Configuration file for tailwind.config.js
+- **tsconfig.json** (Configuration): Configuration file for tsconfig.json
+
+## Data Flows
+
+- User Input → Frontend: User Interaction
+- Frontend → API Route: HTTP Request
+- API Route → Database: Query
+- Database → API Route: Response
+- API Route → Frontend: HTTP Response
+- Database → AI Agent: Data Analysis
+- AI Agent → Database: Insights Storage
+- AI Agent → GitHub: Issue Creation
+- Watcher → Database: Health Monitoring
+- Watcher → GitHub: Alert Notification
+- User Data → Users Table: User Registration
+- Calculation Input → Mortgage Calculations: Calculation Storage
+- Rate Data → Rate Checks: Rate History
+- Lead Data → Leads Table: Lead Storage

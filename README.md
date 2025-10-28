@@ -474,6 +474,23 @@ If you encounter any issues or have questions:
 2. Create a new issue with detailed information
 3. Contact the development team
 
+## 📚 Documentation
+
+### AI-Generated Documentation
+- [**API Reference**](docs/api_reference.md) - Comprehensive API documentation with examples and schemas
+- [**Architecture Map**](docs/architecture_map.md) - System architecture overview with component relationships
+- [**Architecture Diagram**](docs/architecture_map.svg) - Visual system architecture diagram
+- [**Component Summary**](docs/components.md) - Detailed component inventory and descriptions
+
+### AI Automation & Compliance
+- [**AI Automation Guide**](AI_AUTOMATION_README.md) - Complete AI automation system documentation
+- [**AI Compliance**](AI_COMPLIANCE.md) - Privacy, compliance, and ethical AI framework
+- [**Sustainability**](SUSTAINABILITY.md) - Environmental impact and sustainability initiatives
+
+### Generated Files
+- [**OpenAPI Specification**](docs/openapi.json) - Machine-readable API specification
+- [**Mermaid Diagram**](docs/architecture_map.mmd) - Source Mermaid diagram for architecture
+
 ## 📊 Post-Release Review
 
 MortgageMatch Pro has completed a comprehensive post-release review and continuity sprint. See our detailed analysis and improvement plans:

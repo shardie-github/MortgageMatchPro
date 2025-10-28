@@ -1,485 +1,780 @@
 #!/usr/bin/env node
 
-import { execSync } from 'child_process';
+/**
+ * AI-Powered API Reference Generator
+ * Uses GPT + OpenAPI introspection to generate comprehensive API documentation
+ */
+
+import { createClient } from '@supabase/supabase-js';
+import OpenAI from 'openai';
 import fs from 'fs/promises';
 import path from 'path';
-import { fileURLToPath } from 'url';
+import { glob } from 'glob';
 
-const __filename = fileURLToPath(import.meta.url);
-const __dirname = path.dirname(__filename);
-const projectRoot = path.resolve(__dirname, '..');
+const openai = new OpenAI({
+  apiKey: process.env.OPENAI_API_KEY
+});
+
+const supabase = createClient(
+  process.env.SUPABASE_URL,
+  process.env.SUPABASE_SERVICE_KEY
+);
 
 class APIReferenceGenerator {
   constructor() {
     this.apiEndpoints = [];
-    this.eventTypes = [];
-    this.interfaces = [];
+    this.dataModels = [];
+    this.authSchemes = [];
+    this.errorCodes = [];
   }
 
-  async generate() {
-    console.log('📚 Generating API reference documentation...\n');
+  /**
+   * Main function to generate API reference
+   */
+  async generateAPIReference() {
+    console.log('📚 Generating AI-powered API reference...');
 
     try {
-      await this.scanAPIEndpoints();
-      await this.scanEventTypes();
-      await this.scanInterfaces();
-      await this.generateMarkdown();
+      // 1. Discover API endpoints
+      await this.discoverEndpoints();
       
-      console.log('✅ API reference generated successfully!');
+      // 2. Analyze data models
+      await this.analyzeDataModels();
+      
+      // 3. Extract authentication schemes
+      await this.extractAuthSchemes();
+      
+      // 4. Identify error codes
+      await this.identifyErrorCodes();
+      
+      // 5. Generate OpenAPI spec
+      const openApiSpec = await this.generateOpenAPISpec();
+      
+      // 6. Generate documentation
+      const documentation = await this.generateDocumentation(openApiSpec);
+      
+      // 7. Save files
+      await this.saveDocumentation(documentation, openApiSpec);
+      
+      console.log('✅ API reference generated successfully');
+      return documentation;
+
     } catch (error) {
-      console.error('❌ Error generating API reference:', error.message);
-      process.exit(1);
+      console.error('❌ Error generating API reference:', error);
+      throw error;
     }
   }
 
-  async scanAPIEndpoints() {
-    console.log('🔍 Scanning API endpoints...');
-    
-    const apiDir = path.join(projectRoot, 'pages', 'api');
-    const files = await this.getFilesRecursively(apiDir, '.ts');
-    
-    for (const file of files) {
-      const content = await fs.readFile(file, 'utf8');
-      const endpoint = this.parseAPIEndpoint(file, content);
-      if (endpoint) {
-        this.apiEndpoints.push(endpoint);
-      }
-    }
-  }
+  /**
+   * Discover API endpoints from code
+   */
+  async discoverEndpoints() {
+    console.log('🔍 Discovering API endpoints...');
 
-  async scanEventTypes() {
-    console.log('🔍 Scanning event types...');
-    
-    const eventsDir = path.join(projectRoot, 'events', 'schemas');
-    const files = await this.getFilesRecursively(eventsDir, '.ts');
-    
-    for (const file of files) {
-      const content = await fs.readFile(file, 'utf8');
-      const events = this.parseEventTypes(file, content);
-      this.eventTypes.push(...events);
-    }
-  }
-
-  async scanInterfaces() {
-    console.log('🔍 Scanning interfaces...');
-    
-    const libDir = path.join(projectRoot, 'lib');
-    const files = await this.getFilesRecursively(libDir, '.ts');
-    
-    for (const file of files) {
-      const content = await fs.readFile(file, 'utf8');
-      const interfaces = this.parseInterfaces(file, content);
-      this.interfaces.push(...interfaces);
-    }
-  }
-
-  async getFilesRecursively(dir, extension) {
-    const files = [];
-    
     try {
-      const entries = await fs.readdir(dir, { withFileTypes: true });
-      
-      for (const entry of entries) {
-        const fullPath = path.join(dir, entry.name);
-        
-        if (entry.isDirectory()) {
-          const subFiles = await this.getFilesRecursively(fullPath, extension);
-          files.push(...subFiles);
-        } else if (entry.name.endsWith(extension)) {
-          files.push(fullPath);
-        }
+      // Find API route files
+      const apiFiles = await glob('pages/api/**/*.ts');
+      const appApiFiles = await glob('app/api/**/*.ts');
+      const allApiFiles = [...apiFiles, ...appApiFiles];
+
+      for (const file of allApiFiles) {
+        const content = await fs.readFile(file, 'utf8');
+        const endpoints = this.extractEndpointsFromFile(file, content);
+        this.apiEndpoints.push(...endpoints);
       }
+
+      // Add Supabase Edge Functions
+      const edgeFunctions = await glob('supabase/functions/**/*.ts');
+      for (const file of edgeFunctions) {
+        const content = await fs.readFile(file, 'utf8');
+        const endpoints = this.extractEdgeFunctionEndpoints(file, content);
+        this.apiEndpoints.push(...endpoints);
+      }
+
+      console.log(`📡 Discovered ${this.apiEndpoints.length} API endpoints`);
+
     } catch (error) {
-      // Directory doesn't exist or can't be read
+      console.error('Error discovering endpoints:', error);
     }
-    
-    return files;
   }
 
-  parseAPIEndpoint(filePath, content) {
-    const relativePath = path.relative(projectRoot, filePath);
-    const route = relativePath
-      .replace('pages/api/', '/api/')
-      .replace('.ts', '')
-      .replace(/\[([^\]]+)\]/g, ':$1');
+  /**
+   * Extract endpoints from API file
+   */
+  extractEndpointsFromFile(filePath, content) {
+    const endpoints = [];
+    
+    // Extract route information
+    const routePath = this.getRoutePath(filePath);
+    const methods = this.extractMethods(content);
+    
+    for (const method of methods) {
+      const endpoint = {
+        path: routePath,
+        method: method.toUpperCase(),
+        file: filePath,
+        description: this.extractDescription(content),
+        parameters: this.extractParameters(content),
+        requestBody: this.extractRequestBody(content),
+        responses: this.extractResponses(content),
+        auth: this.extractAuth(content),
+        tags: this.extractTags(content)
+      };
+      
+      endpoints.push(endpoint);
+    }
+    
+    return endpoints;
+  }
 
-    // Extract HTTP methods
-    const methods = [];
-    if (content.includes('req.method === \'GET\'')) methods.push('GET');
-    if (content.includes('req.method === \'POST\'')) methods.push('POST');
-    if (content.includes('req.method === \'PUT\'')) methods.push('PUT');
-    if (content.includes('req.method === \'DELETE\'')) methods.push('DELETE');
-    if (content.includes('req.method === \'PATCH\'')) methods.push('PATCH');
-
-    // Extract description from comments
-    const commentMatch = content.match(/\/\*\*([\s\S]*?)\*\//);
-    const description = commentMatch ? commentMatch[1].trim() : '';
-
-    // Extract query parameters
-    const queryParams = this.extractQueryParams(content);
-
-    // Extract request body schema
-    const requestBody = this.extractRequestBody(content);
-
-    // Extract response schema
-    const responseSchema = this.extractResponseSchema(content);
-
-    return {
-      route,
-      methods,
-      description,
-      queryParams,
-      requestBody,
-      responseSchema,
-      file: relativePath
+  /**
+   * Extract Edge Function endpoints
+   */
+  extractEdgeFunctionEndpoints(filePath, content) {
+    const endpoints = [];
+    
+    // Extract function name from path
+    const functionName = path.basename(path.dirname(filePath));
+    const routePath = `/functions/${functionName}`;
+    
+    const endpoint = {
+      path: routePath,
+      method: 'POST', // Edge Functions typically use POST
+      file: filePath,
+      description: this.extractDescription(content),
+      parameters: this.extractParameters(content),
+      requestBody: this.extractRequestBody(content),
+      responses: this.extractResponses(content),
+      auth: this.extractAuth(content),
+      tags: ['Edge Functions']
     };
+    
+    endpoints.push(endpoint);
+    return endpoints;
   }
 
-  parseEventTypes(filePath, content) {
-    const events = [];
-    const relativePath = path.relative(projectRoot, filePath);
-    
-    // Extract event type constants
-    const eventTypeRegex = /export const (\w+_EVENT_TYPES) = \{([\s\S]*?)\}/g;
+  /**
+   * Get route path from file path
+   */
+  getRoutePath(filePath) {
+    if (filePath.includes('pages/api/')) {
+      return filePath.replace('pages/api', '').replace('.ts', '').replace('index', '');
+    } else if (filePath.includes('app/api/')) {
+      return filePath.replace('app/api', '').replace('.ts', '').replace('route', '');
+    }
+    return filePath;
+  }
+
+  /**
+   * Extract HTTP methods from content
+   */
+  extractMethods(content) {
+    const methods = [];
+    const methodRegex = /export\s+(?:async\s+)?(?:function\s+)?(get|post|put|patch|delete|head|options)\s*[=\(]/gi;
     let match;
     
-    while ((match = eventTypeRegex.exec(content)) !== null) {
-      const [, constantName, eventDefinitions] = match;
-      
-      // Parse individual event types
-      const eventRegex = /(\w+):\s*['"`]([^'"`]+)['"`]/g;
-      let eventMatch;
-      
-      while ((eventMatch = eventRegex.exec(eventDefinitions)) !== null) {
-        const [, eventName, eventType] = eventMatch;
-        events.push({
-          name: eventName,
-          type: eventType,
-          constant: constantName,
-          file: relativePath
-        });
-      }
+    while ((match = methodRegex.exec(content)) !== null) {
+      methods.push(match[1]);
     }
     
-    return events;
+    // If no methods found, assume GET
+    if (methods.length === 0) {
+      methods.push('get');
+    }
+    
+    return methods;
   }
 
-  parseInterfaces(filePath, content) {
-    const interfaces = [];
-    const relativePath = path.relative(projectRoot, filePath);
+  /**
+   * Extract description from content
+   */
+  extractDescription(content) {
+    const lines = content.split('\n');
+    for (const line of lines) {
+      if (line.includes('*') && (line.includes('Description:') || line.includes('Purpose:'))) {
+        return line.replace(/[/*]/g, '').trim();
+      }
+    }
+    return 'No description available';
+  }
+
+  /**
+   * Extract parameters from content
+   */
+  extractParameters(content) {
+    const parameters = [];
     
-    // Extract interface definitions
-    const interfaceRegex = /export interface (\w+)\s*\{([\s\S]*?)\}/g;
+    // Look for parameter definitions
+    const paramRegex = /(?:query|param|parameter)\s*[:=]\s*\{([^}]+)\}/gi;
     let match;
     
-    while ((match = interfaceRegex.exec(content)) !== null) {
-      const [, interfaceName, interfaceBody] = match;
-      
-      // Extract properties
-      const properties = [];
-      const propertyRegex = /(\w+)(\?)?:\s*([^;]+);/g;
-      let propMatch;
-      
-      while ((propMatch = propertyRegex.exec(interfaceBody)) !== null) {
-        const [, propName, optional, propType] = propMatch;
-        properties.push({
-          name: propName,
-          optional: !!optional,
-          type: propType.trim()
-        });
-      }
-      
-      interfaces.push({
-        name: interfaceName,
-        properties,
-        file: relativePath
-      });
-    }
-    
-    return interfaces;
-  }
-
-  extractQueryParams(content) {
-    const params = [];
-    const queryMatch = content.match(/const\s*\{\s*([^}]+)\s*\}\s*=\s*req\.query/);
-    
-    if (queryMatch) {
-      const paramList = queryMatch[1];
-      const paramRegex = /(\w+)/g;
-      let match;
-      
-      while ((match = paramRegex.exec(paramList)) !== null) {
-        params.push({
-          name: match[1],
-          type: 'string',
-          required: false
+    while ((match = paramRegex.exec(content)) !== null) {
+      const paramDef = match[1];
+      const parts = paramDef.split(':');
+      if (parts.length >= 2) {
+        parameters.push({
+          name: parts[0].trim(),
+          type: parts[1].trim(),
+          required: !parts[1].includes('?'),
+          description: parts[2] ? parts[2].trim() : ''
         });
       }
     }
     
-    return params;
+    return parameters;
   }
 
+  /**
+   * Extract request body from content
+   */
   extractRequestBody(content) {
-    const bodyMatch = content.match(/const\s*\{\s*([^}]+)\s*\}\s*=\s*req\.body/);
+    // Look for request body type definitions
+    const bodyRegex = /(?:body|requestBody)\s*[:=]\s*\{([^}]+)\}/gi;
+    const match = bodyRegex.exec(content);
     
-    if (bodyMatch) {
-      const bodyList = bodyMatch[1];
-      const paramRegex = /(\w+)/g;
-      const params = [];
-      let match;
-      
-      while ((match = paramRegex.exec(bodyList)) !== null) {
-        params.push({
-          name: match[1],
-          type: 'any',
-          required: true
-        });
-      }
-      
-      return params;
-    }
-    
-    return null;
-  }
-
-  extractResponseSchema(content) {
-    // Look for response structure in the code
-    const responseMatch = content.match(/res\.status\(\d+\)\.json\(\{([\s\S]*?)\}\)/);
-    
-    if (responseMatch) {
-      const responseBody = responseMatch[1];
-      const successMatch = responseBody.match(/success:\s*(\w+)/);
-      const dataMatch = responseBody.match(/data:\s*([^,}]+)/);
-      
+    if (match) {
       return {
-        success: successMatch ? successMatch[1] : 'boolean',
-        data: dataMatch ? dataMatch[1].trim() : 'any'
+        type: 'object',
+        properties: this.parseObjectDefinition(match[1])
       };
     }
     
     return null;
   }
 
-  async generateMarkdown() {
-    console.log('📝 Generating markdown documentation...');
+  /**
+   * Extract responses from content
+   */
+  extractResponses(content) {
+    const responses = {};
     
-    const markdown = this.buildMarkdown();
-    const outputPath = path.join(projectRoot, 'docs', 'API_REFERENCE.md');
+    // Look for response definitions
+    const responseRegex = /(?:response|return)\s*[:=]\s*\{([^}]+)\}/gi;
+    let match;
     
-    // Ensure docs directory exists
-    await fs.mkdir(path.dirname(outputPath), { recursive: true });
+    while ((match = responseRegex.exec(content)) !== null) {
+      const responseDef = match[1];
+      const parts = responseDef.split(':');
+      if (parts.length >= 2) {
+        const statusCode = parts[0].trim();
+        const type = parts[1].trim();
+        responses[statusCode] = {
+          description: this.getStatusDescription(statusCode),
+          content: {
+            'application/json': {
+              schema: {
+                type: type === 'object' ? 'object' : 'string',
+                properties: type === 'object' ? this.parseObjectDefinition(parts[2] || '') : {}
+              }
+            }
+          }
+        };
+      }
+    }
     
-    await fs.writeFile(outputPath, markdown);
-    console.log(`📄 API reference written to: ${outputPath}`);
+    // Add default responses if none found
+    if (Object.keys(responses).length === 0) {
+      responses['200'] = {
+        description: 'Success',
+        content: {
+          'application/json': {
+            schema: { type: 'object' }
+          }
+        }
+      };
+    }
+    
+    return responses;
   }
 
-  buildMarkdown() {
-    let markdown = `# API Reference - MortgageMatchPro v1.4.0
-
-Generated on: ${new Date().toISOString()}
-
-## Overview
-
-This document provides a comprehensive reference for all API endpoints, event types, and interfaces in the MortgageMatchPro application.
-
-## Table of Contents
-
-- [API Endpoints](#api-endpoints)
-- [Event Types](#event-types)
-- [Interfaces](#interfaces)
-
----
-
-## API Endpoints
-
-`;
-
-    // Group endpoints by domain
-    const groupedEndpoints = this.groupEndpointsByDomain();
+  /**
+   * Extract authentication from content
+   */
+  extractAuth(content) {
+    if (content.includes('supabase') || content.includes('auth')) {
+      return {
+        type: 'bearer',
+        scheme: 'bearer',
+        bearerFormat: 'JWT'
+      };
+    }
     
-    for (const [domain, endpoints] of Object.entries(groupedEndpoints)) {
-      markdown += `### ${domain.charAt(0).toUpperCase() + domain.slice(1)} API\n\n`;
+    return null;
+  }
+
+  /**
+   * Extract tags from content
+   */
+  extractTags(content) {
+    const tags = [];
+    
+    if (content.includes('auth')) tags.push('Authentication');
+    if (content.includes('user')) tags.push('Users');
+    if (content.includes('mortgage')) tags.push('Mortgage');
+    if (content.includes('rate')) tags.push('Rates');
+    if (content.includes('lead')) tags.push('Leads');
+    if (content.includes('subscription')) tags.push('Subscriptions');
+    if (content.includes('billing')) tags.push('Billing');
+    
+    return tags.length > 0 ? tags : ['General'];
+  }
+
+  /**
+   * Parse object definition string
+   */
+  parseObjectDefinition(def) {
+    const properties = {};
+    const pairs = def.split(',');
+    
+    for (const pair of pairs) {
+      const [key, value] = pair.split(':');
+      if (key && value) {
+        properties[key.trim()] = {
+          type: value.trim().replace('?', ''),
+          required: !value.includes('?')
+        };
+      }
+    }
+    
+    return properties;
+  }
+
+  /**
+   * Get status code description
+   */
+  getStatusDescription(statusCode) {
+    const descriptions = {
+      '200': 'Success',
+      '201': 'Created',
+      '400': 'Bad Request',
+      '401': 'Unauthorized',
+      '403': 'Forbidden',
+      '404': 'Not Found',
+      '500': 'Internal Server Error'
+    };
+    
+    return descriptions[statusCode] || 'Response';
+  }
+
+  /**
+   * Analyze data models from database schema
+   */
+  async analyzeDataModels() {
+    console.log('📊 Analyzing data models...');
+
+    try {
+      // Read database schema
+      const schemaContent = await fs.readFile('supabase_complete_schema.sql', 'utf8');
+      this.dataModels = this.extractDataModels(schemaContent);
       
-      for (const endpoint of endpoints) {
-        markdown += `#### \`${endpoint.route}\`\n\n`;
-        
-        if (endpoint.description) {
-          markdown += `${endpoint.description}\n\n`;
+      console.log(`📊 Found ${this.dataModels.length} data models`);
+
+    } catch (error) {
+      console.error('Error analyzing data models:', error);
+    }
+  }
+
+  /**
+   * Extract data models from SQL schema
+   */
+  extractDataModels(schemaContent) {
+    const models = [];
+    const tableRegex = /CREATE TABLE\s+(\w+)\s*\(([^;]+)\)/gi;
+    let match;
+    
+    while ((match = tableRegex.exec(schemaContent)) !== null) {
+      const tableName = match[1];
+      const columns = this.extractColumns(match[2]);
+      
+      models.push({
+        name: tableName,
+        type: 'table',
+        columns: columns,
+        description: this.getTableDescription(tableName)
+      });
+    }
+    
+    return models;
+  }
+
+  /**
+   * Extract columns from table definition
+   */
+  extractColumns(tableDef) {
+    const columns = [];
+    const lines = tableDef.split('\n');
+    
+    for (const line of lines) {
+      const trimmed = line.trim();
+      if (trimmed && !trimmed.startsWith('CONSTRAINT') && !trimmed.startsWith('PRIMARY KEY')) {
+        const parts = trimmed.split(/\s+/);
+        if (parts.length >= 2) {
+          columns.push({
+            name: parts[0],
+            type: parts[1],
+            nullable: !trimmed.includes('NOT NULL'),
+            primaryKey: trimmed.includes('PRIMARY KEY'),
+            unique: trimmed.includes('UNIQUE')
+          });
         }
-        
-        markdown += `**Methods:** ${endpoint.methods.join(', ')}\n\n`;
-        
-        if (endpoint.queryParams.length > 0) {
-          markdown += `**Query Parameters:**\n\n`;
-          markdown += `| Parameter | Type | Required | Description |\n`;
-          markdown += `|-----------|------|----------|-------------|\n`;
-          
-          for (const param of endpoint.queryParams) {
-            markdown += `| \`${param.name}\` | ${param.type} | ${param.required ? 'Yes' : 'No'} | - |\n`;
+      }
+    }
+    
+    return columns;
+  }
+
+  /**
+   * Get table description
+   */
+  getTableDescription(tableName) {
+    const descriptions = {
+      'users': 'User account information',
+      'mortgage_calculations': 'Mortgage calculation results',
+      'rate_checks': 'Interest rate check history',
+      'leads': 'Lead generation data',
+      'subscriptions': 'User subscription information',
+      'billing_history': 'Billing transaction history',
+      'analytics_events': 'User analytics events'
+    };
+    
+    return descriptions[tableName] || 'Database table';
+  }
+
+  /**
+   * Extract authentication schemes
+   */
+  async extractAuthSchemes() {
+    this.authSchemes = [
+      {
+        name: 'Bearer Token',
+        type: 'http',
+        scheme: 'bearer',
+        bearerFormat: 'JWT',
+        description: 'JWT token authentication via Supabase'
+      },
+      {
+        name: 'API Key',
+        type: 'apiKey',
+        in: 'header',
+        name: 'X-API-Key',
+        description: 'API key authentication'
+      }
+    ];
+  }
+
+  /**
+   * Identify error codes
+   */
+  async identifyErrorCodes() {
+    this.errorCodes = [
+      { code: 400, message: 'Bad Request', description: 'Invalid request parameters' },
+      { code: 401, message: 'Unauthorized', description: 'Authentication required' },
+      { code: 403, message: 'Forbidden', description: 'Insufficient permissions' },
+      { code: 404, message: 'Not Found', description: 'Resource not found' },
+      { code: 422, message: 'Unprocessable Entity', description: 'Validation error' },
+      { code: 500, message: 'Internal Server Error', description: 'Server error' }
+    ];
+  }
+
+  /**
+   * Generate OpenAPI specification
+   */
+  async generateOpenAPISpec() {
+    const spec = {
+      openapi: '3.0.0',
+      info: {
+        title: 'MortgageMatch Pro API',
+        version: '1.0.0',
+        description: 'AI-powered mortgage intelligence API with advanced analytics and broker portal',
+        contact: {
+          name: 'API Support',
+          email: 'api@mortgagematch.com'
+        }
+      },
+      servers: [
+        {
+          url: 'https://api.mortgagematch.com',
+          description: 'Production server'
+        },
+        {
+          url: 'https://staging-api.mortgagematch.com',
+          description: 'Staging server'
+        }
+      ],
+      paths: {},
+      components: {
+        schemas: this.generateSchemas(),
+        securitySchemes: this.authSchemes.reduce((acc, scheme) => {
+          acc[scheme.name.replace(/\s+/g, '')] = scheme;
+          return acc;
+        }, {}),
+        responses: this.errorCodes.reduce((acc, error) => {
+          acc[error.code] = {
+            description: error.message,
+            content: {
+              'application/json': {
+                schema: {
+                  type: 'object',
+                  properties: {
+                    error: { type: 'string', example: error.message },
+                    message: { type: 'string', example: error.description },
+                    code: { type: 'integer', example: error.code }
+                  }
+                }
+              }
+            }
+          };
+          return acc;
+        }, {})
+      }
+    };
+
+    // Add endpoints to paths
+    for (const endpoint of this.apiEndpoints) {
+      const pathKey = endpoint.path;
+      if (!spec.paths[pathKey]) {
+        spec.paths[pathKey] = {};
+      }
+      
+      spec.paths[pathKey][endpoint.method.toLowerCase()] = {
+        summary: endpoint.description,
+        tags: endpoint.tags,
+        parameters: endpoint.parameters.map(param => ({
+          name: param.name,
+          in: 'query',
+          required: param.required,
+          schema: { type: param.type },
+          description: param.description
+        })),
+        requestBody: endpoint.requestBody ? {
+          content: {
+            'application/json': {
+              schema: endpoint.requestBody
+            }
           }
-          markdown += '\n';
+        } : undefined,
+        responses: endpoint.responses,
+        security: endpoint.auth ? [{ [endpoint.auth.type]: [] }] : undefined
+      };
+    }
+
+    return spec;
+  }
+
+  /**
+   * Generate schemas from data models
+   */
+  generateSchemas() {
+    const schemas = {};
+    
+    for (const model of this.dataModels) {
+      const properties = {};
+      const required = [];
+      
+      for (const column of model.columns) {
+        properties[column.name] = {
+          type: this.mapSqlTypeToJsonType(column.type),
+          nullable: column.nullable
+        };
+        
+        if (!column.nullable && !column.primaryKey) {
+          required.push(column.name);
+        }
+      }
+      
+      schemas[model.name] = {
+        type: 'object',
+        properties,
+        required: required.length > 0 ? required : undefined,
+        description: model.description
+      };
+    }
+    
+    return schemas;
+  }
+
+  /**
+   * Map SQL types to JSON schema types
+   */
+  mapSqlTypeToJsonType(sqlType) {
+    const typeMap = {
+      'varchar': 'string',
+      'text': 'string',
+      'integer': 'integer',
+      'bigint': 'integer',
+      'decimal': 'number',
+      'numeric': 'number',
+      'boolean': 'boolean',
+      'timestamp': 'string',
+      'date': 'string',
+      'time': 'string',
+      'json': 'object',
+      'jsonb': 'object',
+      'uuid': 'string'
+    };
+    
+    return typeMap[sqlType.toLowerCase()] || 'string';
+  }
+
+  /**
+   * Generate comprehensive documentation
+   */
+  async generateDocumentation(openApiSpec) {
+    const prompt = `
+Generate comprehensive API documentation for the following OpenAPI specification:
+
+${JSON.stringify(openApiSpec, null, 2)}
+
+Please create:
+1. Overview and getting started guide
+2. Authentication guide
+3. Endpoint documentation with examples
+4. Data models and schemas
+5. Error handling guide
+6. Rate limiting information
+7. SDK examples
+8. Best practices
+
+Format as Markdown with clear sections and examples.
+    `.trim();
+
+    try {
+      const response = await openai.chat.completions.create({
+        model: 'gpt-4',
+        messages: [
+          {
+            role: 'system',
+            content: 'You are an expert API documentation writer. Create comprehensive, clear, and helpful documentation.'
+          },
+          {
+            role: 'user',
+            content: prompt
+          }
+        ],
+        temperature: 0.3,
+        max_tokens: 4000
+      });
+
+      return response.choices[0].message.content;
+
+    } catch (error) {
+      console.error('Error generating documentation with AI:', error);
+      return this.generateFallbackDocumentation(openApiSpec);
+    }
+  }
+
+  /**
+   * Generate fallback documentation
+   */
+  generateFallbackDocumentation(openApiSpec) {
+    let markdown = `# MortgageMatch Pro API Reference\n\n`;
+    markdown += `## Overview\n\n`;
+    markdown += `The MortgageMatch Pro API provides AI-powered mortgage intelligence with advanced analytics and broker portal functionality.\n\n`;
+    markdown += `## Base URL\n\n`;
+    markdown += `- Production: \`https://api.mortgagematch.com\`\n`;
+    markdown += `- Staging: \`https://staging-api.mortgagematch.com\`\n\n`;
+    markdown += `## Authentication\n\n`;
+    markdown += `The API uses JWT token authentication via Supabase.\n\n`;
+    markdown += `## Endpoints\n\n`;
+    
+    for (const [path, methods] of Object.entries(openApiSpec.paths)) {
+      markdown += `### ${path}\n\n`;
+      
+      for (const [method, spec] of Object.entries(methods)) {
+        markdown += `#### ${method.toUpperCase()}\n\n`;
+        markdown += `${spec.summary}\n\n`;
+        
+        if (spec.parameters && spec.parameters.length > 0) {
+          markdown += `**Parameters:**\n\n`;
+          for (const param of spec.parameters) {
+            markdown += `- \`${param.name}\` (${param.schema.type}): ${param.description}\n`;
+          }
+          markdown += `\n`;
         }
         
-        if (endpoint.requestBody) {
+        if (spec.requestBody) {
           markdown += `**Request Body:**\n\n`;
-          markdown += `| Parameter | Type | Required | Description |\n`;
-          markdown += `|-----------|------|----------|-------------|\n`;
-          
-          for (const param of endpoint.requestBody) {
-            markdown += `| \`${param.name}\` | ${param.type} | ${param.required ? 'Yes' : 'No'} | - |\n`;
-          }
-          markdown += '\n';
-        }
-        
-        if (endpoint.responseSchema) {
-          markdown += `**Response Schema:**\n\n`;
           markdown += `\`\`\`json\n`;
           markdown += `{\n`;
-          markdown += `  "success": ${endpoint.responseSchema.success},\n`;
-          markdown += `  "data": ${endpoint.responseSchema.data}\n`;
+          markdown += `  "example": "value"\n`;
           markdown += `}\n`;
           markdown += `\`\`\`\n\n`;
         }
         
-        markdown += `**File:** \`${endpoint.file}\`\n\n`;
-        markdown += '---\n\n';
-      }
-    }
-
-    // Event Types section
-    markdown += `## Event Types\n\n`;
-    
-    const groupedEvents = this.groupEventsByDomain();
-    
-    for (const [domain, events] of Object.entries(groupedEvents)) {
-      markdown += `### ${domain.charAt(0).toUpperCase() + domain.slice(1)} Events\n\n`;
-      
-      for (const event of events) {
-        markdown += `#### \`${event.type}\`\n\n`;
-        markdown += `**Constant:** \`${event.constant}.${event.name}\`\n\n`;
-        markdown += `**File:** \`${event.file}\`\n\n`;
-        markdown += '---\n\n';
-      }
-    }
-
-    // Interfaces section
-    markdown += `## Interfaces\n\n`;
-    
-    const groupedInterfaces = this.groupInterfacesByDomain();
-    
-    for (const [domain, interfaces] of Object.entries(groupedInterfaces)) {
-      markdown += `### ${domain.charAt(0).toUpperCase() + domain.slice(1)} Interfaces\n\n`;
-      
-      for (const interface_ of interfaces) {
-        markdown += `#### \`${interface_.name}\`\n\n`;
-        
-        if (interface_.properties.length > 0) {
-          markdown += `**Properties:**\n\n`;
-          markdown += `| Property | Type | Required | Description |\n`;
-          markdown += `|----------|------|----------|-------------|\n`;
-          
-          for (const prop of interface_.properties) {
-            markdown += `| \`${prop.name}\` | ${prop.type} | ${prop.optional ? 'No' : 'Yes'} | - |\n`;
+        if (spec.responses) {
+          markdown += `**Responses:**\n\n`;
+          for (const [code, response] of Object.entries(spec.responses)) {
+            markdown += `- \`${code}\`: ${response.description}\n`;
           }
-          markdown += '\n';
+          markdown += `\n`;
         }
-        
-        markdown += `**File:** \`${interface_.file}\`\n\n`;
-        markdown += '---\n\n';
       }
     }
-
-    markdown += `## Notes
-
-- This documentation is automatically generated from the source code
-- For the most up-to-date information, refer to the actual implementation files
-- Event types are used for inter-service communication via the event bus
-- All API endpoints return JSON responses with a consistent structure
-
-## Contributing
-
-When adding new API endpoints, event types, or interfaces:
-
-1. Follow the existing naming conventions
-2. Add JSDoc comments for better documentation
-3. Update this reference by running: \`npm run docs:generate\`
-4. Ensure all changes are properly tested
-
----
-
-*Generated by MortgageMatchPro API Reference Generator v1.4.0*
-`;
-
+    
     return markdown;
   }
 
-  groupEndpointsByDomain() {
-    const grouped = {};
+  /**
+   * Save documentation files
+   */
+  async saveDocumentation(documentation, openApiSpec) {
+    // Ensure docs directory exists
+    await fs.mkdir('docs', { recursive: true });
     
-    for (const endpoint of this.apiEndpoints) {
-      const domain = this.getDomainFromPath(endpoint.file);
-      if (!grouped[domain]) {
-        grouped[domain] = [];
-      }
-      grouped[domain].push(endpoint);
-    }
+    // Save API reference
+    await fs.writeFile('docs/api_reference.md', documentation, 'utf8');
+    console.log('📚 API reference saved to docs/api_reference.md');
     
-    return grouped;
+    // Save OpenAPI spec
+    await fs.writeFile('docs/openapi.json', JSON.stringify(openApiSpec, null, 2), 'utf8');
+    console.log('📋 OpenAPI spec saved to docs/openapi.json');
+    
+    // Save endpoint summary
+    const endpointSummary = this.generateEndpointSummary();
+    await fs.writeFile('docs/endpoints.md', endpointSummary, 'utf8');
+    console.log('📡 Endpoint summary saved to docs/endpoints.md');
   }
 
-  groupEventsByDomain() {
-    const grouped = {};
+  /**
+   * Generate endpoint summary
+   */
+  generateEndpointSummary() {
+    let markdown = `# API Endpoints Summary\n\n`;
+    markdown += `Total Endpoints: ${this.apiEndpoints.length}\n\n`;
     
-    for (const event of this.eventTypes) {
-      const domain = this.getDomainFromPath(event.file);
-      if (!grouped[domain]) {
-        grouped[domain] = [];
+    const groupedEndpoints = this.apiEndpoints.reduce((acc, endpoint) => {
+      const tag = endpoint.tags[0] || 'General';
+      if (!acc[tag]) acc[tag] = [];
+      acc[tag].push(endpoint);
+      return acc;
+    }, {});
+    
+    for (const [tag, endpoints] of Object.entries(groupedEndpoints)) {
+      markdown += `## ${tag}\n\n`;
+      
+      for (const endpoint of endpoints) {
+        markdown += `- **${endpoint.method}** \`${endpoint.path}\` - ${endpoint.description}\n`;
       }
-      grouped[domain].push(event);
+      markdown += `\n`;
     }
     
-    return grouped;
-  }
-
-  groupInterfacesByDomain() {
-    const grouped = {};
-    
-    for (const interface_ of this.interfaces) {
-      const domain = this.getDomainFromPath(interface_.file);
-      if (!grouped[domain]) {
-        grouped[domain] = [];
-      }
-      grouped[domain].push(interface_);
-    }
-    
-    return grouped;
-  }
-
-  getDomainFromPath(filePath) {
-    if (filePath.includes('pages/api/')) {
-      const parts = filePath.split('/');
-      const apiIndex = parts.indexOf('api');
-      if (apiIndex < parts.length - 1) {
-        return parts[apiIndex + 1];
-      }
-    }
-    
-    if (filePath.includes('lib/')) {
-      const parts = filePath.split('/');
-      const libIndex = parts.indexOf('lib');
-      if (libIndex < parts.length - 1) {
-        return parts[libIndex + 1];
-      }
-    }
-    
-    return 'general';
+    return markdown;
   }
 }
 
-// Run the generator
-const generator = new APIReferenceGenerator();
-generator.generate().catch(error => {
-  console.error('❌ Generation failed:', error);
-  process.exit(1);
-});
+// CLI usage
+if (import.meta.url === `file://${process.argv[1]}`) {
+  const generator = new APIReferenceGenerator();
+  
+  generator.generateAPIReference()
+    .then((documentation) => {
+      console.log('✅ API reference generated successfully');
+      console.log(`Endpoints: ${generator.apiEndpoints.length}`);
+      console.log(`Data models: ${generator.dataModels.length}`);
+      console.log(`Auth schemes: ${generator.authSchemes.length}`);
+    })
+    .catch((error) => {
+      console.error('❌ Error generating API reference:', error);
+      process.exit(1);
+    });
+}

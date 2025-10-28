@@ -1,0 +1,449 @@
+<svg width="800" height="600" xmlns="http://www.w3.org/2000/svg">
+  <text x="400" y="30" text-anchor="middle" font-size="20" font-weight="bold">MortgageMatch Pro Architecture</text>
+  <text x="20" y="80" font-size="16" font-weight="bold">Frontend</text>
+  <rect x="40" y="110" width="120" height="40" fill="lightblue" stroke="black" stroke-width="1"/>
+  <text x="100" y="135" text-anchor="middle" font-size="12">_app</text>
+  <rect x="40" y="170" width="120" height="40" fill="lightblue" stroke="black" stroke-width="1"/>
+  <text x="100" y="195" text-anchor="middle" font-size="12">login</text>
+  <rect x="40" y="230" width="120" height="40" fill="lightblue" stroke="black" stroke-width="1"/>
+  <text x="100" y="255" text-anchor="middle" font-size="12">callback</text>
+  <rect x="40" y="290" width="120" height="40" fill="lightblue" stroke="black" stroke-width="1"/>
+  <text x="100" y="315" text-anchor="middle" font-size="12">members</text>
+  <rect x="40" y="350" width="120" height="40" fill="lightblue" stroke="black" stroke-width="1"/>
+  <text x="100" y="375" text-anchor="middle" font-size="12">index</text>
+  <rect x="40" y="410" width="120" height="40" fill="lightblue" stroke="black" stroke-width="1"/>
+  <text x="100" y="435" text-anchor="middle" font-size="12">growth</text>
+  <rect x="40" y="470" width="120" height="40" fill="lightblue" stroke="black" stroke-width="1"/>
+  <text x="100" y="495" text-anchor="middle" font-size="12">branding</text>
+  <rect x="40" y="530" width="120" height="40" fill="lightblue" stroke="black" stroke-width="1"/>
+  <text x="100" y="555" text-anchor="middle" font-size="12">textarea</text>
+  <rect x="40" y="590" width="120" height="40" fill="lightblue" stroke="black" stroke-width="1"/>
+  <text x="100" y="615" text-anchor="middle" font-size="12">tabs</text>
+  <rect x="40" y="650" width="120" height="40" fill="lightblue" stroke="black" stroke-width="1"/>
+  <text x="100" y="675" text-anchor="middle" font-size="12">table</text>
+  <rect x="40" y="710" width="120" height="40" fill="lightblue" stroke="black" stroke-width="1"/>
+  <text x="100" y="735" text-anchor="middle" font-size="12">slider</text>
+  <rect x="40" y="770" width="120" height="40" fill="lightblue" stroke="black" stroke-width="1"/>
+  <text x="100" y="795" text-anchor="middle" font-size="12">select</text>
+  <rect x="40" y="830" width="120" height="40" fill="lightblue" stroke="black" stroke-width="1"/>
+  <text x="100" y="855" text-anchor="middle" font-size="12">label</text>
+  <rect x="40" y="890" width="120" height="40" fill="lightblue" stroke="black" stroke-width="1"/>
+  <text x="100" y="915" text-anchor="middle" font-size="12">input</text>
+  <rect x="40" y="950" width="120" height="40" fill="lightblue" stroke="black" stroke-width="1"/>
+  <text x="100" y="975" text-anchor="middle" font-size="12">dialog</text>
+  <rect x="40" y="1010" width="120" height="40" fill="lightblue" stroke="black" stroke-width="1"/>
+  <text x="100" y="1035" text-anchor="middle" font-size="12">card</text>
+  <rect x="40" y="1070" width="120" height="40" fill="lightblue" stroke="black" stroke-width="1"/>
+  <text x="100" y="1095" text-anchor="middle" font-size="12">button</text>
+  <rect x="40" y="1130" width="120" height="40" fill="lightblue" stroke="black" stroke-width="1"/>
+  <text x="100" y="1155" text-anchor="middle" font-size="12">badge</text>
+  <rect x="40" y="1190" width="120" height="40" fill="lightblue" stroke="black" stroke-width="1"/>
+  <text x="100" y="1215" text-anchor="middle" font-size="12">LoadingStates</text>
+  <rect x="40" y="1250" width="120" height="40" fill="lightblue" stroke="black" stroke-width="1"/>
+  <text x="100" y="1275" text-anchor="middle" font-size="12">ErrorStates</text>
+  <rect x="40" y="1310" width="120" height="40" fill="lightblue" stroke="black" stroke-width="1"/>
+  <text x="100" y="1335" text-anchor="middle" font-size="12">EnhancedInput</text>
+  <rect x="40" y="1370" width="120" height="40" fill="lightblue" stroke="black" stroke-width="1"/>
+  <text x="100" y="1395" text-anchor="middle" font-size="12">EnhancedButton</text>
+  <rect x="40" y="1430" width="120" height="40" fill="lightblue" stroke="black" stroke-width="1"/>
+  <text x="100" y="1455" text-anchor="middle" font-size="12">ConfidenceIndicator</text>
+  <rect x="40" y="1490" width="120" height="40" fill="lightblue" stroke="black" stroke-width="1"/>
+  <text x="100" y="1515" text-anchor="middle" font-size="12">MembersManagement</text>
+  <rect x="40" y="1550" width="120" height="40" fill="lightblue" stroke="black" stroke-width="1"/>
+  <text x="100" y="1575" text-anchor="middle" font-size="12">BrandingManagement</text>
+  <rect x="40" y="1610" width="120" height="40" fill="lightblue" stroke="black" stroke-width="1"/>
+  <text x="100" y="1635" text-anchor="middle" font-size="12">AdminLayout</text>
+  <rect x="40" y="1670" width="120" height="40" fill="lightblue" stroke="black" stroke-width="1"/>
+  <text x="100" y="1695" text-anchor="middle" font-size="12">GrowthDashboard</text>
+  <rect x="40" y="1730" width="120" height="40" fill="lightblue" stroke="black" stroke-width="1"/>
+  <text x="100" y="1755" text-anchor="middle" font-size="12">page</text>
+  <text x="20" y="1810" font-size="16" font-weight="bold">Backend</text>
+  <rect x="40" y="1840" width="120" height="40" fill="lightblue" stroke="black" stroke-width="1"/>
+  <text x="100" y="1865" text-anchor="middle" font-size="12">scenarios</text>
+  <rect x="40" y="1900" width="120" height="40" fill="lightblue" stroke="black" stroke-width="1"/>
+  <text x="100" y="1925" text-anchor="middle" font-size="12">scenario-simulations</text>
+  <rect x="40" y="1960" width="120" height="40" fill="lightblue" stroke="black" stroke-width="1"/>
+  <text x="100" y="1985" text-anchor="middle" font-size="12">resource-test</text>
+  <rect x="40" y="2020" width="120" height="40" fill="lightblue" stroke="black" stroke-width="1"/>
+  <text x="100" y="2045" text-anchor="middle" font-size="12">refinance-watchlist</text>
+  <rect x="40" y="2080" width="120" height="40" fill="lightblue" stroke="black" stroke-width="1"/>
+  <text x="100" y="2105" text-anchor="middle" font-size="12">rates</text>
+  <rect x="40" y="2140" width="120" height="40" fill="lightblue" stroke="black" stroke-width="1"/>
+  <text x="100" y="2165" text-anchor="middle" font-size="12">rate-limit-test</text>
+  <rect x="40" y="2200" width="120" height="40" fill="lightblue" stroke="black" stroke-width="1"/>
+  <text x="100" y="2225" text-anchor="middle" font-size="12">prescriptive-recommendations</text>
+  <rect x="40" y="2260" width="120" height="40" fill="lightblue" stroke="black" stroke-width="1"/>
+  <text x="100" y="2285" text-anchor="middle" font-size="12">predictive-insights</text>
+  <rect x="40" y="2320" width="120" height="40" fill="lightblue" stroke="black" stroke-width="1"/>
+  <text x="100" y="2345" text-anchor="middle" font-size="12">prediction-alerts</text>
+  <rect x="40" y="2380" width="120" height="40" fill="lightblue" stroke="black" stroke-width="1"/>
+  <text x="100" y="2405" text-anchor="middle" font-size="12">performance-test</text>
+  <rect x="40" y="2440" width="120" height="40" fill="lightblue" stroke="black" stroke-width="1"/>
+  <text x="100" y="2465" text-anchor="middle" font-size="12">optimization-test</text>
+  <rect x="40" y="2500" width="120" height="40" fill="lightblue" stroke="black" stroke-width="1"/>
+  <text x="100" y="2525" text-anchor="middle" font-size="12">leads</text>
+  <rect x="40" y="2560" width="120" height="40" fill="lightblue" stroke="black" stroke-width="1"/>
+  <text x="100" y="2585" text-anchor="middle" font-size="12">healthz</text>
+  <rect x="40" y="2620" width="120" height="40" fill="lightblue" stroke="black" stroke-width="1"/>
+  <text x="100" y="2645" text-anchor="middle" font-size="12">health</text>
+  <rect x="40" y="2680" width="120" height="40" fill="lightblue" stroke="black" stroke-width="1"/>
+  <text x="100" y="2705" text-anchor="middle" font-size="12">graphql</text>
+  <rect x="40" y="2740" width="120" height="40" fill="lightblue" stroke="black" stroke-width="1"/>
+  <text x="100" y="2765" text-anchor="middle" font-size="12">forecasts</text>
+  <rect x="40" y="2800" width="120" height="40" fill="lightblue" stroke="black" stroke-width="1"/>
+  <text x="100" y="2825" text-anchor="middle" font-size="12">feedback</text>
+  <rect x="40" y="2860" width="120" height="40" fill="lightblue" stroke="black" stroke-width="1"/>
+  <text x="100" y="2885" text-anchor="middle" font-size="12">cost-optimization-test</text>
+  <rect x="40" y="2920" width="120" height="40" fill="lightblue" stroke="black" stroke-width="1"/>
+  <text x="100" y="2945" text-anchor="middle" font-size="12">calculate</text>
+  <rect x="40" y="2980" width="120" height="40" fill="lightblue" stroke="black" stroke-width="1"/>
+  <text x="100" y="3005" text-anchor="middle" font-size="12">affordability</text>
+  <rect x="40" y="3040" width="120" height="40" fill="lightblue" stroke="black" stroke-width="1"/>
+  <text x="100" y="3065" text-anchor="middle" font-size="12">verify</text>
+  <rect x="40" y="3100" width="120" height="40" fill="lightblue" stroke="black" stroke-width="1"/>
+  <text x="100" y="3125" text-anchor="middle" font-size="12">stripe</text>
+  <rect x="40" y="3160" width="120" height="40" fill="lightblue" stroke="black" stroke-width="1"/>
+  <text x="100" y="3185" text-anchor="middle" font-size="12">scenarios</text>
+  <rect x="40" y="3220" width="120" height="40" fill="lightblue" stroke="black" stroke-width="1"/>
+  <text x="100" y="3245" text-anchor="middle" font-size="12">reports</text>
+  <rect x="40" y="3280" width="120" height="40" fill="lightblue" stroke="black" stroke-width="1"/>
+  <text x="100" y="3305" text-anchor="middle" font-size="12">rates</text>
+  <rect x="40" y="3340" width="120" height="40" fill="lightblue" stroke="black" stroke-width="1"/>
+  <text x="100" y="3365" text-anchor="middle" font-size="12">matches</text>
+  <rect x="40" y="3400" width="120" height="40" fill="lightblue" stroke="black" stroke-width="1"/>
+  <text x="100" y="3425" text-anchor="middle" font-size="12">scheduled</text>
+  <rect x="40" y="3460" width="120" height="40" fill="lightblue" stroke="black" stroke-width="1"/>
+  <text x="100" y="3485" text-anchor="middle" font-size="12">metrics</text>
+  <rect x="40" y="3520" width="120" height="40" fill="lightblue" stroke="black" stroke-width="1"/>
+  <text x="100" y="3545" text-anchor="middle" font-size="12">index</text>
+  <rect x="40" y="3580" width="120" height="40" fill="lightblue" stroke="black" stroke-width="1"/>
+  <text x="100" y="3605" text-anchor="middle" font-size="12">export</text>
+  <rect x="40" y="3640" width="120" height="40" fill="lightblue" stroke="black" stroke-width="1"/>
+  <text x="100" y="3665" text-anchor="middle" font-size="12">report</text>
+  <rect x="40" y="3700" width="120" height="40" fill="lightblue" stroke="black" stroke-width="1"/>
+  <text x="100" y="3725" text-anchor="middle" font-size="12">metrics</text>
+  <rect x="40" y="3760" width="120" height="40" fill="lightblue" stroke="black" stroke-width="1"/>
+  <text x="100" y="3785" text-anchor="middle" font-size="12">incidents</text>
+  <rect x="40" y="3820" width="120" height="40" fill="lightblue" stroke="black" stroke-width="1"/>
+  <text x="100" y="3845" text-anchor="middle" font-size="12">health</text>
+  <rect x="40" y="3880" width="120" height="40" fill="lightblue" stroke="black" stroke-width="1"/>
+  <text x="100" y="3905" text-anchor="middle" font-size="12">alerts</text>
+  <rect x="40" y="3940" width="120" height="40" fill="lightblue" stroke="black" stroke-width="1"/>
+  <text x="100" y="3965" text-anchor="middle" font-size="12">dashboard</text>
+  <rect x="40" y="4000" width="120" height="40" fill="lightblue" stroke="black" stroke-width="1"/>
+  <text x="100" y="4025" text-anchor="middle" font-size="12">webhooks</text>
+  <rect x="40" y="4060" width="120" height="40" fill="lightblue" stroke="black" stroke-width="1"/>
+  <text x="100" y="4085" text-anchor="middle" font-size="12">members</text>
+  <rect x="40" y="4120" width="120" height="40" fill="lightblue" stroke="black" stroke-width="1"/>
+  <text x="100" y="4145" text-anchor="middle" font-size="12">dashboard</text>
+  <rect x="40" y="4180" width="120" height="40" fill="lightblue" stroke="black" stroke-width="1"/>
+  <text x="100" y="4205" text-anchor="middle" font-size="12">branding</text>
+  <rect x="40" y="4240" width="120" height="40" fill="lightblue" stroke="black" stroke-width="1"/>
+  <text x="100" y="4265" text-anchor="middle" font-size="12">billing</text>
+  <rect x="40" y="4300" width="120" height="40" fill="lightblue" stroke="black" stroke-width="1"/>
+  <text x="100" y="4325" text-anchor="middle" font-size="12">api-keys</text>
+  <rect x="40" y="4360" width="120" height="40" fill="lightblue" stroke="black" stroke-width="1"/>
+  <text x="100" y="4385" text-anchor="middle" font-size="12">create-intent</text>
+  <rect x="40" y="4420" width="120" height="40" fill="lightblue" stroke="black" stroke-width="1"/>
+  <text x="100" y="4445" text-anchor="middle" font-size="12">connect</text>
+  <rect x="40" y="4480" width="120" height="40" fill="lightblue" stroke="black" stroke-width="1"/>
+  <text x="100" y="4505" text-anchor="middle" font-size="12">generate</text>
+  <rect x="40" y="4540" width="120" height="40" fill="lightblue" stroke="black" stroke-width="1"/>
+  <text x="100" y="4565" text-anchor="middle" font-size="12">[leadId]</text>
+  <rect x="40" y="4600" width="120" height="40" fill="lightblue" stroke="black" stroke-width="1"/>
+  <text x="100" y="4625" text-anchor="middle" font-size="12">search-ai</text>
+  <rect x="40" y="4660" width="120" height="40" fill="lightblue" stroke="black" stroke-width="1"/>
+  <text x="100" y="4685" text-anchor="middle" font-size="12">utils</text>
+  <rect x="40" y="4720" width="120" height="40" fill="lightblue" stroke="black" stroke-width="1"/>
+  <text x="100" y="4745" text-anchor="middle" font-size="12">supabase</text>
+  <rect x="40" y="4780" width="120" height="40" fill="lightblue" stroke="black" stroke-width="1"/>
+  <text x="100" y="4805" text-anchor="middle" font-size="12">stripe</text>
+  <rect x="40" y="4840" width="120" height="40" fill="lightblue" stroke="black" stroke-width="1"/>
+  <text x="100" y="4865" text-anchor="middle" font-size="12">security</text>
+  <rect x="40" y="4900" width="120" height="40" fill="lightblue" stroke="black" stroke-width="1"/>
+  <text x="100" y="4925" text-anchor="middle" font-size="12">security-enhanced</text>
+  <rect x="40" y="4960" width="120" height="40" fill="lightblue" stroke="black" stroke-width="1"/>
+  <text x="100" y="4985" text-anchor="middle" font-size="12">scenario-types</text>
+  <rect x="40" y="5020" width="120" height="40" fill="lightblue" stroke="black" stroke-width="1"/>
+  <text x="100" y="5045" text-anchor="middle" font-size="12">scenario-manager</text>
+  <rect x="40" y="5080" width="120" height="40" fill="lightblue" stroke="black" stroke-width="1"/>
+  <text x="100" y="5105" text-anchor="middle" font-size="12">realtime-service</text>
+  <rect x="40" y="5140" width="120" height="40" fill="lightblue" stroke="black" stroke-width="1"/>
+  <text x="100" y="5165" text-anchor="middle" font-size="12">rate-apis</text>
+  <rect x="40" y="5200" width="120" height="40" fill="lightblue" stroke="black" stroke-width="1"/>
+  <text x="100" y="5225" text-anchor="middle" font-size="12">post-launch-integration</text>
+  <rect x="40" y="5260" width="120" height="40" fill="lightblue" stroke="black" stroke-width="1"/>
+  <text x="100" y="5285" text-anchor="middle" font-size="12">performance-monitoring</text>
+  <rect x="40" y="5320" width="120" height="40" fill="lightblue" stroke="black" stroke-width="1"/>
+  <text x="100" y="5345" text-anchor="middle" font-size="12">performance-monitor</text>
+  <rect x="40" y="5380" width="120" height="40" fill="lightblue" stroke="black" stroke-width="1"/>
+  <text x="100" y="5405" text-anchor="middle" font-size="12">openai</text>
+  <rect x="40" y="5440" width="120" height="40" fill="lightblue" stroke="black" stroke-width="1"/>
+  <text x="100" y="5465" text-anchor="middle" font-size="12">openai-enhanced</text>
+  <rect x="40" y="5500" width="120" height="40" fill="lightblue" stroke="black" stroke-width="1"/>
+  <text x="100" y="5525" text-anchor="middle" font-size="12">monitoring</text>
+  <rect x="40" y="5560" width="120" height="40" fill="lightblue" stroke="black" stroke-width="1"/>
+  <text x="100" y="5585" text-anchor="middle" font-size="12">monetization</text>
+  <rect x="40" y="5620" width="120" height="40" fill="lightblue" stroke="black" stroke-width="1"/>
+  <text x="100" y="5645" text-anchor="middle" font-size="12">lead-qualification</text>
+  <rect x="40" y="5680" width="120" height="40" fill="lightblue" stroke="black" stroke-width="1"/>
+  <text x="100" y="5705" text-anchor="middle" font-size="12">lead-monitoring</text>
+  <rect x="40" y="5740" width="120" height="40" fill="lightblue" stroke="black" stroke-width="1"/>
+  <text x="100" y="5765" text-anchor="middle" font-size="12">intent-matching</text>
+  <rect x="40" y="5800" width="120" height="40" fill="lightblue" stroke="black" stroke-width="1"/>
+  <text x="100" y="5825" text-anchor="middle" font-size="12">index</text>
+  <rect x="40" y="5860" width="120" height="40" fill="lightblue" stroke="black" stroke-width="1"/>
+  <text x="100" y="5885" text-anchor="middle" font-size="12">health-check</text>
+  <rect x="40" y="5920" width="120" height="40" fill="lightblue" stroke="black" stroke-width="1"/>
+  <text x="100" y="5945" text-anchor="middle" font-size="12">feedback-system</text>
+  <rect x="40" y="5980" width="120" height="40" fill="lightblue" stroke="black" stroke-width="1"/>
+  <text x="100" y="6005" text-anchor="middle" font-size="12">export-service</text>
+  <rect x="40" y="6040" width="120" height="40" fill="lightblue" stroke="black" stroke-width="1"/>
+  <text x="100" y="6065" text-anchor="middle" font-size="12">explainability-agent</text>
+  <rect x="40" y="6100" width="120" height="40" fill="lightblue" stroke="black" stroke-width="1"/>
+  <text x="100" y="6125" text-anchor="middle" font-size="12">error-handling</text>
+  <rect x="40" y="6160" width="120" height="40" fill="lightblue" stroke="black" stroke-width="1"/>
+  <text x="100" y="6185" text-anchor="middle" font-size="12">database.types</text>
+  <rect x="40" y="6220" width="120" height="40" fill="lightblue" stroke="black" stroke-width="1"/>
+  <text x="100" y="6245" text-anchor="middle" font-size="12">database-service</text>
+  <rect x="40" y="6280" width="120" height="40" fill="lightblue" stroke="black" stroke-width="1"/>
+  <text x="100" y="6305" text-anchor="middle" font-size="12">compliance</text>
+  <rect x="40" y="6340" width="120" height="40" fill="lightblue" stroke="black" stroke-width="1"/>
+  <text x="100" y="6365" text-anchor="middle" font-size="12">broker-notifications</text>
+  <rect x="40" y="6400" width="120" height="40" fill="lightblue" stroke="black" stroke-width="1"/>
+  <text x="100" y="6425" text-anchor="middle" font-size="12">auth-service</text>
+  <rect x="40" y="6460" width="120" height="40" fill="lightblue" stroke="black" stroke-width="1"/>
+  <text x="100" y="6485" text-anchor="middle" font-size="12">api-service</text>
+  <rect x="40" y="6520" width="120" height="40" fill="lightblue" stroke="black" stroke-width="1"/>
+  <text x="100" y="6545" text-anchor="middle" font-size="12">analytics</text>
+  <rect x="40" y="6580" width="120" height="40" fill="lightblue" stroke="black" stroke-width="1"/>
+  <text x="100" y="6605" text-anchor="middle" font-size="12">alerting</text>
+  <rect x="40" y="6640" width="120" height="40" fill="lightblue" stroke="black" stroke-width="1"/>
+  <text x="100" y="6665" text-anchor="middle" font-size="12">theme-service</text>
+  <rect x="40" y="6700" width="120" height="40" fill="lightblue" stroke="black" stroke-width="1"/>
+  <text x="100" y="6725" text-anchor="middle" font-size="12">webhook-service</text>
+  <rect x="40" y="6760" width="120" height="40" fill="lightblue" stroke="black" stroke-width="1"/>
+  <text x="100" y="6785" text-anchor="middle" font-size="12">schema-validator</text>
+  <rect x="40" y="6820" width="120" height="40" fill="lightblue" stroke="black" stroke-width="1"/>
+  <text x="100" y="6845" text-anchor="middle" font-size="12">tenancy</text>
+  <rect x="40" y="6880" width="120" height="40" fill="lightblue" stroke="black" stroke-width="1"/>
+  <text x="100" y="6905" text-anchor="middle" font-size="12">billing</text>
+  <rect x="40" y="6940" width="120" height="40" fill="lightblue" stroke="black" stroke-width="1"/>
+  <text x="100" y="6965" text-anchor="middle" font-size="12">cross-border-sandbox</text>
+  <rect x="40" y="7000" width="120" height="40" fill="lightblue" stroke="black" stroke-width="1"/>
+  <text x="100" y="7025" text-anchor="middle" font-size="12">scoping</text>
+  <rect x="40" y="7060" width="120" height="40" fill="lightblue" stroke="black" stroke-width="1"/>
+  <text x="100" y="7085" text-anchor="middle" font-size="12">rbac</text>
+  <rect x="40" y="7120" width="120" height="40" fill="lightblue" stroke="black" stroke-width="1"/>
+  <text x="100" y="7145" text-anchor="middle" font-size="12">organization-service</text>
+  <rect x="40" y="7180" width="120" height="40" fill="lightblue" stroke="black" stroke-width="1"/>
+  <text x="100" y="7205" text-anchor="middle" font-size="12">context</text>
+  <rect x="40" y="7240" width="120" height="40" fill="lightblue" stroke="black" stroke-width="1"/>
+  <text x="100" y="7265" text-anchor="middle" font-size="12">api-key-service</text>
+  <rect x="40" y="7300" width="120" height="40" fill="lightblue" stroke="black" stroke-width="1"/>
+  <text x="100" y="7325" text-anchor="middle" font-size="12">DataEthics</text>
+  <rect x="40" y="7360" width="120" height="40" fill="lightblue" stroke="black" stroke-width="1"/>
+  <text x="100" y="7385" text-anchor="middle" font-size="12">RetryService</text>
+  <rect x="40" y="7420" width="120" height="40" fill="lightblue" stroke="black" stroke-width="1"/>
+  <text x="100" y="7445" text-anchor="middle" font-size="12">RequestDeduplicationService</text>
+  <rect x="40" y="7480" width="120" height="40" fill="lightblue" stroke="black" stroke-width="1"/>
+  <text x="100" y="7505" text-anchor="middle" font-size="12">CircuitBreakerService</text>
+  <rect x="40" y="7540" width="120" height="40" fill="lightblue" stroke="black" stroke-width="1"/>
+  <text x="100" y="7565" text-anchor="middle" font-size="12">distributed-rate-limiter</text>
+  <rect x="40" y="7600" width="120" height="40" fill="lightblue" stroke="black" stroke-width="1"/>
+  <text x="100" y="7625" text-anchor="middle" font-size="12">profiling-suite</text>
+  <rect x="40" y="7660" width="120" height="40" fill="lightblue" stroke="black" stroke-width="1"/>
+  <text x="100" y="7685" text-anchor="middle" font-size="12">connection-pool</text>
+  <rect x="40" y="7720" width="120" height="40" fill="lightblue" stroke="black" stroke-width="1"/>
+  <text x="100" y="7745" text-anchor="middle" font-size="12">caching-system</text>
+  <rect x="40" y="7780" width="120" height="40" fill="lightblue" stroke="black" stroke-width="1"/>
+  <text x="100" y="7805" text-anchor="middle" font-size="12">resource-manager</text>
+  <rect x="40" y="7840" width="120" height="40" fill="lightblue" stroke="black" stroke-width="1"/>
+  <text x="100" y="7865" text-anchor="middle" font-size="12">performance-monitor</text>
+  <rect x="40" y="7900" width="120" height="40" fill="lightblue" stroke="black" stroke-width="1"/>
+  <text x="100" y="7925" text-anchor="middle" font-size="12">optimization-manager</text>
+  <rect x="40" y="7960" width="120" height="40" fill="lightblue" stroke="black" stroke-width="1"/>
+  <text x="100" y="7985" text-anchor="middle" font-size="12">cost-optimizer</text>
+  <rect x="40" y="8020" width="120" height="40" fill="lightblue" stroke="black" stroke-width="1"/>
+  <text x="100" y="8045" text-anchor="middle" font-size="12">sre-metrics</text>
+  <rect x="40" y="8080" width="120" height="40" fill="lightblue" stroke="black" stroke-width="1"/>
+  <text x="100" y="8105" text-anchor="middle" font-size="12">operational-readiness</text>
+  <rect x="40" y="8140" width="120" height="40" fill="lightblue" stroke="black" stroke-width="1"/>
+  <text x="100" y="8165" text-anchor="middle" font-size="12">load-balancer</text>
+  <rect x="40" y="8200" width="120" height="40" fill="lightblue" stroke="black" stroke-width="1"/>
+  <text x="100" y="8225" text-anchor="middle" font-size="12">telemetry</text>
+  <rect x="40" y="8260" width="120" height="40" fill="lightblue" stroke="black" stroke-width="1"/>
+  <text x="100" y="8285" text-anchor="middle" font-size="12">monitoring</text>
+  <rect x="40" y="8320" width="120" height="40" fill="lightblue" stroke="black" stroke-width="1"/>
+  <text x="100" y="8345" text-anchor="middle" font-size="12">health-check</text>
+  <rect x="40" y="8380" width="120" height="40" fill="lightblue" stroke="black" stroke-width="1"/>
+  <text x="100" y="8405" text-anchor="middle" font-size="12">EnhancedMetrics</text>
+  <rect x="40" y="8440" width="120" height="40" fill="lightblue" stroke="black" stroke-width="1"/>
+  <text x="100" y="8465" text-anchor="middle" font-size="12">marketing-service</text>
+  <rect x="40" y="8500" width="120" height="40" fill="lightblue" stroke="black" stroke-width="1"/>
+  <text x="100" y="8525" text-anchor="middle" font-size="12">security-compliance</text>
+  <rect x="40" y="8560" width="120" height="40" fill="lightblue" stroke="black" stroke-width="1"/>
+  <text x="100" y="8585" text-anchor="middle" font-size="12">real-estate-apis</text>
+  <rect x="40" y="8620" width="120" height="40" fill="lightblue" stroke="black" stroke-width="1"/>
+  <text x="100" y="8645" text-anchor="middle" font-size="12">programmable-banking</text>
+  <rect x="40" y="8680" width="120" height="40" fill="lightblue" stroke="black" stroke-width="1"/>
+  <text x="100" y="8705" text-anchor="middle" font-size="12">open-banking</text>
+  <rect x="40" y="8740" width="120" height="40" fill="lightblue" stroke="black" stroke-width="1"/>
+  <text x="100" y="8765" text-anchor="middle" font-size="12">multi-region-api-governance</text>
+  <rect x="40" y="8800" width="120" height="40" fill="lightblue" stroke="black" stroke-width="1"/>
+  <text x="100" y="8825" text-anchor="middle" font-size="12">global-payment-rails</text>
+  <rect x="40" y="8860" width="120" height="40" fill="lightblue" stroke="black" stroke-width="1"/>
+  <text x="100" y="8885" text-anchor="middle" font-size="12">embedded-payments</text>
+  <rect x="40" y="8920" width="120" height="40" fill="lightblue" stroke="black" stroke-width="1"/>
+  <text x="100" y="8945" text-anchor="middle" font-size="12">api-marketplace</text>
+  <rect x="40" y="8980" width="120" height="40" fill="lightblue" stroke="black" stroke-width="1"/>
+  <text x="100" y="9005" text-anchor="middle" font-size="12">analytics-billing</text>
+  <rect x="40" y="9040" width="120" height="40" fill="lightblue" stroke="black" stroke-width="1"/>
+  <text x="100" y="9065" text-anchor="middle" font-size="12">ai-pricing</text>
+  <rect x="40" y="9100" width="120" height="40" fill="lightblue" stroke="black" stroke-width="1"/>
+  <text x="100" y="9125" text-anchor="middle" font-size="12">useApi</text>
+  <rect x="40" y="9160" width="120" height="40" fill="lightblue" stroke="black" stroke-width="1"/>
+  <text x="100" y="9185" text-anchor="middle" font-size="12">schema</text>
+  <rect x="40" y="9220" width="120" height="40" fill="lightblue" stroke="black" stroke-width="1"/>
+  <text x="100" y="9245" text-anchor="middle" font-size="12">context</text>
+  <rect x="40" y="9280" width="120" height="40" fill="lightblue" stroke="black" stroke-width="1"/>
+  <text x="100" y="9305" text-anchor="middle" font-size="12">FeatureFlags</text>
+  <rect x="40" y="9340" width="120" height="40" fill="lightblue" stroke="black" stroke-width="1"/>
+  <text x="100" y="9365" text-anchor="middle" font-size="12">personalization-engine</text>
+  <rect x="40" y="9400" width="120" height="40" fill="lightblue" stroke="black" stroke-width="1"/>
+  <text x="100" y="9425" text-anchor="middle" font-size="12">llm-experimentation</text>
+  <rect x="40" y="9460" width="120" height="40" fill="lightblue" stroke="black" stroke-width="1"/>
+  <text x="100" y="9485" text-anchor="middle" font-size="12">experiment-framework</text>
+  <rect x="40" y="9520" width="120" height="40" fill="lightblue" stroke="black" stroke-width="1"/>
+  <text x="100" y="9545" text-anchor="middle" font-size="12">compliance-controls</text>
+  <rect x="40" y="9580" width="120" height="40" fill="lightblue" stroke="black" stroke-width="1"/>
+  <text x="100" y="9605" text-anchor="middle" font-size="12">ai-growth-agents</text>
+  <rect x="40" y="9640" width="120" height="40" fill="lightblue" stroke="black" stroke-width="1"/>
+  <text x="100" y="9665" text-anchor="middle" font-size="12">ab-testing</text>
+  <rect x="40" y="9700" width="120" height="40" fill="lightblue" stroke="black" stroke-width="1"/>
+  <text x="100" y="9725" text-anchor="middle" font-size="12">ErrorService</text>
+  <rect x="40" y="9760" width="120" height="40" fill="lightblue" stroke="black" stroke-width="1"/>
+  <text x="100" y="9785" text-anchor="middle" font-size="12">customer-health-scoring</text>
+  <rect x="40" y="9820" width="120" height="40" fill="lightblue" stroke="black" stroke-width="1"/>
+  <text x="100" y="9845" text-anchor="middle" font-size="12">ProfileContext</text>
+  <rect x="40" y="9880" width="120" height="40" fill="lightblue" stroke="black" stroke-width="1"/>
+  <text x="100" y="9905" text-anchor="middle" font-size="12">keys</text>
+  <rect x="40" y="9940" width="120" height="40" fill="lightblue" stroke="black" stroke-width="1"/>
+  <text x="100" y="9965" text-anchor="middle" font-size="12">data-retention</text>
+  <rect x="40" y="10000" width="120" height="40" fill="lightblue" stroke="black" stroke-width="1"/>
+  <text x="100" y="10025" text-anchor="middle" font-size="12">ModelCacheService</text>
+  <rect x="40" y="10060" width="120" height="40" fill="lightblue" stroke="black" stroke-width="1"/>
+  <text x="100" y="10085" text-anchor="middle" font-size="12">CacheService</text>
+  <rect x="40" y="10120" width="120" height="40" fill="lightblue" stroke="black" stroke-width="1"/>
+  <text x="100" y="10145" text-anchor="middle" font-size="12">BudgetGuardService</text>
+  <rect x="40" y="10180" width="120" height="40" fill="lightblue" stroke="black" stroke-width="1"/>
+  <text x="100" y="10205" text-anchor="middle" font-size="12">metering-service</text>
+  <rect x="40" y="10240" width="120" height="40" fill="lightblue" stroke="black" stroke-width="1"/>
+  <text x="100" y="10265" text-anchor="middle" font-size="12">billing-service</text>
+  <rect x="40" y="10300" width="120" height="40" fill="lightblue" stroke="black" stroke-width="1"/>
+  <text x="100" y="10325" text-anchor="middle" font-size="12">report-scheduler</text>
+  <rect x="40" y="10360" width="120" height="40" fill="lightblue" stroke="black" stroke-width="1"/>
+  <text x="100" y="10385" text-anchor="middle" font-size="12">analytics-service</text>
+  <rect x="40" y="10420" width="120" height="40" fill="lightblue" stroke="black" stroke-width="1"/>
+  <text x="100" y="10445" text-anchor="middle" font-size="12">request-manager</text>
+  <rect x="40" y="10480" width="120" height="40" fill="lightblue" stroke="black" stroke-width="1"/>
+  <text x="100" y="10505" text-anchor="middle" font-size="12">public-api-service</text>
+  <rect x="40" y="10540" width="120" height="40" fill="lightblue" stroke="black" stroke-width="1"/>
+  <text x="100" y="10565" text-anchor="middle" font-size="12">endpoints</text>
+  <rect x="40" y="10600" width="120" height="40" fill="lightblue" stroke="black" stroke-width="1"/>
+  <text x="100" y="10625" text-anchor="middle" font-size="12">api-service</text>
+  <rect x="40" y="10660" width="120" height="40" fill="lightblue" stroke="black" stroke-width="1"/>
+  <text x="100" y="10685" text-anchor="middle" font-size="12">cost-governance-service</text>
+  <rect x="40" y="10720" width="120" height="40" fill="lightblue" stroke="black" stroke-width="1"/>
+  <text x="100" y="10745" text-anchor="middle" font-size="12">ModelRoutingService</text>
+  <rect x="40" y="10780" width="120" height="40" fill="lightblue" stroke="black" stroke-width="1"/>
+  <text x="100" y="10805" text-anchor="middle" font-size="12">ExplainabilityService</text>
+  <rect x="40" y="10840" width="120" height="40" fill="lightblue" stroke="black" stroke-width="1"/>
+  <text x="100" y="10865" text-anchor="middle" font-size="12">EnhancedPromptTemplates</text>
+  <rect x="40" y="10900" width="120" height="40" fill="lightblue" stroke="black" stroke-width="1"/>
+  <text x="100" y="10925" text-anchor="middle" font-size="12">AdaptivePrompting</text>
+  <rect x="40" y="10960" width="120" height="40" fill="lightblue" stroke="black" stroke-width="1"/>
+  <text x="100" y="10985" text-anchor="middle" font-size="12">workflow-automation-agent</text>
+  <rect x="40" y="11020" width="120" height="40" fill="lightblue" stroke="black" stroke-width="1"/>
+  <text x="100" y="11045" text-anchor="middle" font-size="12">welcome-flow-agent</text>
+  <rect x="40" y="11080" width="120" height="40" fill="lightblue" stroke="black" stroke-width="1"/>
+  <text x="100" y="11105" text-anchor="middle" font-size="12">treasury-risk-agent</text>
+  <rect x="40" y="11140" width="120" height="40" fill="lightblue" stroke="black" stroke-width="1"/>
+  <text x="100" y="11165" text-anchor="middle" font-size="12">sustainable-products-agent</text>
+  <rect x="40" y="11200" width="120" height="40" fill="lightblue" stroke="black" stroke-width="1"/>
+  <text x="100" y="11225" text-anchor="middle" font-size="12">scenario-simulator</text>
+  <rect x="40" y="11260" width="120" height="40" fill="lightblue" stroke="black" stroke-width="1"/>
+  <text x="100" y="11285" text-anchor="middle" font-size="12">retainbot-agent</text>
+  <rect x="40" y="11320" width="120" height="40" fill="lightblue" stroke="black" stroke-width="1"/>
+  <text x="100" y="11345" text-anchor="middle" font-size="12">regtech-agent</text>
+  <rect x="40" y="11380" width="120" height="40" fill="lightblue" stroke="black" stroke-width="1"/>
+  <text x="100" y="11405" text-anchor="middle" font-size="12">refinance-agent</text>
+  <rect x="40" y="11440" width="120" height="40" fill="lightblue" stroke="black" stroke-width="1"/>
+  <text x="100" y="11465" text-anchor="middle" font-size="12">prescriptive-agent</text>
+  <rect x="40" y="11500" width="120" height="40" fill="lightblue" stroke="black" stroke-width="1"/>
+  <text x="100" y="11525" text-anchor="middle" font-size="12">predictive-orchestrator</text>
+  <rect x="40" y="11560" width="120" height="40" fill="lightblue" stroke="black" stroke-width="1"/>
+  <text x="100" y="11585" text-anchor="middle" font-size="12">openai-agent-sdk</text>
+  <rect x="40" y="11620" width="120" height="40" fill="lightblue" stroke="black" stroke-width="1"/>
+  <text x="100" y="11645" text-anchor="middle" font-size="12">green-score-agent</text>
+  <rect x="40" y="11680" width="120" height="40" fill="lightblue" stroke="black" stroke-width="1"/>
+  <text x="100" y="11705" text-anchor="middle" font-size="12">global-compliance-agent</text>
+  <rect x="40" y="11740" width="120" height="40" fill="lightblue" stroke="black" stroke-width="1"/>
+  <text x="100" y="11765" text-anchor="middle" font-size="12">forecasting-agent</text>
+  <rect x="40" y="11800" width="120" height="40" fill="lightblue" stroke="black" stroke-width="1"/>
+  <text x="100" y="11825" text-anchor="middle" font-size="12">explainability-agent</text>
+  <rect x="40" y="11860" width="120" height="40" fill="lightblue" stroke="black" stroke-width="1"/>
+  <text x="100" y="11885" text-anchor="middle" font-size="12">enhanced-explainability-agent</text>
+  <rect x="40" y="11920" width="120" height="40" fill="lightblue" stroke="black" stroke-width="1"/>
+  <text x="100" y="11945" text-anchor="middle" font-size="12">document-ai-agent</text>
+  <rect x="40" y="11980" width="120" height="40" fill="lightblue" stroke="black" stroke-width="1"/>
+  <text x="100" y="12005" text-anchor="middle" font-size="12">data-ingestion-agent</text>
+  <rect x="40" y="12040" width="120" height="40" fill="lightblue" stroke="black" stroke-width="1"/>
+  <text x="100" y="12065" text-anchor="middle" font-size="12">LenderIntegrationRegistry</text>
+  <rect x="40" y="12100" width="120" height="40" fill="lightblue" stroke="black" stroke-width="1"/>
+  <text x="100" y="12125" text-anchor="middle" font-size="12">DummyBankAdapter</text>
+  <rect x="40" y="12160" width="120" height="40" fill="lightblue" stroke="black" stroke-width="1"/>
+  <text x="100" y="12185" text-anchor="middle" font-size="12">CRMBridge</text>
+  <rect x="40" y="12220" width="120" height="40" fill="lightblue" stroke="black" stroke-width="1"/>
+  <text x="100" y="12245" text-anchor="middle" font-size="12">RegionalRateFeeds</text>
+  <text x="20" y="12300" font-size="16" font-weight="bold">AI</text>
+  <rect x="40" y="12330" width="120" height="40" fill="lightblue" stroke="black" stroke-width="1"/>
+  <text x="100" y="12355" text-anchor="middle" font-size="12">self_diagnose</text>
+  <rect x="40" y="12390" width="120" height="40" fill="lightblue" stroke="black" stroke-width="1"/>
+  <text x="100" y="12415" text-anchor="middle" font-size="12">privacy_guard</text>
+  <rect x="40" y="12450" width="120" height="40" fill="lightblue" stroke="black" stroke-width="1"/>
+  <text x="100" y="12475" text-anchor="middle" font-size="12">ai_autoscale</text>
+  <rect x="40" y="12510" width="120" height="40" fill="lightblue" stroke="black" stroke-width="1"/>
+  <text x="100" y="12535" text-anchor="middle" font-size="12">watcher_notifier</text>
+  <rect x="40" y="12570" width="120" height="40" fill="lightblue" stroke="black" stroke-width="1"/>
+  <text x="100" y="12595" text-anchor="middle" font-size="12">db_integrity.watcher</text>
+  <rect x="40" y="12630" width="120" height="40" fill="lightblue" stroke="black" stroke-width="1"/>
+  <text x="100" y="12655" text-anchor="middle" font-size="12">api_contract.watcher</text>
+  <rect x="40" y="12690" width="120" height="40" fill="lightblue" stroke="black" stroke-width="1"/>
+  <text x="100" y="12715" text-anchor="middle" font-size="12">ai_performance.watcher</text>
+  <text x="20" y="12770" font-size="16" font-weight="bold">Infrastructure</text>
+  <rect x="40" y="12800" width="120" height="40" fill="lightblue" stroke="black" stroke-width="1"/>
+  <text x="100" y="12825" text-anchor="middle" font-size="12">watcher-cron</text>
+  <rect x="40" y="12860" width="120" height="40" fill="lightblue" stroke="black" stroke-width="1"/>
+  <text x="100" y="12885" text-anchor="middle" font-size="12">vercel-promotion</text>
+  <rect x="40" y="12920" width="120" height="40" fill="lightblue" stroke="black" stroke-width="1"/>
+  <text x="100" y="12945" text-anchor="middle" font-size="12">slo-check</text>
+  <rect x="40" y="12980" width="120" height="40" fill="lightblue" stroke="black" stroke-width="1"/>
+  <text x="100" y="13005" text-anchor="middle" font-size="12">release-pr</text>
+  <rect x="40" y="13040" width="120" height="40" fill="lightblue" stroke="black" stroke-width="1"/>
+  <text x="100" y="13065" text-anchor="middle" font-size="12">onboarding</text>
+  <rect x="40" y="13100" width="120" height="40" fill="lightblue" stroke="black" stroke-width="1"/>
+  <text x="100" y="13125" text-anchor="middle" font-size="12">dr-drill</text>
+  <rect x="40" y="13160" width="120" height="40" fill="lightblue" stroke="black" stroke-width="1"/>
+  <text x="100" y="13185" text-anchor="middle" font-size="12">ci</text>
+  <rect x="40" y="13220" width="120" height="40" fill="lightblue" stroke="black" stroke-width="1"/>
+  <text x="100" y="13245" text-anchor="middle" font-size="12">ai-audit</text>
+  <rect x="40" y="13280" width="120" height="40" fill="lightblue" stroke="black" stroke-width="1"/>
+  <text x="100" y="13305" text-anchor="middle" font-size="12">package.json</text>
+  <rect x="40" y="13340" width="120" height="40" fill="lightblue" stroke="black" stroke-width="1"/>
+  <text x="100" y="13365" text-anchor="middle" font-size="12">next.config.js</text>
+  <rect x="40" y="13400" width="120" height="40" fill="lightblue" stroke="black" stroke-width="1"/>
+  <text x="100" y="13425" text-anchor="middle" font-size="12">tailwind.config.js</text>
+  <rect x="40" y="13460" width="120" height="40" fill="lightblue" stroke="black" stroke-width="1"/>
+  <text x="100" y="13485" text-anchor="middle" font-size="12">tsconfig.json</text>
+</svg>
