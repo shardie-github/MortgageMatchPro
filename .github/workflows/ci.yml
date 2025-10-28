@@ -7,8 +7,117 @@ on:
     branches: [ main ]
 
 jobs:
+  # Security and Quality Checks
+  security:
+    runs-on: ubuntu-latest
+    steps:
+    - uses: actions/checkout@v4
+      with:
+        fetch-depth: 0  # Full history for secrets scan
+
+    - name: Setup Node.js
+      uses: actions/setup-node@v4
+      with:
+        node-version: '18'
+        cache: 'npm'
+
+    - name: Install dependencies
+      run: npm ci
+
+    - name: Run secrets scan
+      run: node scripts/secrets-scan.mjs
+      env:
+        SUPABASE_URL: ${{ secrets.SUPABASE_URL }}
+        SUPABASE_SERVICE_KEY: ${{ secrets.SUPABASE_SERVICE_KEY }}
+
+    - name: Upload secrets scan report
+      uses: actions/upload-artifact@v4
+      if: always()
+      with:
+        name: secrets-scan-report
+        path: secrets-scan-report.json
+        retention-days: 30
+
+  # Bundle Size and Performance Checks
+  bundle-check:
+    runs-on: ubuntu-latest
+    steps:
+    - uses: actions/checkout@v4
+
+    - name: Setup Node.js
+      uses: actions/setup-node@v4
+      with:
+        node-version: '18'
+        cache: 'npm'
+
+    - name: Install dependencies
+      run: npm ci
+
+    - name: Build application
+      run: npm run build
+      env:
+        NODE_ENV: production
+        OPENAI_API_KEY: ${{ secrets.OPENAI_API_KEY }}
+        SUPABASE_URL: ${{ secrets.SUPABASE_URL }}
+        SUPABASE_ANON_KEY: ${{ secrets.SUPABASE_ANON_KEY }}
+        SUPABASE_SERVICE_KEY: ${{ secrets.SUPABASE_SERVICE_KEY }}
+
+    - name: Run bundle size check
+      run: node scripts/bundle-report.mjs --check
+
+    - name: Upload bundle analysis report
+      uses: actions/upload-artifact@v4
+      if: always()
+      with:
+        name: bundle-analysis-report
+        path: bundle-analysis-report.json
+        retention-days: 30
+
+  # Database Performance and RLS Checks
+  database-check:
+    runs-on: ubuntu-latest
+    steps:
+    - uses: actions/checkout@v4
+
+    - name: Setup Node.js
+      uses: actions/setup-node@v4
+      with:
+        node-version: '18'
+        cache: 'npm'
+
+    - name: Install dependencies
+      run: npm ci
+
+    - name: Install ts-node
+      run: npm install -g ts-node
+
+    - name: Run database performance check
+      run: node scripts/db-slowquery-check.mjs
+      env:
+        SUPABASE_URL: ${{ secrets.SUPABASE_URL }}
+        SUPABASE_SERVICE_KEY: ${{ secrets.SUPABASE_SERVICE_KEY }}
+
+    - name: Run RLS smoke tests
+      run: npx ts-node scripts/rls-smoke.ts
+      env:
+        SUPABASE_URL: ${{ secrets.SUPABASE_URL }}
+        SUPABASE_ANON_KEY: ${{ secrets.SUPABASE_ANON_KEY }}
+        SUPABASE_SERVICE_KEY: ${{ secrets.SUPABASE_SERVICE_KEY }}
+
+    - name: Upload database reports
+      uses: actions/upload-artifact@v4
+      if: always()
+      with:
+        name: database-reports
+        path: |
+          db-performance-report.json
+          rls-smoke-test-report.json
+        retention-days: 30
+
+  # Main Test Suite
   test:
     runs-on: ubuntu-latest
+    needs: [security, bundle-check]
 
     services:
       postgres:
@@ -82,9 +191,146 @@ jobs:
         path: playwright-report/
         retention-days: 30
 
+  # Health and Integration Checks
+  health-check:
+    runs-on: ubuntu-latest
+    needs: [test, database-check]
+    if: github.ref == 'refs/heads/main'
+
+    steps:
+    - uses: actions/checkout@v4
+
+    - name: Setup Node.js
+      uses: actions/setup-node@v4
+      with:
+        node-version: '18'
+        cache: 'npm'
+
+    - name: Install dependencies
+      run: npm ci
+
+    - name: Build application
+      run: npm run build
+      env:
+        NODE_ENV: production
+        OPENAI_API_KEY: ${{ secrets.OPENAI_API_KEY }}
+        SUPABASE_URL: ${{ secrets.SUPABASE_URL }}
+        SUPABASE_ANON_KEY: ${{ secrets.SUPABASE_ANON_KEY }}
+        SUPABASE_SERVICE_KEY: ${{ secrets.SUPABASE_SERVICE_KEY }}
+
+    - name: Start application
+      run: |
+        npm start &
+        sleep 30
+      env:
+        NODE_ENV: production
+        OPENAI_API_KEY: ${{ secrets.OPENAI_API_KEY }}
+        SUPABASE_URL: ${{ secrets.SUPABASE_URL }}
+        SUPABASE_ANON_KEY: ${{ secrets.SUPABASE_ANON_KEY }}
+        SUPABASE_SERVICE_KEY: ${{ secrets.SUPABASE_SERVICE_KEY }}
+
+    - name: Run health checks
+      run: node scripts/healthcheck.js http://localhost:3000
+
+    - name: Upload health check report
+      uses: actions/upload-artifact@v4
+      if: always()
+      with:
+        name: health-check-report
+        path: health-check-report.json
+        retention-days: 30
+
+  # Performance Load Testing (gated behind label)
+  performance-test:
+    runs-on: ubuntu-latest
+    needs: [test, database-check]
+    if: contains(github.event.pull_request.labels.*.name, 'perf-check')
+
+    steps:
+    - uses: actions/checkout@v4
+
+    - name: Setup Node.js
+      uses: actions/setup-node@v4
+      with:
+        node-version: '18'
+        cache: 'npm'
+
+    - name: Install dependencies
+      run: npm ci
+
+    - name: Build application
+      run: npm run build
+      env:
+        NODE_ENV: production
+        OPENAI_API_KEY: ${{ secrets.OPENAI_API_KEY }}
+        SUPABASE_URL: ${{ secrets.SUPABASE_URL }}
+        SUPABASE_ANON_KEY: ${{ secrets.SUPABASE_ANON_KEY }}
+        SUPABASE_SERVICE_KEY: ${{ secrets.SUPABASE_SERVICE_KEY }}
+
+    - name: Start application
+      run: |
+        npm start &
+        sleep 30
+      env:
+        NODE_ENV: production
+        OPENAI_API_KEY: ${{ secrets.OPENAI_API_KEY }}
+        SUPABASE_URL: ${{ secrets.SUPABASE_URL }}
+        SUPABASE_ANON_KEY: ${{ secrets.SUPABASE_ANON_KEY }}
+        SUPABASE_SERVICE_KEY: ${{ secrets.SUPABASE_SERVICE_KEY }}
+
+    - name: Run performance tests
+      run: |
+        # Install k6
+        sudo apt-key adv --keyserver hkp://keyserver.ubuntu.com:80 --recv-keys C5AD17C747E3415A3642D57D77C6C491D6AC1D69
+        echo "deb https://dl.k6.io/deb stable main" | sudo tee /etc/apt/sources.list.d/k6.list
+        sudo apt-get update
+        sudo apt-get install k6
+        
+        # Run load test
+        k6 run --duration 60s --vus 10 scripts/load-test.js
+
+    - name: Upload performance report
+      uses: actions/upload-artifact@v4
+      if: always()
+      with:
+        name: performance-report
+        path: performance-report.json
+        retention-days: 30
+
+  # Cost Monitoring
+  cost-check:
+    runs-on: ubuntu-latest
+    if: github.ref == 'refs/heads/main'
+    steps:
+    - uses: actions/checkout@v4
+
+    - name: Setup Node.js
+      uses: actions/setup-node@v4
+      with:
+        node-version: '18'
+        cache: 'npm'
+
+    - name: Install dependencies
+      run: npm ci
+
+    - name: Run cost guard
+      run: node scripts/cost-guard.mjs
+      env:
+        SUPABASE_URL: ${{ secrets.SUPABASE_URL }}
+        SUPABASE_SERVICE_KEY: ${{ secrets.SUPABASE_SERVICE_KEY }}
+
+    - name: Upload cost report
+      uses: actions/upload-artifact@v4
+      if: always()
+      with:
+        name: cost-guard-report
+        path: cost-guard-report.json
+        retention-days: 30
+
+  # Build and Deploy
   build:
     runs-on: ubuntu-latest
-    needs: test
+    needs: [test, database-check, bundle-check]
 
     steps:
     - uses: actions/checkout@v4
@@ -116,7 +362,7 @@ jobs:
 
   deploy:
     runs-on: ubuntu-latest
-    needs: [test, build]
+    needs: [build, health-check]
     if: github.ref == 'refs/heads/main'
 
     steps:

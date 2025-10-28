@@ -82,7 +82,10 @@
     "test:ci": "jest --ci --coverage --config tests/jest.config.js",
     "performance:bundle": "node scripts/bundle-optimizer.mjs",
     "performance:all": "npm run performance:profile && npm run performance:bundle",
-    "build:optimize": "npm run build && npm run performance:bundle"
+    "build:optimize": "npm run build && npm run performance:bundle",
+    "bundle:analyze": "node scripts/bundle-report.mjs",
+    "bundle:check": "node scripts/bundle-report.mjs --check",
+    "bundle:budget": "node scripts/bundle-report.mjs --budget"
   },
   "dependencies": {
     "@hookform/resolvers": "^3.3.2",
@@ -195,6 +198,7 @@
     "preset": "react-native"
   },
   "engines": {
-    "node": ">=18.18 <23"
+    "node": ">=18.18.0 <20.0.0",
+    "npm": ">=8.0.0"
   }
 }
