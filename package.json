@@ -85,7 +85,13 @@
     "build:optimize": "npm run build && npm run performance:bundle",
     "bundle:analyze": "node scripts/bundle-report.mjs",
     "bundle:check": "node scripts/bundle-report.mjs --check",
-    "bundle:budget": "node scripts/bundle-report.mjs --budget"
+    "bundle:budget": "node scripts/bundle-report.mjs --budget",
+    "migrate:emc": "npx ts-node scripts/migrate-emc.ts",
+    "dr:rehearsal": "npx ts-node scripts/clone-and-restore-check.ts",
+    "slo:check": "npx ts-node scripts/slo-checker.ts",
+    "feature-flags:init": "node -e \"const { initializeFeatureFlags } = require('./lib/feature-flags.ts'); initializeFeatureFlags({ supabaseUrl: process.env.SUPABASE_URL, supabaseAnonKey: process.env.SUPABASE_ANON_KEY });\"",
+    "maintenance:enable": "node -e \"const { getFeatureFlagsClient } = require('./lib/feature-flags.ts'); getFeatureFlagsClient().isEnabled('maintenance_mode').then(console.log);\"",
+    "maintenance:disable": "node -e \"console.log('Use Supabase dashboard to disable maintenance_mode flag');\""
   },
   "dependencies": {
     "@hookform/resolvers": "^3.3.2",
