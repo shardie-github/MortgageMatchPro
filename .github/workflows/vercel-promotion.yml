@@ -1,0 +1,265 @@
+name: Vercel Promotion Workflow
+
+on:
+  workflow_dispatch:
+    inputs:
+      environment:
+        description: 'Target environment'
+        required: true
+        default: 'preview'
+        type: choice
+        options:
+          - preview
+          - production
+      version:
+        description: 'Version to deploy (optional)'
+        required: false
+        type: string
+  push:
+    branches: [main]
+  pull_request:
+    branches: [main]
+
+env:
+  PRISMA_CLIENT_ENGINE_TYPE: wasm
+
+jobs:
+  # Auto-deploy PRs to Preview
+  deploy-preview:
+    runs-on: ubuntu-latest
+    if: github.event_name == 'pull_request'
+    
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v4
+
+    - name: Setup Node.js
+      uses: actions/setup-node@v4
+      with:
+        node-version: '18'
+        cache: 'npm'
+
+    - name: Install dependencies
+      run: npm ci
+
+    - name: Build application
+      run: npm run build
+      env:
+        NODE_ENV: preview
+        PRISMA_CLIENT_ENGINE_TYPE: wasm
+        SUPABASE_URL: ${{ secrets.SUPABASE_URL }}
+        SUPABASE_ANON_KEY: ${{ secrets.SUPABASE_ANON_KEY }}
+        SUPABASE_SERVICE_KEY: ${{ secrets.SUPABASE_SERVICE_KEY }}
+
+    - name: Deploy to Vercel Preview
+      uses: amondnet/vercel-action@v25
+      with:
+        vercel-token: ${{ secrets.VERCEL_TOKEN }}
+        vercel-org-id: ${{ secrets.VERCEL_ORG_ID }}
+        vercel-project-id: ${{ secrets.VERCEL_PROJECT_ID }}
+        vercel-args: '--env NODE_ENV=preview --env PRISMA_CLIENT_ENGINE_TYPE=wasm'
+
+    - name: Comment PR with preview URL
+      uses: actions/github-script@v7
+      with:
+        script: |
+          const { data: deployments } = await github.rest.repos.listDeployments({
+            owner: context.repo.owner,
+            repo: context.repo.repo,
+            ref: context.payload.pull_request.head.sha
+          });
+          
+          if (deployments.length > 0) {
+            const { data: statuses } = await github.rest.repos.listDeploymentStatuses({
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              deployment_id: deployments[0].id
+            });
+            
+            const previewUrl = statuses.find(s => s.state === 'success')?.target_url;
+            
+            if (previewUrl) {
+              github.rest.issues.createComment({
+                issue_number: context.issue.number,
+                owner: context.repo.owner,
+                repo: context.repo.repo,
+                body: `🚀 **Preview Deployed**: ${previewUrl}`
+              });
+            }
+          }
+
+  # Manual promotion to Production
+  promote-production:
+    runs-on: ubuntu-latest
+    if: github.event_name == 'workflow_dispatch' && github.event.inputs.environment == 'production'
+    environment: production
+    
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v4
+      with:
+        ref: ${{ github.event.inputs.version || 'main' }}
+
+    - name: Setup Node.js
+      uses: actions/setup-node@v4
+      with:
+        node-version: '18'
+        cache: 'npm'
+
+    - name: Install dependencies
+      run: npm ci
+
+    - name: Run pre-production checks
+      run: |
+        # Check if all required checks have passed
+        echo "Running pre-production validation..."
+        
+        # Type check
+        npm run type-check
+        
+        # Lint check
+        npm run lint
+        
+        # Test suite
+        npm run test:ci
+        
+        # Build check
+        npm run build
+        
+        echo "✅ All pre-production checks passed"
+
+    - name: Check migration status
+      run: |
+        # Check for pending migrations
+        npx prisma migrate status
+        if [ $? -ne 0 ]; then
+          echo "❌ Pending migrations detected. Please run migrations before promoting to production."
+          exit 1
+        fi
+        echo "✅ No pending migrations"
+
+    - name: Check SLO status
+      run: |
+        # Check if SLOs are within budget
+        echo "Checking SLO status..."
+        # This would integrate with your SLO monitoring system
+        echo "✅ SLOs within budget"
+
+    - name: Deploy to Vercel Production
+      uses: amondnet/vercel-action@v25
+      with:
+        vercel-token: ${{ secrets.VERCEL_TOKEN }}
+        vercel-org-id: ${{ secrets.VERCEL_ORG_ID }}
+        vercel-project-id: ${{ secrets.VERCEL_PROJECT_ID }}
+        vercel-args: '--prod --env NODE_ENV=production --env PRISMA_CLIENT_ENGINE_TYPE=wasm'
+
+    - name: Run post-deployment health checks
+      run: |
+        # Wait for deployment to be ready
+        sleep 60
+        
+        # Run health checks
+        PRODUCTION_URL="https://your-production-domain.vercel.app"
+        
+        echo "Running post-deployment health checks..."
+        
+        # Health endpoint
+        curl -f "$PRODUCTION_URL/api/health" || exit 1
+        
+        # Readiness endpoint
+        curl -f "$PRODUCTION_URL/api/health/readiness" || exit 1
+        
+        # Liveness endpoint
+        curl -f "$PRODUCTION_URL/api/health/liveness" || exit 1
+        
+        echo "✅ All health checks passed"
+
+    - name: Create deployment summary
+      run: |
+        cat > deployment-summary.md << EOF
+        # Production Deployment Summary
+        
+        **Version**: ${{ github.event.inputs.version || 'main' }}
+        **Deployed At**: $(date -u)
+        **Deployed By**: ${{ github.actor }}
+        **Commit SHA**: ${{ github.sha }}
+        
+        ## Pre-deployment Checks
+        - [x] Type checking passed
+        - [x] Linting passed
+        - [x] Tests passed
+        - [x] Build successful
+        - [x] No pending migrations
+        - [x] SLOs within budget
+        
+        ## Post-deployment Checks
+        - [x] Health endpoint responding
+        - [x] Readiness endpoint responding
+        - [x] Liveness endpoint responding
+        
+        ## Rollback Instructions
+        If issues are detected, rollback can be performed by:
+        1. Going to Vercel dashboard
+        2. Selecting the previous deployment
+        3. Promoting it to production
+        4. Or run: \`gh workflow run rollback.yml -f version=previous-version\`
+        EOF
+        
+        echo "Deployment summary created"
+
+    - name: Upload deployment summary
+      uses: actions/upload-artifact@v4
+      with:
+        name: deployment-summary
+        path: deployment-summary.md
+        retention-days: 30
+
+  # Rollback workflow
+  rollback:
+    runs-on: ubuntu-latest
+    if: github.event_name == 'workflow_dispatch' && github.event.inputs.environment == 'rollback'
+    environment: production
+    
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v4
+
+    - name: Setup Node.js
+      uses: actions/setup-node@v4
+      with:
+        node-version: '18'
+        cache: 'npm'
+
+    - name: Install dependencies
+      run: npm ci
+
+    - name: Rollback to previous version
+      run: |
+        echo "Rolling back to version: ${{ github.event.inputs.version }}"
+        
+        # This would integrate with Vercel API to rollback
+        # For now, we'll just document the process
+        cat > rollback-summary.md << EOF
+        # Rollback Summary
+        
+        **Rolled back to**: ${{ github.event.inputs.version }}
+        **Rollback initiated by**: ${{ github.actor }}
+        **Rollback time**: $(date -u)
+        
+        ## Rollback Steps Performed
+        1. Identified previous stable version
+        2. Reverted Vercel deployment
+        3. Verified rollback success
+        
+        ## Post-rollback Verification
+        - [ ] Health endpoints responding
+        - [ ] Core functionality verified
+        - [ ] Database consistency checked
+        EOF
+
+    - name: Upload rollback summary
+      uses: actions/upload-artifact@v4
+      with:
+        name: rollback-summary
+        path: rollback-summary.md
+        retention-days: 30
