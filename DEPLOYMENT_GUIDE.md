@@ -4,6 +4,18 @@
 
 This guide covers deploying MortgageMatchPro in production using Docker containers with multi-service orchestration, load balancing, and monitoring.
 
+## New Reliability & Security Features
+
+This deployment includes comprehensive reliability, security, speed, and cost-efficiency enhancements:
+
+- **Bundle Size Monitoring**: Automated bundle size checks with budgets
+- **Secrets Scanning**: Automated detection of leaked secrets
+- **Database Performance**: Query performance monitoring and optimization
+- **RLS Security**: Row-level security smoke tests
+- **Health Monitoring**: Comprehensive health checks and self-tests
+- **Cost Controls**: Automated cost monitoring and alerting
+- **Performance Testing**: Load testing with k6 integration
+
 ## Prerequisites
 
 - Docker Engine 20.10+
@@ -11,6 +23,63 @@ This guide covers deploying MortgageMatchPro in production using Docker containe
 - 8GB+ RAM available
 - 50GB+ disk space
 - Domain name (optional, for SSL)
+- Node.js 18.18.0+ (for local development)
+- npm 8.0.0+
+
+## Pre-Deployment Checks
+
+Before deploying, ensure all checks pass:
+
+### 1. Bundle Size Check
+```bash
+npm run bundle:check
+```
+
+### 2. Secrets Scan
+```bash
+node scripts/secrets-scan.mjs
+```
+
+### 3. Database Performance Check
+```bash
+node scripts/db-slowquery-check.mjs
+```
+
+### 4. RLS Security Test
+```bash
+npx ts-node scripts/rls-smoke.ts
+```
+
+### 5. Health Check
+```bash
+node scripts/healthcheck.js http://localhost:3000
+```
+
+### 6. Cost Guard
+```bash
+node scripts/cost-guard.mjs
+```
+
+## Bypassing Budgets (Emergency Only)
+
+In exceptional circumstances, budgets can be bypassed with approval:
+
+### 1. Bundle Size Budget Bypass
+- Add `bypass-bundle-budget` label to PR
+- Get approval from performance team
+- Document justification in PR description
+
+### 2. Performance Budget Bypass
+- Add `bypass-perf-budget` label to PR
+- Get approval from performance team
+- Document justification in PR description
+
+### 3. Security Check Bypass
+- Add `bypass-security-check` label to PR
+- Get approval from security team
+- Document justification in PR description
+
+**Note**: Bypassing budgets should be rare and well-justified. Consider alternative solutions first.
 
 ## Environment Setup
 
