@@ -1,0 +1,162 @@
+{
+  "project_ref": "ghqyxhbyyirveptgwoqm",
+  "embeddings_table": "ai_embeddings",
+  "models": {
+    "chat": "gpt-4-turbo-preview",
+    "embedding": "text-embedding-3-small",
+    "analysis": "gpt-4-turbo-preview"
+  },
+  "refresh_interval_days": 7,
+  "health_metrics": {
+    "enabled": true,
+    "collection_interval_minutes": 15,
+    "retention_days": 30,
+    "alert_thresholds": {
+      "error_rate_percent": 5,
+      "response_time_ms": 200,
+      "memory_usage_mb": 512,
+      "deploy_failures_count": 3
+    }
+  },
+  "insights": {
+    "enabled": true,
+    "analysis_triggers": [
+      "pull_request_merged",
+      "deployment_completed",
+      "performance_degradation",
+      "error_spike"
+    ],
+    "confidence_threshold": 0.7,
+    "auto_comment_prs": true
+  },
+  "embeddings": {
+    "enabled": true,
+    "namespaces": {
+      "documentation": {
+        "enabled": true,
+        "refresh_interval_days": 7,
+        "content_types": ["markdown", "api_docs", "readme"]
+      },
+      "product": {
+        "enabled": true,
+        "refresh_interval_days": 3,
+        "content_types": ["api_routes", "components", "features"]
+      },
+      "user_data": {
+        "enabled": false,
+        "refresh_interval_days": 1,
+        "content_types": ["feedback", "analytics", "behavior"]
+      }
+    },
+    "search": {
+      "default_namespace": "documentation",
+      "max_results": 10,
+      "similarity_threshold": 0.7,
+      "hybrid_search": true
+    }
+  },
+  "future_runtime": {
+    "edge_runtime": {
+      "enabled": true,
+      "check_interval_days": 1,
+      "blocking_dependencies": [
+        "sharp", "canvas", "puppeteer", "playwright",
+        "sqlite3", "mysql2", "pg-native", "redis"
+      ]
+    },
+    "wasm_workers": {
+      "enabled": true,
+      "check_interval_days": 1,
+      "prisma_engine": "wasm"
+    },
+    "hydrogen_oxygen": {
+      "enabled": true,
+      "check_interval_days": 7,
+      "bridge_required": true
+    }
+  },
+  "autoscaling": {
+    "enabled": true,
+    "cost_threshold_percent": 20,
+    "usage_metrics": [
+      "api_requests_per_minute",
+      "database_connections",
+      "memory_usage",
+      "response_time"
+    ],
+    "scaling_triggers": {
+      "scale_up": {
+        "cpu_percent": 80,
+        "memory_percent": 85,
+        "response_time_ms": 500
+      },
+      "scale_down": {
+        "cpu_percent": 30,
+        "memory_percent": 40,
+        "response_time_ms": 100
+      }
+    }
+  },
+  "privacy": {
+    "enabled": true,
+    "pii_detection": true,
+    "data_retention_days": 90,
+    "anonymization": true,
+    "compliance": {
+      "gdpr": true,
+      "ccpa": true,
+      "pipeda": true
+    }
+  },
+  "notifications": {
+    "github_issues": {
+      "enabled": true,
+      "labels": ["ai-health", "automated", "critical"],
+      "assignees": []
+    },
+    "github_discussions": {
+      "enabled": true,
+      "category": "cost-alerts",
+      "tags": ["cost", "optimization", "ai-generated"]
+    },
+    "slack": {
+      "enabled": false,
+      "webhook_url": "",
+      "channels": {
+        "alerts": "#ai-alerts",
+        "insights": "#ai-insights"
+      }
+    }
+  },
+  "monitoring": {
+    "log_level": "info",
+    "metrics_retention_days": 90,
+    "alert_cooldown_minutes": 30,
+    "dashboard_url": "https://supabase.com/dashboard/project/ghqyxhbyyirveptgwoqm/editor/ai_health_metrics"
+  },
+  "integrations": {
+    "cursor_ai": {
+      "enabled": true,
+      "context_window": 8000,
+      "auto_suggest": true
+    },
+    "openai_sdk": {
+      "enabled": true,
+      "rate_limit_rpm": 1000,
+      "timeout_ms": 30000
+    },
+    "vercel_ai_sdk": {
+      "enabled": true,
+      "streaming": true,
+      "cache_ttl_seconds": 300
+    },
+    "supabase_edge": {
+      "enabled": true,
+      "functions": [
+        "search-ai",
+        "health-monitor",
+        "cost-analyzer"
+      ]
+    }
+  }
+}

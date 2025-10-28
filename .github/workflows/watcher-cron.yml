@@ -1,0 +1,180 @@
+name: Autonomous Regression Watchers
+
+on:
+  schedule:
+    # Run nightly at 3 AM UTC
+    - cron: '0 3 * * *'
+  workflow_dispatch:
+    inputs:
+      watcher_type:
+        description: 'Type of watcher to run'
+        required: false
+        default: 'all'
+        type: choice
+        options:
+          - all
+          - db_integrity
+          - api_contract
+          - ai_performance
+
+env:
+  NODE_VERSION: '18'
+  SUPABASE_URL: ${{ secrets.SUPABASE_URL }}
+  SUPABASE_SERVICE_KEY: ${{ secrets.SUPABASE_SERVICE_KEY }}
+  OPENAI_API_KEY: ${{ secrets.OPENAI_API_KEY }}
+  GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
+jobs:
+  db-integrity-watcher:
+    name: Database Integrity Watcher
+    runs-on: ubuntu-latest
+    if: github.event.inputs.watcher_type == 'all' || github.event.inputs.watcher_type == 'db_integrity'
+    timeout-minutes: 30
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: ${{ env.NODE_VERSION }}
+          cache: 'npm'
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Run Database Integrity Check
+        run: npx ts-node watchers/db_integrity.watcher.ts
+        env:
+          SUPABASE_URL: ${{ env.SUPABASE_URL }}
+          SUPABASE_SERVICE_KEY: ${{ env.SUPABASE_SERVICE_KEY }}
+          GITHUB_TOKEN: ${{ env.GITHUB_TOKEN }}
+          GITHUB_REPOSITORY_OWNER: ${{ github.repository_owner }}
+          GITHUB_REPOSITORY_NAME: ${{ github.event.repository.name }}
+
+  api-contract-watcher:
+    name: API Contract Watcher
+    runs-on: ubuntu-latest
+    if: github.event.inputs.watcher_type == 'all' || github.event.inputs.watcher_type == 'api_contract'
+    timeout-minutes: 20
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: ${{ env.NODE_VERSION }}
+          cache: 'npm'
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Run API Contract Check
+        run: npx ts-node watchers/api_contract.watcher.ts
+        env:
+          SUPABASE_URL: ${{ env.SUPABASE_URL }}
+          SUPABASE_SERVICE_KEY: ${{ env.SUPABASE_SERVICE_KEY }}
+          GITHUB_TOKEN: ${{ env.GITHUB_TOKEN }}
+          GITHUB_REPOSITORY_OWNER: ${{ github.repository_owner }}
+          GITHUB_REPOSITORY_NAME: ${{ github.event.repository.name }}
+
+  ai-performance-watcher:
+    name: AI Performance Watcher
+    runs-on: ubuntu-latest
+    if: github.event.inputs.watcher_type == 'all' || github.event.inputs.watcher_type == 'ai_performance'
+    timeout-minutes: 25
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: ${{ env.NODE_VERSION }}
+          cache: 'npm'
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Run AI Performance Check
+        run: npx ts-node watchers/ai_performance.watcher.ts
+        env:
+          SUPABASE_URL: ${{ env.SUPABASE_URL }}
+          SUPABASE_SERVICE_KEY: ${{ env.SUPABASE_SERVICE_KEY }}
+          OPENAI_API_KEY: ${{ env.OPENAI_API_KEY }}
+          GITHUB_TOKEN: ${{ env.GITHUB_TOKEN }}
+          GITHUB_REPOSITORY_OWNER: ${{ github.repository_owner }}
+          GITHUB_REPOSITORY_NAME: ${{ github.event.repository.name }}
+
+  notify-watcher-results:
+    name: Notify Watcher Results
+    runs-on: ubuntu-latest
+    needs: [db-integrity-watcher, api-contract-watcher, ai-performance-watcher]
+    if: always()
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: ${{ env.NODE_VERSION }}
+          cache: 'npm'
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Generate Watcher Summary
+        run: |
+          npx ts-node -e "
+          const { WatcherNotifier } = require('./watchers/watcher_notifier.ts');
+          const notifier = new WatcherNotifier();
+          notifier.generateSummary({
+            db_integrity: '${{ needs.db-integrity-watcher.result }}',
+            api_contract: '${{ needs.api-contract-watcher.result }}',
+            ai_performance: '${{ needs.ai-performance-watcher.result }}'
+          }).then(summary => {
+            console.log('WATCHER_SUMMARY<<EOF');
+            console.log(JSON.stringify(summary, null, 2));
+            console.log('EOF');
+          });
+          "
+
+      - name: Create Summary Issue
+        if: ${{ needs.db-integrity-watcher.result == 'failure' || needs.api-contract-watcher.result == 'failure' || needs.ai-performance-watcher.result == 'failure' }}
+        uses: actions/github-script@v7
+        with:
+          script: |
+            const summary = `${{ steps.generate-summary.outputs.WATCHER_SUMMARY }}`;
+            const parsed = JSON.parse(summary);
+            
+            const issueBody = `## 🔍 Autonomous Watcher Report
+            
+            **Generated:** ${new Date().toISOString()}
+            
+            ### Watcher Results
+            - **Database Integrity:** ${parsed.db_integrity}
+            - **API Contract:** ${parsed.api_contract}
+            - **AI Performance:** ${parsed.ai_performance}
+            
+            ### Issues Found
+            ${parsed.issues?.map(issue => `- ${issue}`).join('\n') || 'No issues detected'}
+            
+            ### Recommendations
+            ${parsed.recommendations?.map(rec => `- ${rec}`).join('\n') || 'No recommendations'}
+            
+            ---
+            *This report was generated by the Autonomous Watcher system.*`;
+            
+            github.rest.issues.create({
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              title: `🔍 Watcher Report - ${new Date().toISOString().split('T')[0]}`,
+              body: issueBody,
+              labels: ['watcher-report', 'automated', 'regression']
+            });
